@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pytest
 
-from clippings.adapters.clippings import MockClippingsReader
+from clippings.adapters.books import MockClippingsReader
 from clippings.domain.books import (
     ClippingImportCandidateDTO,
     ClippingsReader,

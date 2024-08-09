@@ -53,6 +53,25 @@ class BooksStorage(abc.ABC):
         pass
 
 
+@dataclass(frozen=True)
+class FinderQuery:
+    start: int = 0
+    limit: int | None = 10
+
+
+_default_query = FinderQuery()
+
+
+class BooksFinderABC(abc.ABC):
+    @abc.abstractmethod
+    async def find(self, query: FinderQuery = _default_query) -> list[Book]:
+        pass
+
+    @abc.abstractmethod
+    async def count(self, query: FinderQuery = _default_query) -> int:
+        pass
+
+
 @dataclass
 class ClippingImportCandidateDTO:
     book_title: str
@@ -76,4 +95,56 @@ class ImportClippingsUseCase:
         self._reader = reader
 
     async def execute(self) -> None:
+        pass
+
+
+@dataclass
+class BookOnPageDTO:
+    book_id: str
+    cover_url: str
+    title: str
+    author: str
+    clippings_count: int
+    last_clipping_added_at: str
+    rating: int
+    review: str
+
+
+@dataclass
+class ButtonDTO:
+    label: str
+    url: str
+
+
+@dataclass
+class SelectOptionDTO:
+    label: str
+    value: str
+
+
+@dataclass
+class SelectDTO:
+    label: str
+    options: list[SelectOptionDTO]
+
+
+@dataclass
+class BooksPageDTO:
+    books: list[BookOnPageDTO]
+    page: int
+    total_pages: int
+    import_button: ButtonDTO
+    add_book_button: ButtonDTO
+    sort_select: SelectDTO
+
+
+class BooksPresenterABC(abc.ABC):
+    @abc.abstractmethod
+    async def for_page(self, page: int, on_page: int) -> BooksPageDTO:
+        pass
+
+
+class BooksPageHtmlRenderedABC(abc.ABC):
+    @abc.abstractmethod
+    async def render(self, dto: BooksPageDTO) -> str:
         pass
