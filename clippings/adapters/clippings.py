@@ -2,40 +2,36 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from clippings.domain.clippings import (
-    Clipping,
-    ClippingFilter,
+from clippings.domain.books import (
+    Book,
+    BooksStorage,
+    ClippingImportCandidateDTO,
     ClippingsReader,
-    ClippingsStorage,
 )
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator, AsyncIterator
+    from collections.abc import AsyncGenerator
 
 
 class MockClippingsReader(ClippingsReader):
-    def __init__(self, clippings: list[Clipping]) -> None:
+    def __init__(self, clippings: list[ClippingImportCandidateDTO]) -> None:
         self._clippings = clippings
 
-    async def read(self) -> AsyncGenerator[Clipping, None]:
+    async def read(self) -> AsyncGenerator[ClippingImportCandidateDTO, None]:
         for clipping in self._clippings:
             yield clipping
 
 
-class MockClippingsStorage(ClippingsStorage):
+class MockBooksStorage(BooksStorage):
     def __init__(self) -> None:
-        self._clippings: dict[str, Clipping] = {}
+        self._books: dict[str, Book] = {}
 
-    async def get_many(self, filter: ClippingFilter) -> list[Clipping]:
-        start = filter.start
-        end = start + filter.limit
-        clippings = list(self._clippings.values())
-        clippings.sort(key=lambda c: (c.created_at, c.id), reverse=True)
-        return clippings[start:end]
+    async def get(self, id: str) -> Book | None:
+        return self._books.get(id)
 
-    async def add(self, clipping: Clipping) -> None:
-        self._clippings[clipping.id] = clipping
+    async def add(self, book: Book) -> None:
+        self._books[book.id] = book
 
-    async def extend(self, clippings: AsyncIterator[Clipping]) -> None:
-        async for clipping in clippings:
-            await self.add(clipping)
+    async def extend(self, books: list[Book]) -> None:
+        for book in books:
+            await self.add(book)

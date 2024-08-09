@@ -1,25 +1,51 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from datetime import datetime
 
 import pytest
 
 from clippings.adapters.clippings import MockClippingsReader
-
-if TYPE_CHECKING:
-    from clippings.domain.clippings import Clipping, ClippingsReader
+from clippings.domain.books import (
+    ClippingImportCandidateDTO,
+    ClippingsReader,
+    ClippingType,
+)
 
 
 @pytest.fixture()
 def make_sut():
-    def _make_sut(clippings: list[Clipping]) -> ClippingsReader:
+    def _make_sut(clippings: list[ClippingImportCandidateDTO]) -> ClippingsReader:
         return MockClippingsReader(clippings)
 
     return _make_sut
 
 
-async def test_can_read_from_reader(make_sut, mother):
-    clippings = [mother.clipping(id=f"clipping:{i}") for i in range(3)]
+@pytest.fixture()
+def make_clipping_import_candidate_dto():
+    def maker(
+        book_title: str = "The Book",
+        book_author: str = "The Author",
+        page: int = 1,
+        location: tuple[int, int] = (10, 22),
+        type: ClippingType = ClippingType.HIGHLIGHT,
+        content: str = "The Content",
+        added_at: datetime = datetime(2024, 8, 9),  # noqa: B008
+    ) -> ClippingImportCandidateDTO:
+        return ClippingImportCandidateDTO(
+            book_title=book_title,
+            book_author=book_author,
+            page=page,
+            location=location,
+            type=type,
+            content=content,
+            added_at=added_at,
+        )
+
+    return maker
+
+
+async def test_can_read_from_reader(make_sut, make_clipping_import_candidate_dto):
+    clippings = [make_clipping_import_candidate_dto() for _ in range(3)]
     sut = make_sut(clippings)
 
     result = [item async for item in sut.read()]
