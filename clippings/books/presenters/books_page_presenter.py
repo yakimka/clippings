@@ -1,74 +1,55 @@
 from __future__ import annotations
 
-from pathlib import Path
-from typing import TYPE_CHECKING
+import abc
+from dataclasses import dataclass
 
 from jinja2 import Template
 
-from clippings.domain.books import (
-    Book,
-    BookOnPageDTO,
-    BooksFinderABC,
-    BooksPageDTO,
-    BooksPageHtmlRenderedABC,
-    BooksPresenterABC,
-    BooksStorage,
-    ButtonDTO,
-    ClippingImportCandidateDTO,
-    ClippingsReader,
-    FinderQuery,
-    SelectDTO,
-    SelectOptionDTO,
-)
-
-if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator
+from clippings.books.ports import BooksFinderABC, FinderQuery
+from clippings.books.presenters import TEMPLATES_DIR
 
 
-class MockClippingsReader(ClippingsReader):
-    def __init__(self, clippings: list[ClippingImportCandidateDTO]) -> None:
-        self._clippings = clippings
-
-    async def read(self) -> AsyncGenerator[ClippingImportCandidateDTO, None]:
-        for clipping in self._clippings:
-            yield clipping
-
-
-class MockBooksStorage(BooksStorage):
-    def __init__(self) -> None:
-        self._books: dict[str, Book] = {}
-
-    async def get(self, id: str) -> Book | None:
-        return self._books.get(id)
-
-    async def add(self, book: Book) -> None:
-        self._books[book.id] = book
-
-    async def extend(self, books: list[Book]) -> None:
-        for book in books:
-            await self.add(book)
+@dataclass
+class BookOnPageDTO:
+    book_id: str
+    cover_url: str
+    title: str
+    author: str
+    clippings_count: int
+    last_clipping_added_at: str
+    rating: int
+    review: str
 
 
-_default_query = FinderQuery()
+@dataclass
+class ButtonDTO:
+    label: str
+    url: str
 
 
-class MockBooksFinder(BooksFinderABC):
-    def __init__(self, books_map: dict[str, Book] | None = None) -> None:
-        self._books: dict[str, Book] = {} if books_map is None else books_map
-
-    async def find(self, query: FinderQuery = _default_query) -> list[Book]:
-        books = sorted(self._books.values(), key=lambda b: (b.title, b.id))
-        start = query.start
-        if query.limit is None:
-            return books[start:]
-        end = start + query.limit
-        return books[start:end]
-
-    async def count(self, query: FinderQuery = _default_query) -> int:  # noqa: U100
-        return len(await self.find(FinderQuery(start=0, limit=None)))
+@dataclass
+class SelectOptionDTO:
+    label: str
+    value: str
 
 
-class BooksPresenter(BooksPresenterABC):
+@dataclass
+class SelectDTO:
+    label: str
+    options: list[SelectOptionDTO]
+
+
+@dataclass
+class BooksPageDTO:
+    books: list[BookOnPageDTO]
+    page: int
+    total_pages: int
+    import_button: ButtonDTO
+    add_book_button: ButtonDTO
+    sort_select: SelectDTO
+
+
+class BooksPresenter:
     def __init__(self, finder: BooksFinderABC) -> None:
         self._finder = finder
 
@@ -119,10 +100,15 @@ class BooksPresenter(BooksPresenterABC):
         )
 
 
+class BooksPageHtmlRenderedABC(abc.ABC):
+    @abc.abstractmethod
+    async def render(self, dto: BooksPageDTO) -> str:
+        pass
+
+
 class BooksPageHtmlRendered(BooksPageHtmlRenderedABC):
     def __init__(self) -> None:
-        base_path = Path(__file__).parent
-        self._template = (base_path / "books_page.html").read_text()
+        self._template = (TEMPLATES_DIR / "books_page.html").read_text()
 
     async def render(self, dto: BooksPageDTO) -> str:
         template = Template(self._template)

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from clippings.domain.books import Author, Book, Clipping, ClippingType
+from clippings.books.entities import Author, Book, Clipping, ClippingType
 
 
 class ObjectMother:  # noqa: PIE798

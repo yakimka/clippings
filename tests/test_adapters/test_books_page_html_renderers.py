@@ -1,17 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import pytest
 
-from clippings.adapters.books import (
+from clippings.books.adapters.finders import MockBooksFinder
+from clippings.books.presenters.books_page_presenter import (
     BooksPageHtmlRendered,
+    BooksPageHtmlRenderedABC,
     BooksPresenter,
-    MockBooksFinder,
 )
-
-if TYPE_CHECKING:
-    from clippings.domain.books import BooksPageHtmlRenderedABC
 
 
 @pytest.fixture()

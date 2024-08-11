@@ -1,20 +1,21 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
-from clippings.adapters.books import MockClippingsReader
-from clippings.domain.books import (
-    ClippingImportCandidateDTO,
-    ClippingsReader,
-    ClippingType,
-)
+from clippings.books.adapters.readers import MockClippingsReader
+from clippings.books.dtos import ClippingImportCandidateDTO
+from clippings.books.entities import ClippingType
+
+if TYPE_CHECKING:
+    from clippings.books.ports import ClippingsReaderABC
 
 
 @pytest.fixture()
 def make_sut():
-    def _make_sut(clippings: list[ClippingImportCandidateDTO]) -> ClippingsReader:
+    def _make_sut(clippings: list[ClippingImportCandidateDTO]) -> ClippingsReaderABC:
         return MockClippingsReader(clippings)
 
     return _make_sut

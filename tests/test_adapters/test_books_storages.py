@@ -4,15 +4,15 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from clippings.adapters.books import MockBooksStorage
+from clippings.books.adapters.storages import MockBooksStorage
 
 if TYPE_CHECKING:
-    from clippings.domain.books import BooksStorage
+    from clippings.books.ports import BooksStorageABC
 
 
 @pytest.fixture()
 def make_sut():
-    def _make_sut() -> BooksStorage:
+    def _make_sut() -> BooksStorageABC:
         return MockBooksStorage()
 
     return _make_sut

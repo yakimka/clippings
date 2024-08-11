@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 from random import shuffle  # noqa: DUO102
+from typing import TYPE_CHECKING
 
 import pytest
 
-from clippings.adapters.books import MockBooksFinder
-from clippings.domain.books import Book, BooksFinderABC, FinderQuery
+from clippings.books.adapters.finders import MockBooksFinder
+from clippings.books.ports import BooksFinderABC, FinderQuery
+
+if TYPE_CHECKING:
+    from clippings.books.entities import Book
 
 
 @pytest.fixture()

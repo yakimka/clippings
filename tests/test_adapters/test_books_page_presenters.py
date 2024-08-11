@@ -1,12 +1,22 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import pytest
 
-from clippings.adapters.books import BooksPresenter, MockBooksFinder
-from clippings.domain.books import Book, BookOnPageDTO, BooksPresenterABC
+from clippings.books.adapters.finders import MockBooksFinder
+from clippings.books.presenters.books_page_presenter import (
+    BookOnPageDTO,
+    BooksPresenter,
+)
+
+if TYPE_CHECKING:
+    from clippings.books.entities import Book
 
 
 @pytest.fixture()
 def make_sut():
-    def _make_sut(books: list[Book] | None = None) -> BooksPresenterABC:
+    def _make_sut(books: list[Book] | None = None) -> BooksPresenter:
         books_map = {book.id: book for book in books or []}
         finder = MockBooksFinder(books_map)
         return BooksPresenter(finder)
