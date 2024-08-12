@@ -9,8 +9,8 @@ if TYPE_CHECKING:
 
 
 class MockBooksStorage(BooksStorageABC):
-    def __init__(self) -> None:
-        self._books: dict[str, Book] = {}
+    def __init__(self, books_map: dict[str, Book] | None = None) -> None:
+        self._books: dict[str, Book] = {} if books_map is None else books_map
 
     async def get(self, id: str) -> Book | None:
         return self._books.get(id)

@@ -14,3 +14,9 @@ class PaginationItemDTO:
     number: int
     current: bool
     url: str
+
+
+@dataclass
+class NotFoundDTO:
+    page_title: str
+    message: str
