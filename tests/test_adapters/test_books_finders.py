@@ -87,6 +87,6 @@ async def test_by_default_return_in_order_by_title(make_sut, mother):
 async def test_can_get_count_of_books(make_sut, make_books):
     sut = make_sut(make_books(42))
 
-    result = await sut.count()
+    result = await sut.count(FinderQuery(start=0, limit=None))
 
     assert result == 42

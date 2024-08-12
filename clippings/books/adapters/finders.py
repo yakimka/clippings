@@ -23,5 +23,5 @@ class MockBooksFinder(BooksFinderABC):
         end = start + query.limit
         return books[start:end]
 
-    async def count(self, query: FinderQuery = _default_query) -> int:  # noqa: U100
-        return len(await self.find(FinderQuery(start=0, limit=None)))
+    async def count(self, query: FinderQuery) -> int:
+        return len(await self.find(query))

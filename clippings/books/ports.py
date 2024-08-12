@@ -40,7 +40,7 @@ class BooksFinderABC(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def count(self, query: FinderQuery = _default_query) -> int:
+    async def count(self, query: FinderQuery) -> int:
         pass
 
 

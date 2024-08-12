@@ -60,7 +60,7 @@ class BooksPresenter:
     ) -> BooksPageDTO:
         query = FinderQuery(start=(page - 1) * on_page, limit=on_page)
         books = await self._finder.find(query)
-        books_count = await self._finder.count(query)
+        books_count = await self._finder.count(FinderQuery(start=0, limit=None))
         books_dto = []
         for book in books:
             books_dto.append(
