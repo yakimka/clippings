@@ -32,4 +32,4 @@ async def test_can_render_books_page(page_presenter, make_sut):
     result = await sut.render(page_data)
 
     assert isinstance(result, str)
-    assert "<!DOCTYPE html>" in result
+    assert "<!doctype html>" in result.lower()

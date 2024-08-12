@@ -10,12 +10,7 @@ class ButtonDTO:
 
 
 @dataclass
-class SelectOptionDTO:
-    label: str
-    value: str
-
-
-@dataclass
-class SelectDTO:
-    label: str
-    options: list[SelectOptionDTO]
+class PaginationItemDTO:
+    number: int
+    current: bool
+    url: str

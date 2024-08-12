@@ -7,7 +7,7 @@ from jinja2 import Template
 
 from clippings.books.ports import BooksFinderABC, FinderQuery
 from clippings.books.presenters import TEMPLATES_DIR
-from clippings.books.presenters.dtos import ButtonDTO, SelectDTO, SelectOptionDTO
+from clippings.books.presenters.dtos import ButtonDTO, PaginationItemDTO
 
 
 @dataclass
@@ -24,12 +24,14 @@ class BookOnPageDTO:
 
 @dataclass
 class BooksPageDTO:
+    page_title: str
     books: list[BookOnPageDTO]
     page: int
     total_pages: int
     import_button: ButtonDTO
     add_book_button: ButtonDTO
-    sort_select: SelectDTO
+    headers: list[str]
+    pages: list[PaginationItemDTO]
 
 
 class BooksPagePresenter:
@@ -49,7 +51,7 @@ class BooksPagePresenter:
             books_dto.append(
                 BookOnPageDTO(
                     book_id=book.id,
-                    cover_url="https://example.com/cover.jpg",
+                    cover_url="https://placehold.co/400x600",
                     title=book.title,
                     author=book.author.name,
                     clippings_count=len(book.clippings),
@@ -60,6 +62,7 @@ class BooksPagePresenter:
             )
 
         return BooksPageDTO(
+            page_title="Books",
             books=books_dto,
             page=page,
             total_pages=(books_count + on_page - 1) // on_page,
@@ -71,15 +74,23 @@ class BooksPagePresenter:
                 label="Add book",
                 url="/add",
             ),
-            sort_select=SelectDTO(
-                label="Sort by",
-                options=[
-                    SelectOptionDTO(label="Title", value="title"),
-                    SelectOptionDTO(label="Author", value="author"),
-                    SelectOptionDTO(label="Rating", value="rating"),
-                    SelectOptionDTO(label="Clippings count", value="clippings_count"),
-                ],
-            ),
+            headers=[
+                "Cover",
+                "Book",
+                "Clippings count",
+                "Last added",
+                "Rating",
+                "Review",
+                "Actions",
+            ],
+            pages=[
+                PaginationItemDTO(
+                    number=i,
+                    current=i == 1,
+                    url=f"/books?page={i}",
+                )
+                for i in range(1, 10)
+            ],
         )
 
 

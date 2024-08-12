@@ -1,175 +1,51 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard (Books View)</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #333;
-        }
-
-        .actions {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            background-color: #8BC34A;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-
-        .input-box {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            width: 250px;
-            margin-bottom: 10px;
-        }
-
-        .table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .table-header, .table-row {
-            display: flex;
-            justify-content: space-between;
-            background-color: #e0e0e0;
-            padding: 10px 0;
-            border-bottom: 1px solid #ccc;
-        }
-
-        .table-header {
-            background-color: #64B5F6;
-            color: white;
-            font-weight: bold;
-        }
-
-        .header-item, .row-item {
-            flex: 1;
-            text-align: center;
-            padding: 5px 0;
-        }
-
-        .row-item input[type="checkbox"] {
-            margin: 0 auto;
-        }
-
-        .row-item button {
-            background-color: #FFB74D;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 5px 10px;
-            cursor: pointer;
-        }
-        .sort-container {
-            display: flex;
-            align-items: center;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            overflow: hidden;
-            width: 300px;
-            margin-bottom: 10px;
-        }
-
-        .select-box {
-            flex: 1;
-            border: none;
-            border-right: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 0;
-            background-color: white;
-            color: #333;
-            cursor: pointer;
-            appearance: none;
-        }
-
-        .desc-checkbox {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            background-color: white;
-            color: #333;
-            cursor: pointer;
-        }
-
-        .desc-checkbox input[type="checkbox"] {
-            margin-right: 5px;
-            cursor: pointer;
-        }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <title>{{ data.page_title }}</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Dashboard</h1>
-
-        <div class="actions">
-            <button class="btn">{{ data.import_button.label }}</button>
-            <button class="btn">{{ data.add_book_button.label }}</button>
-            <div class="sort-container">
-                <select class="select-box">
-                    {% for option in data.sort_select.options %}
-                        <option value="{{ option.value }}">{{ option.label }}</option>
-                    {% endfor %}
-                </select>
-                <label class="desc-checkbox">
-                    <input type="checkbox"> Desc
-                </label>
-            </div>
-        </div>
-
-        <div class="table">
-            <div class="table-header">
-                <div class="header-item">Cover</div>
-                <div class="header-item">Book</div>
-                <div class="header-item">Clippings count</div>
-                <div class="header-item">Last added</div>
-                <div class="header-item">Rating</div>
-                <div class="header-item">Review</div>
-                <div class="header-item">Edit (or actions)</div>
-                <div class="header-item">Go to clippings</div>
-            </div>
-            {% for book in data.books %}
-                <div class="table-row">
-                    <div class="row-item">[Cover Image]</div>
-                    <div class="row-item">{{ book.title }}. {{ book.author }}</div>
-                    <div class="row-item">{{ book.clippings_count }}</div>
-                    <div class="row-item">{{ book.last_clipping_added_at }}</div>
-                    <div class="row-item">{{ book.rating }}</div>
-                    <div class="row-item">{{ book.review }}</div>
-                    <div class="row-item"><button>Edit</button></div>
-                    <div class="row-item"><button>Go to Clippings</button></div>
-                </div>
-            {% endfor %}
-        </div>
+<main class="container">
+    <h1>{{ data.page_title }}</h1>
+    <div>
+        <button>{{ data.add_book_button.label }}</button>
+        <button>{{ data.import_button.label }}</button>
     </div>
+
+    <table>
+        <thead>
+        <tr>
+            {% for header in data.headers %}
+            <th scope="col">{{ header }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for book in data.books %}
+        <tr>
+            <th scope="row"><img src="{{ book.cover_url }}" width="100" alt="Book Image"></th>
+            <td>{{ book.title }}. {{ book.author }}</td>
+            <td>{{ book.clippings_count }}</td>
+            <td>{{ book.last_clipping_added_at }}</td>
+            <td>{{ book.rating }}</td>
+            <td>{{ book.review }}</td>
+            <td>Actions</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="pagination">
+        {% for page in data.pages %}
+        {% if page.current %}
+        <span>{{ page.number }}</span>
+        {% else %}
+        <a href="{{ page.url }}">{{ page.number }}</a>
+        {% endif %}
+        {% endfor %}
+    </div>
+</main>
 </body>
 </html>
