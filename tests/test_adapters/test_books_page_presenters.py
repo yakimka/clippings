@@ -7,7 +7,7 @@ import pytest
 from clippings.books.adapters.finders import MockBooksFinder
 from clippings.books.presenters.books_page_presenter import (
     BookOnPageDTO,
-    BooksPresenter,
+    BooksPagePresenter,
 )
 
 if TYPE_CHECKING:
@@ -16,10 +16,10 @@ if TYPE_CHECKING:
 
 @pytest.fixture()
 def make_sut():
-    def _make_sut(books: list[Book] | None = None) -> BooksPresenter:
+    def _make_sut(books: list[Book] | None = None) -> BooksPagePresenter:
         books_map = {book.id: book for book in books or []}
         finder = MockBooksFinder(books_map)
-        return BooksPresenter(finder)
+        return BooksPagePresenter(finder)
 
     return _make_sut
 
@@ -39,7 +39,7 @@ async def test_can_present_books_content(make_sut, mother):
     ]
     sut = make_sut(books)
 
-    result = await sut.for_page(page=1, on_page=10)
+    result = await sut.present(page=1, on_page=10)
 
     assert result.books == [
         BookOnPageDTO(
@@ -86,7 +86,7 @@ async def test_pagination(
     books = [mother.book(id=f"book:{i}", title=f"Book {i}") for i in range(books_count)]
     sut = make_sut(books)
 
-    result = await sut.for_page(page=page, on_page=on_page)
+    result = await sut.present(page=page, on_page=on_page)
 
     assert result.books
     assert result.page == page

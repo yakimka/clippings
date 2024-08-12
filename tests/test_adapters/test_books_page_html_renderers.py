@@ -6,7 +6,7 @@ from clippings.books.adapters.finders import MockBooksFinder
 from clippings.books.presenters.books_page_presenter import (
     BooksPageHtmlRendered,
     BooksPageHtmlRenderedABC,
-    BooksPresenter,
+    BooksPagePresenter,
 )
 
 
@@ -14,7 +14,7 @@ from clippings.books.presenters.books_page_presenter import (
 def page_presenter(mother):
     books = [mother.book(id=f"b:{i}") for i in range(5)]
     finder = MockBooksFinder({book.id: book for book in books})
-    return BooksPresenter(finder)
+    return BooksPagePresenter(finder)
 
 
 @pytest.fixture()
@@ -27,7 +27,7 @@ def make_sut():
 
 async def test_can_render_books_page(page_presenter, make_sut):
     sut = make_sut()
-    page_data = await page_presenter.for_page(page=1, on_page=2)
+    page_data = await page_presenter.present(page=1, on_page=2)
 
     result = await sut.render(page_data)
 

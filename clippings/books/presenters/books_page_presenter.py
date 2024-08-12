@@ -7,6 +7,7 @@ from jinja2 import Template
 
 from clippings.books.ports import BooksFinderABC, FinderQuery
 from clippings.books.presenters import TEMPLATES_DIR
+from clippings.books.presenters.dtos import ButtonDTO, SelectDTO, SelectOptionDTO
 
 
 @dataclass
@@ -22,24 +23,6 @@ class BookOnPageDTO:
 
 
 @dataclass
-class ButtonDTO:
-    label: str
-    url: str
-
-
-@dataclass
-class SelectOptionDTO:
-    label: str
-    value: str
-
-
-@dataclass
-class SelectDTO:
-    label: str
-    options: list[SelectOptionDTO]
-
-
-@dataclass
 class BooksPageDTO:
     books: list[BookOnPageDTO]
     page: int
@@ -49,11 +32,11 @@ class BooksPageDTO:
     sort_select: SelectDTO
 
 
-class BooksPresenter:
+class BooksPagePresenter:
     def __init__(self, finder: BooksFinderABC) -> None:
         self._finder = finder
 
-    async def for_page(
+    async def present(
         self,
         page: int,
         on_page: int,
