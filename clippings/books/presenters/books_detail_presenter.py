@@ -53,13 +53,13 @@ class BooksDetailPresenter:
         )
 
 
-class BooksDetailHtmlRenderedABC(abc.ABC):
+class BooksDetailStringRenderedABC(abc.ABC):
     @abc.abstractmethod
     async def render(self, dto: BooksDetailDTO | NotFoundDTO) -> str:
         pass
 
 
-class BooksDetailHtmlRendered(BooksDetailHtmlRenderedABC):
+class BooksDetailHtmlRendered(BooksDetailStringRenderedABC):
     def __init__(self) -> None:
         self._template = (TEMPLATES_DIR / "books_detail.html").read_text()
 

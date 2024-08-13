@@ -5,8 +5,8 @@ import pytest
 from clippings.books.adapters.finders import MockBooksFinder
 from clippings.books.presenters.books_page_presenter import (
     BooksPageHtmlRendered,
-    BooksPageHtmlRenderedABC,
     BooksPagePresenter,
+    BooksPageStringRenderedABC,
 )
 
 
@@ -19,7 +19,7 @@ def page_presenter(mother):
 
 @pytest.fixture()
 def make_sut():
-    def _make_sut() -> BooksPageHtmlRenderedABC:
+    def _make_sut() -> BooksPageStringRenderedABC:
         return BooksPageHtmlRendered()
 
     return _make_sut

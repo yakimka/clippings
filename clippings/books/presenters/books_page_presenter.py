@@ -94,13 +94,13 @@ class BooksPagePresenter:
         )
 
 
-class BooksPageHtmlRenderedABC(abc.ABC):
+class BooksPageStringRenderedABC(abc.ABC):
     @abc.abstractmethod
     async def render(self, dto: BooksPageDTO) -> str:
         pass
 
 
-class BooksPageHtmlRendered(BooksPageHtmlRenderedABC):
+class BooksPageHtmlRendered(BooksPageStringRenderedABC):
     def __init__(self) -> None:
         self._template = (TEMPLATES_DIR / "books_page.html").read_text()
 
