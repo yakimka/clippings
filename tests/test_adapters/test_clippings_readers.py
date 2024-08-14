@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING
 import pytest
 
 from clippings.books.adapters.readers import MockClippingsReader
+from clippings.books.dtos import ClippingImportCandidateDTO
 from clippings.books.entities import ClippingType
-from clippings.books.use_cases.import_clippings import ClippingImportCandidateDTO
 
 if TYPE_CHECKING:
     from clippings.books.ports import ClippingsReaderABC

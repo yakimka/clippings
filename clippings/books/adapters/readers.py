@@ -7,7 +7,7 @@ from clippings.books.ports import ClippingsReaderABC
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
-    from clippings.books.use_cases.import_clippings import ClippingImportCandidateDTO
+    from clippings.books.dtos import ClippingImportCandidateDTO
 
 
 class MockClippingsReader(ClippingsReaderABC):

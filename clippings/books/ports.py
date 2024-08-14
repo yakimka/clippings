@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
+    from clippings.books.dtos import ClippingImportCandidateDTO
     from clippings.books.entities import Book
-    from clippings.books.use_cases.import_clippings import ClippingImportCandidateDTO
 
 
 class BooksStorageABC(abc.ABC):
