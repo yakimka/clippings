@@ -17,6 +17,10 @@ class BooksStorageABC(abc.ABC):
         pass
 
     @abc.abstractmethod
+    async def get_titles_map(self, titles: list[str]) -> dict[str, Book]:
+        pass
+
+    @abc.abstractmethod
     async def add(self, book: Book) -> None:
         pass
 

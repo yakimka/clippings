@@ -25,7 +25,6 @@ def make_sut():
 def make_clipping_import_candidate_dto():
     def maker(
         book_title: str = "The Book",
-        book_author: str = "The Author",
         page: int = 1,
         location: tuple[int, int] = (10, 22),
         type: ClippingType = ClippingType.HIGHLIGHT,
@@ -34,7 +33,6 @@ def make_clipping_import_candidate_dto():
     ) -> ClippingImportCandidateDTO:
         return ClippingImportCandidateDTO(
             book_title=book_title,
-            book_author=book_author,
             page=page,
             location=location,
             type=type,

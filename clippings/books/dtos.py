@@ -12,7 +12,6 @@ if TYPE_CHECKING:
 @dataclass
 class ClippingImportCandidateDTO:
     book_title: str
-    book_author: str
     page: int
     location: tuple[int, int]
     type: ClippingType
