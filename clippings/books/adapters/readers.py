@@ -12,8 +12,8 @@ if TYPE_CHECKING:
 
 class MockClippingsReader(ClippingsReaderABC):
     def __init__(self, clippings: list[ClippingImportCandidateDTO]) -> None:
-        self._clippings = clippings
+        self.clippings = clippings
 
     async def read(self) -> AsyncGenerator[ClippingImportCandidateDTO, None]:
-        for clipping in self._clippings:
+        for clipping in self.clippings:
             yield clipping

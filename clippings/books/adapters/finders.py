@@ -13,10 +13,10 @@ _default_query = FinderQuery()
 
 class MockBooksFinder(BooksFinderABC):
     def __init__(self, books_map: dict[str, Book] | None = None) -> None:
-        self._books: dict[str, Book] = {} if books_map is None else books_map
+        self.books: dict[str, Book] = {} if books_map is None else books_map
 
     async def find(self, query: FinderQuery = _default_query) -> list[Book]:
-        books = sorted(self._books.values(), key=lambda b: (b.title, b.id))
+        books = sorted(self.books.values(), key=lambda b: (b.title, b.id))
         start = query.start
         if query.limit is None:
             return books[start:]
