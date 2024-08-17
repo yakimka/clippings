@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from clippings.books.dtos import ClippingImportCandidateDTO
-from clippings.books.entities import Author, Book, Clipping, ClippingType
+from clippings.books.entities import Book, Clipping, ClippingType
 
 
 class ObjectMother:  # noqa: PIE798
@@ -11,14 +11,12 @@ class ObjectMother:  # noqa: PIE798
         *,
         id: str = "book:id",
         title: str = "The Book",
-        author: Author | None = None,
+        author_name: str | None = "The Author",
         clippings: list[Clipping] | None = None,
     ) -> Book:
-        if author is None:
-            author = cls.author()
         if clippings is None:
             clippings = []
-        return Book(id=id, title=title, author=author, clippings=clippings)
+        return Book(id=id, title=title, author_name=author_name, clippings=clippings)
 
     @classmethod
     def clipping(
@@ -39,15 +37,6 @@ class ObjectMother:  # noqa: PIE798
             content=content,
             added_at=added_at,
         )
-
-    @classmethod
-    def author(
-        cls,
-        *,
-        id: str = "author:id",
-        name: str = "The Author",
-    ) -> Author:
-        return Author(id=id, name=name)
 
     @classmethod
     def clipping_import_candidate_dto(

@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING
 
+from clippings.books.ports import IdGenerator
+
 if TYPE_CHECKING:
     from datetime import datetime
 
@@ -12,14 +14,11 @@ if TYPE_CHECKING:
 class Book:
     id: str
     title: str
-    author: Author
+    author_name: str | None
     clippings: list[Clipping]
 
-
-@dataclass
-class Author:
-    id: str
-    name: str
+    def add_clippings(self, clippings: list[Clipping]) -> None:
+        self.clippings.extend(clippings)
 
 
 class ClippingType(Enum):

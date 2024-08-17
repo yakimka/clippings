@@ -106,7 +106,7 @@ async def test_add_clippings_to_existing_book(
     assert result == [
         BookDTO(
             id="book:42",
-            add_clippings=[
+            clippings=[
                 ClippingDTO(
                     page=1,
                     location=(10, 22),

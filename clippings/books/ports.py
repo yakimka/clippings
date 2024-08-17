@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
@@ -14,6 +14,10 @@ if TYPE_CHECKING:
 class BooksStorageABC(abc.ABC):
     @abc.abstractmethod
     async def get(self, id: str) -> Book | None:
+        pass
+
+    @abc.abstractmethod
+    async def get_many(self, ids: list[str]) -> list[Book]:
         pass
 
     @abc.abstractmethod
@@ -51,4 +55,10 @@ class BooksFinderABC(abc.ABC):
 class ClippingsReaderABC(abc.ABC):
     @abc.abstractmethod
     def read(self) -> AsyncGenerator[ClippingImportCandidateDTO, None]:
+        pass
+
+
+class IdGenerator(Protocol):
+    @abc.abstractmethod
+    def __call__(self, text: str) -> str:
         pass

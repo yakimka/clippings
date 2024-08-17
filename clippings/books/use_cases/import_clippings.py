@@ -3,11 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from clippings.books.entities import Book, Clipping, ClippingType
+
 if TYPE_CHECKING:
 
     from datetime import datetime
 
-    from clippings.books.entities import Book, ClippingType
     from clippings.books.ports import BooksStorageABC, ClippingsReaderABC
 
 
@@ -29,7 +30,7 @@ class NewBookDTO:
 @dataclass
 class BookDTO:
     id: str
-    add_clippings: list[ClippingDTO]
+    clippings: list[ClippingDTO]
 
 
 class ParseBooksForImportUseCase:
@@ -54,7 +55,7 @@ class ParseBooksForImportUseCase:
         result: list[NewBookDTO | BookDTO] = []
         for candidate_title, clippings in clippings_by_title.items():
             if existed_book := books_by_title.get(candidate_title):
-                result.append(BookDTO(id=existed_book.id, add_clippings=clippings))
+                result.append(BookDTO(id=existed_book.id, clippings=clippings))
             else:
                 result.append(NewBookDTO(title=candidate_title, clippings=clippings))
 
@@ -65,5 +66,36 @@ class ImportClippingsUseCase:
     def __init__(self, storage: BooksStorageABC):
         self._storage = storage
 
-    async def execute(self, books: list[Book]) -> None:
-        pass
+    async def execute(self, books: list[NewBookDTO | BookDTO]) -> None:
+        existing_books = await self._storage.get_many(
+            [book.id for book in books if isinstance(book, BookDTO)]
+        )
+        existing_books_map = {book.id: book for book in existing_books}
+
+        to_update = []
+        for book_candidate in books:
+            clippings = [
+                Clipping(
+                    id="clipping:new",
+                    page=clipping.page,
+                    location=clipping.location,
+                    type=clipping.type,
+                    content=clipping.content,
+                    added_at=clipping.added_at,
+                )
+                for clipping in book_candidate.clippings
+            ]
+
+            if isinstance(book_candidate, NewBookDTO):
+                book = Book(
+                    id="book:new",
+                    title=book_candidate.title,
+                    author_name=None,
+                    clippings=clippings,
+                )
+            else:
+                book = existing_books_map[book_candidate.id]
+                book.add_clippings(clippings)
+            to_update.append(book)
+
+        await self._storage.extend(to_update)

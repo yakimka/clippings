@@ -15,6 +15,13 @@ class MockBooksStorage(BooksStorageABC):
     async def get(self, id: str) -> Book | None:
         return self.books.get(id)
 
+    async def get_many(self, ids: list[str]) -> list[Book]:
+        books = []
+        for id in ids:
+            if book := self.books.get(id):
+                books.append(book)
+        return books
+
     async def get_titles_map(self, titles: list[str]) -> dict[str, Book]:
         return {
             book.title: book for book in self.books.values() if book.title in titles

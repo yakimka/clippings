@@ -46,7 +46,7 @@ class BooksDetailPresenter:
             edit_review_button=ButtonDTO(label="Edit review", url="/"),
             book_cover_url="https://placehold.co/400x600",
             book_title=book.title,
-            book_author=book.author.name,
+            book_author=book.author_name,
             book_rating=10,
             book_review="My review for this book",
             count_of_clippings=len(book.clippings),

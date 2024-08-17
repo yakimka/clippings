@@ -29,7 +29,7 @@ async def test_can_present_book_content(make_sut, mother):
     book = mother.book(
         id="book:1",
         title="The Book",
-        author=mother.author(name="The Author"),
+        author_name="The Author",
         clippings=[mother.clipping(), mother.clipping()],
     )
     sut = make_sut([book])

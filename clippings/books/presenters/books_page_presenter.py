@@ -53,7 +53,7 @@ class BooksPagePresenter:
                     book_id=book.id,
                     cover_url="https://placehold.co/400x600",
                     title=book.title,
-                    author=book.author.name,
+                    author=book.author_name,
                     clippings_count=len(book.clippings),
                     last_clipping_added_at="-",
                     rating=10,
