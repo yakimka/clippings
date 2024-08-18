@@ -1,17 +1,22 @@
+from __future__ import annotations
+
 from datetime import datetime
+from typing import TYPE_CHECKING
 from unittest.mock import ANY, create_autospec
 
 import pytest
 
 from clippings.books.adapters.storages import MockBooksStorage
 from clippings.books.entities import ClippingType
-from clippings.books.ports import BooksStorageABC
 from clippings.books.use_cases.import_clippings import (
     BookDTO,
     ClippingDTO,
     ImportClippingsUseCase,
     NewBookDTO,
 )
+
+if TYPE_CHECKING:
+    from clippings.books.ports import BooksStorageABC
 
 
 @pytest.fixture()

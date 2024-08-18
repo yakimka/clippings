@@ -1,3 +1,7 @@
-from pathlib import Path
+from jinja2 import Environment, PackageLoader, StrictUndefined
 
-TEMPLATES_DIR = Path(__file__).parent / "templates"
+jinja_env = Environment(
+    loader=PackageLoader(__name__, "templates"),
+    undefined=StrictUndefined,
+    autoescape=True,
+)

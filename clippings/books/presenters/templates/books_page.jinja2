@@ -1,0 +1,56 @@
+{% extends "base.jinja2" %}
+{% block title %}{{ data.page_title }}{% endblock %}
+{% block body %}
+<main class="container">
+    <h1>{{ data.page_title }}</h1>
+
+    <div role="group">
+        <button>{{ data.actions_map.import_clippings.label }}</button>
+        <a role="button" href="{{ data.actions_map.add_book.url.value }}">
+            {{ data.actions_map.add_book.label }}
+        </a>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            {% for field_id, field_name in data.field_labels %}
+            <th scope="col">{{ field_name }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for book in data.books %}
+        <tr>
+            <th scope="row">
+                <a href="{{ book.actions_map.view_book.url.value }}">
+                    <img src="{{ book.cover_url }}" width="100" alt="Book Image">
+                </a>
+            </th>
+            <td>
+                <a class="contrast" href="{{ book.actions_map.view_book.url.value }}">
+                    {{ book.name }}
+                </a>
+            </td>
+            <td>{{ book.clippings_count }}</td>
+            <td>{{ book.last_clipping_added_at }}</td>
+            <td>{{ book.rating }}</td>
+            <td>{{ book.review }}</td>
+            <td>
+                <div role="group">
+                    <button
+                        class="secondary"
+                        hx-{{ book.actions_map.delete_book.url.method }}="{{ book.actions_map.delete_book.url.value }}"
+                        hx-target="closest tr">{{ book.actions_map.delete_book.label }}
+                    </button>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    {% with pages=data.pagination %}
+    {% include "pagination.jinja2" %}
+    {% endwith %}
+</main>
+{% endblock %}

@@ -4,10 +4,8 @@ import abc
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from jinja2 import Template
-
-from clippings.books.presenters import TEMPLATES_DIR
-from clippings.books.presenters.dtos import ButtonDTO, NotFoundDTO
+from clippings.books.presenters import jinja_env
+from clippings.books.presenters.dtos import ActionDTO, NotFoundDTO
 
 if TYPE_CHECKING:
     from clippings.books.ports import BooksStorageABC
@@ -16,9 +14,9 @@ if TYPE_CHECKING:
 @dataclass
 class BooksDetailDTO:
     page_title: str
-    upload_cover_button: ButtonDTO
-    find_cover_button: ButtonDTO
-    edit_review_button: ButtonDTO
+    upload_cover_button: ActionDTO
+    find_cover_button: ActionDTO
+    edit_review_button: ActionDTO
     book_cover_url: str
     book_title: str
     book_author: str
@@ -41,9 +39,9 @@ class BooksDetailPresenter:
 
         return BooksDetailDTO(
             page_title="Book detail",
-            upload_cover_button=ButtonDTO(label="Upload cover", url="/"),
-            find_cover_button=ButtonDTO(label="Find cover", url="/"),
-            edit_review_button=ButtonDTO(label="Edit review", url="/"),
+            upload_cover_button=ActionDTO(label="Upload cover", url="/"),
+            find_cover_button=ActionDTO(label="Find cover", url="/"),
+            edit_review_button=ActionDTO(label="Edit review", url="/"),
             book_cover_url="https://placehold.co/400x600",
             book_title=book.title,
             book_author=book.author_name,
@@ -61,8 +59,8 @@ class BooksDetailStringRenderedABC(abc.ABC):
 
 class BooksDetailHtmlRendered(BooksDetailStringRenderedABC):
     def __init__(self) -> None:
-        self._template = (TEMPLATES_DIR / "books_detail.html").read_text()
+        self._template_name = "books_detail.jinja2"
+        self._env = jinja_env
 
     async def render(self, dto: BooksDetailDTO | NotFoundDTO) -> str:
-        template = Template(self._template)
-        return template.render(data=dto)
+        return self._env.get_template(self._template_name).render(data=dto)
