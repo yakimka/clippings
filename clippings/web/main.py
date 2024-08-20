@@ -1,3 +1,5 @@
+from random import randint  # noqa: DUO102
+
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, Response
 
@@ -17,7 +19,14 @@ from clippings.test.object_mother import ObjectMother
 app = FastAPI()
 
 mother = ObjectMother()
-all_books = [mother.book(id=f"book:{i}", title=f"The Book {i}") for i in range(100)]
+all_books = [
+    mother.book(
+        id=f"book:{i}",
+        title=f"The Book {i}",
+        clippings=[mother.clipping() for _ in range(randint(0, 10))],  # noqa: S311
+    )
+    for i in range(100)
+]
 books_map = {book.id: book for book in all_books}
 
 

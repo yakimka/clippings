@@ -19,7 +19,6 @@ if TYPE_CHECKING:
 
 @dataclass
 class BookOnPageDTO:
-    book_id: str
     cover_url: str
     name: str
     clippings_count: int
@@ -72,7 +71,6 @@ class BooksPagePresenter:
             page_title="Books",
             books=[
                 BookOnPageDTO(
-                    book_id=book.id,
                     cover_url="https://placehold.co/400x600",
                     name=f"{book.title} by {book.author_name}",
                     clippings_count=len(book.clippings),

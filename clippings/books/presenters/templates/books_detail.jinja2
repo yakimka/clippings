@@ -1,26 +1,23 @@
 {% extends "base.jinja2" %}
 {% block title %}{{ data.page_title }}{% endblock %}
+{% block style %}
+{% include "book_cover.css" %}
+{% endblock %}
 {% block body %}
 <main class="container">
-    <h1>{{ data.page_title }}</h1>
+    <section style="display: flex; align-items: center; gap: var(--pico-spacing);">
+        <div>
+            <img src="{{ data.cover_url }}" width="100" alt="Book Image" class="book-cover">
+        </div>
+        <div>
+            <h1>{{ data.title }}</h1>
+            <h3>{{ data.author }}</h3>
+            <p>{{ data.rating }}</p>
+        </div>
+    </section>
 
-    <div class="grid">
-        <div>
-            <img src="{{ data.cover_url }}" width="400" alt="Book Image">
-            <div>
-                <button>{{ data.actions_map.upload_cover.label }}</button>
-                <button>{{ data.actions_map.find_cover.label }}</button>
-            </div>
-        </div>
-        <div>
-            <h2>{{ data.title.value }}</h2>
-            <p>{{ data.author.value }}</p>
-            <p><b>{{ data.count_of_clippings.label }}</b> {{ data.count_of_clippings.value }}</p>
-            <p><b>{{ data.rating.label }}</b> {{ data.rating.value }}</p>
-            <p><b>{{ data.review.label }}</b></p>
-            <p>{{ data.review.value }}</p>
-            <button>{{ data.actions_map.edit_review.label }}</button>
-        </div>
-    </div>
+    <section>
+        <p>{{ data.review }}</p>
+    </section>
 </main>
 {% endblock %}

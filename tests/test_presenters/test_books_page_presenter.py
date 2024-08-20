@@ -53,7 +53,6 @@ async def test_can_present_books_content(make_sut, mother):
 
     assert result.books == [
         BookOnPageDTO(
-            book_id="book:2",
             cover_url="https://placehold.co/400x600",
             name="Another Book by Another Author",
             clippings_count=0,
@@ -63,7 +62,6 @@ async def test_can_present_books_content(make_sut, mother):
             actions=ANY,
         ),
         BookOnPageDTO(
-            book_id="book:1",
             cover_url="https://placehold.co/400x600",
             name="The Book by The Author",
             clippings_count=0,
