@@ -7,6 +7,7 @@ import pytest
 
 from clippings.books.adapters.storages import MockBooksStorage
 from clippings.books.presenters.books_detail_presenter import (
+    BookFieldDTO,
     BooksDetailDTO,
     BooksDetailPresenter,
 )
@@ -37,12 +38,12 @@ async def test_can_present_book_content(make_sut, mother):
     result = await sut.present(book_id="book:1")
 
     assert result == BooksDetailDTO(
-        book_cover_url="https://placehold.co/400x600",
-        book_title="The Book",
-        book_author="by The Author",
-        book_rating=10,
-        book_review="My review for this book",
-        count_of_clippings=2,
+        cover_url="https://placehold.co/400x600",
+        title=BookFieldDTO(label=ANY, value="The Book"),
+        author=BookFieldDTO(label=ANY, value="by The Author"),
+        rating=BookFieldDTO(label=ANY, value="10/10"),
+        review=BookFieldDTO(label=ANY, value="My review for this book"),
+        count_of_clippings=BookFieldDTO(label=ANY, value="2"),
         page_title=ANY,
         actions=ANY,
     )

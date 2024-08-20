@@ -17,15 +17,21 @@ if TYPE_CHECKING:
 
 
 @dataclass
+class BookFieldDTO:
+    label: str
+    value: str
+
+
+@dataclass
 class BooksDetailDTO:
     page_title: str
     actions: list[ActionDTO]
-    book_cover_url: str
-    book_title: str
-    book_author: str
-    book_rating: int
-    book_review: str
-    count_of_clippings: int
+    cover_url: str
+    title: BookFieldDTO
+    author: BookFieldDTO
+    rating: BookFieldDTO
+    review: BookFieldDTO
+    count_of_clippings: BookFieldDTO
 
     @property
     def actions_map(self) -> dict[str, ActionDTO]:
@@ -68,12 +74,14 @@ class BooksDetailPresenter:
                 ),
                 ActionDTO(id="edit_review", label="Edit review", url=None),
             ],
-            book_cover_url="https://placehold.co/400x600",
-            book_title=book.title,
-            book_author=f"by {book.author_name}",
-            book_rating=10,
-            book_review="My review for this book",
-            count_of_clippings=len(book.clippings),
+            cover_url="https://placehold.co/400x600",
+            title=BookFieldDTO(label="", value=book.title),
+            author=BookFieldDTO(label="", value=f"by {book.author_name}"),
+            rating=BookFieldDTO(label="Rating:", value="10/10"),
+            review=BookFieldDTO(label="Review:", value="My review for this book"),
+            count_of_clippings=BookFieldDTO(
+                label="Clippings count:", value=str(len(book.clippings))
+            ),
         )
 
 

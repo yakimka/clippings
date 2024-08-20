@@ -6,18 +6,19 @@
 
     <div class="grid">
         <div>
-            <img src="{{ data.book_cover_url }}" width="400" alt="Book Image">
+            <img src="{{ data.cover_url }}" width="400" alt="Book Image">
             <div>
                 <button>{{ data.actions_map.upload_cover.label }}</button>
                 <button>{{ data.actions_map.find_cover.label }}</button>
             </div>
         </div>
         <div>
-            <h2>{{ data.book_title }}</h2>
-            <p>{{ data.book_author }}</p>
-            <p>{{ data.book_rating }}</p>
-            <p>{{ data.book_review }}</p>
-            <p>{{ data.count_of_clippings }}</p>
+            <h2>{{ data.title.value }}</h2>
+            <p>{{ data.author.value }}</p>
+            <p><b>{{ data.count_of_clippings.label }}</b> {{ data.count_of_clippings.value }}</p>
+            <p><b>{{ data.rating.label }}</b> {{ data.rating.value }}</p>
+            <p><b>{{ data.review.label }}</b></p>
+            <p>{{ data.review.value }}</p>
             <button>{{ data.actions_map.edit_review.label }}</button>
         </div>
     </div>
