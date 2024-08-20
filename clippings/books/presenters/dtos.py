@@ -24,7 +24,7 @@ class UrlDTO:
 class ActionDTO:
     id: str
     label: str
-    url: UrlDTO
+    url: UrlDTO | None
 
 
 @dataclass

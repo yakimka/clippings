@@ -1,0 +1,25 @@
+{% extends "base.jinja2" %}
+{% block title %}{{ data.page_title }}{% endblock %}
+{% block body %}
+<main class="container">
+    <h1>{{ data.page_title }}</h1>
+
+    <div class="grid">
+        <div>
+            <img src="{{ data.book_cover_url }}" width="400" alt="Book Image">
+            <div>
+                <button>{{ data.actions_map.upload_cover.label }}</button>
+                <button>{{ data.actions_map.find_cover.label }}</button>
+            </div>
+        </div>
+        <div>
+            <h2>{{ data.book_title }}</h2>
+            <p>{{ data.book_author }}</p>
+            <p>{{ data.book_rating }}</p>
+            <p>{{ data.book_review }}</p>
+            <p>{{ data.count_of_clippings }}</p>
+            <button>{{ data.actions_map.edit_review.label }}</button>
+        </div>
+    </div>
+</main>
+{% endblock %}

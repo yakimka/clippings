@@ -2,6 +2,11 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, Response
 
 from clippings.books.adapters.finders import MockBooksFinder
+from clippings.books.adapters.storages import MockBooksStorage
+from clippings.books.presenters.books_detail_presenter import (
+    BooksDetailHtmlRendered,
+    BooksDetailPresenter,
+)
 from clippings.books.presenters.books_page_presenter import (
     BooksPageHtmlRendered,
     BooksPagePresenter,
@@ -32,6 +37,18 @@ async def books(
 @app.delete("/books/{book_id}", response_class=Response)
 async def delete_book(book_id: str) -> Response:  # noqa: U100
     return Response(status_code=200)
+
+
+@app.get("/books/{book_id}", response_class=HTMLResponse)
+async def book_detail(book_id: str) -> str:
+    mother = ObjectMother()
+    book = mother.book(id="book:42", title="The Book42")
+    books_map = {book.id: book}
+    books_storage = MockBooksStorage(books_map)
+    book_presenter = BooksDetailPresenter(storage=books_storage)
+    book_page_rendered = BooksDetailHtmlRendered()
+    book_dto = await book_presenter.present(book_id=book_id)
+    return await book_page_rendered.render(book_dto)
 
 
 if __name__ == "__main__":

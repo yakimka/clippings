@@ -39,12 +39,10 @@ async def test_can_present_book_content(make_sut, mother):
     assert result == BooksDetailDTO(
         book_cover_url="https://placehold.co/400x600",
         book_title="The Book",
-        book_author="The Author",
+        book_author="by The Author",
         book_rating=10,
         book_review="My review for this book",
         count_of_clippings=2,
         page_title=ANY,
-        upload_cover_button=ANY,
-        find_cover_button=ANY,
-        edit_review_button=ANY,
+        actions=ANY,
     )
