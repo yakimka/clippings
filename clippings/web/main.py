@@ -16,15 +16,16 @@ from clippings.test.object_mother import ObjectMother
 
 app = FastAPI()
 
+mother = ObjectMother()
+all_books = [mother.book(id=f"book:{i}", title=f"The Book {i}") for i in range(100)]
+books_map = {book.id: book for book in all_books}
+
 
 @app.get("/books/", response_class=HTMLResponse)
 async def books(
     page: int = 1,
     on_page: int = 10,
 ) -> str:
-    mother = ObjectMother()
-    books = [mother.book(id=f"book:{i}", title=f"The Book {i}") for i in range(100)]
-    books_map = {book.id: book for book in books}
     books_finder = MockBooksFinder(books_map)
     books_presenter = BooksPagePresenter(
         finder=books_finder, pagination_presenter=classic_pagination_presenter
@@ -41,9 +42,6 @@ async def delete_book(book_id: str) -> Response:  # noqa: U100
 
 @app.get("/books/{book_id}", response_class=HTMLResponse)
 async def book_detail(book_id: str) -> str:
-    mother = ObjectMother()
-    book = mother.book(id="book:42", title="The Book42")
-    books_map = {book.id: book}
     books_storage = MockBooksStorage(books_map)
     book_presenter = BooksDetailPresenter(storage=books_storage)
     book_page_rendered = BooksDetailHtmlRendered()
