@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 @dataclass
 class ClippingImportCandidateDTO:
     book_title: str
-    page: int
+    page: tuple[int, int]
     location: tuple[int, int]
     type: ClippingType
     content: str

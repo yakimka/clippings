@@ -1,23 +1,56 @@
 {% extends "base.jinja2" %}
 {% block title %}{{ data.page_title }}{% endblock %}
 {% block style %}
-{% include "book_cover.css" %}
+    {% include "book_cover.css" %}
 {% endblock %}
 {% block body %}
-<main class="container">
-    <section style="display: flex; align-items: center; gap: var(--pico-spacing);">
-        <div>
-            <img src="{{ data.cover_url }}" width="100" alt="Book Image" class="book-cover">
-        </div>
-        <div>
-            <h1>{{ data.title }}</h1>
-            <h3>{{ data.author }}</h3>
-            <p>{{ data.rating }}</p>
-        </div>
-    </section>
+    <main class="container">
+        <section style="display: flex; align-items: center; gap: var(--pico-spacing);">
+            <div>
+                <img src="{{ data.cover_url }}" width="100" alt="Book Image" class="book-cover">
+            </div>
+            <hgroup>
+                <h1>{{ data.title }}</h1>
+                <h3>{{ data.author }}</h3>
+                <p>{{ data.rating }}</p>
+            </hgroup>
+        </section>
 
-    <section>
-        <p>{{ data.review }}</p>
-    </section>
-</main>
+        <section>
+            <p>{{ data.review }}</p>
+        </section>
+
+        <section>
+            {% for clipping in data.clippings %}
+                <article>
+                    <section>{{ clipping.content }}</section>
+                    {% if clipping.inline_notes %}
+                    <h6>{{ data.notes_label }}</h6>
+                    <hr>
+                    {% endif %}
+                    {% for note in clipping.inline_notes %}
+                    <section>
+                        <small>{{ note.content }}</small>
+                        <small><a href="#" class="secondary">edit</a></small>
+                        <small><a href="#" class="secondary">delete</a></small>
+                    </section>
+                    {% endfor %}
+                    <footer style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <kbd>{{ clipping.type }}</kbd>
+                            <kbd>{{ clipping.page }}</kbd>
+                            <kbd>{{ clipping.location }}</kbd>
+                            <kbd>{{ clipping.added_at }}</kbd>
+                        </div>
+                        <div>
+                            <small><a href="#" class="secondary">add note</a></small>
+                            <small><a href="#" class="secondary">edit</a></small>
+                            <small><a href="#" class="secondary">delete</a></small>
+                        </div>
+                    </footer>
+
+                </article>
+            {% endfor %}
+        </section>
+    </main>
 {% endblock %}

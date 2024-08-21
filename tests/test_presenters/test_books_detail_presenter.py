@@ -1,18 +1,17 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from datetime import datetime
 from unittest.mock import ANY
 
 import pytest
 
 from clippings.books.adapters.storages import MockBooksStorage
+from clippings.books.entities import Book, ClippingType
 from clippings.books.presenters.books_detail_presenter import (
     BooksDetailDTO,
     BooksDetailPresenter,
+    ClippingDTO,
 )
-
-if TYPE_CHECKING:
-    from clippings.books.entities import Book
 
 
 @pytest.fixture()
@@ -30,7 +29,16 @@ async def test_can_present_book_content(make_sut, mother):
         id="book:1",
         title="The Book",
         author_name="The Author",
-        clippings=[mother.clipping(), mother.clipping()],
+        clippings=[
+            mother.clipping(
+                page=(1, 2),
+                location=(10, 22),
+                type=ClippingType.HIGHLIGHT,
+                content="some highlighted text",
+                added_at=datetime(2024, 8, 9),
+                inline_notes=[],
+            )
+        ],
     )
     sut = make_sut([book])
 
@@ -42,6 +50,17 @@ async def test_can_present_book_content(make_sut, mother):
         author="by The Author",
         rating="Rating: 10/10",
         review="My review for this book",
+        clippings=[
+            ClippingDTO(
+                content="some highlighted text",
+                type="Highlight",
+                page="Page: 1-2",
+                location="Loc: 10-22",
+                added_at="Added: 2024-08-09",
+                inline_notes=[],
+            ),
+        ],
+        notes_label=ANY,
         page_title=ANY,
         actions=ANY,
     )

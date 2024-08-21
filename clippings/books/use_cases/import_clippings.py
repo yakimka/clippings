@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 @dataclass
 class ClippingDTO:
-    page: int
+    page: tuple[int, int]
     location: tuple[int, int]
     type: ClippingType
     content: str
@@ -82,6 +82,7 @@ class ImportClippingsUseCase:
                     type=clipping.type,
                     content=clipping.content,
                     added_at=clipping.added_at,
+                    inline_notes=[],
                 )
                 for clipping in book_candidate.clippings
             ]

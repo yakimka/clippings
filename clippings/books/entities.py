@@ -25,10 +25,18 @@ class ClippingType(Enum):
 
 
 @dataclass
+class InlineNote:
+    id: str
+    content: str
+    added_at: datetime
+
+
+@dataclass
 class Clipping:
     id: str
-    page: int
+    page: tuple[int, int]
     location: tuple[int, int]
     type: ClippingType
     content: str
+    inline_notes: list[InlineNote]
     added_at: datetime

@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from clippings.books.dtos import ClippingImportCandidateDTO
-from clippings.books.entities import Book, Clipping, ClippingType
+from clippings.books.entities import Book, Clipping, ClippingType, InlineNote
 
 
 class ObjectMother:  # noqa: PIE798
@@ -23,11 +23,12 @@ class ObjectMother:  # noqa: PIE798
         cls,
         *,
         id: str = "clipping:id",
-        page: int = 1,
+        page: tuple[int, int] = (1, 1),
         location: tuple[int, int] = (10, 22),
         type: ClippingType = ClippingType.HIGHLIGHT,
         content: str = "some highlighted text",
         added_at: datetime = datetime(2024, 8, 9),  # noqa: B008
+        inline_notes: list[InlineNote] | None = None,
     ) -> Clipping:
         return Clipping(
             id=id,
@@ -36,13 +37,24 @@ class ObjectMother:  # noqa: PIE798
             type=type,
             content=content,
             added_at=added_at,
+            inline_notes=inline_notes or [],
         )
+
+    @classmethod
+    def inline_note(
+        cls,
+        *,
+        id: str = "inline_note:id",
+        content: str = "some note",
+        added_at: datetime = datetime(2024, 8, 9),  # noqa: B008
+    ) -> InlineNote:
+        return InlineNote(id=id, content=content, added_at=added_at)
 
     @classmethod
     def clipping_import_candidate_dto(
         cls,
         book_title: str = "The Book",
-        page: int = 1,
+        page: tuple[int, int] = (1, 1),
         location: tuple[int, int] = (10, 22),
         type: ClippingType = ClippingType.HIGHLIGHT,
         content: str = "The Content",

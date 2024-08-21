@@ -45,7 +45,7 @@ def make_new_book_dto():
 @pytest.fixture()
 def make_clipping_dto():
     def _make_clipping_dto(
-        page: int = 1,
+        page: tuple[int, int] = (1, 1),
         location: tuple[int, int] = (10, 22),
         type: ClippingType = ClippingType.HIGHLIGHT,
         content: str = "some highlighted text",
@@ -120,7 +120,7 @@ async def test_import_existed_book(
             clippings=[
                 mother.clipping(
                     id="clipping:42",
-                    page=1,
+                    page=(1, 1),
                     location=(10, 22),
                     type=ClippingType.HIGHLIGHT,
                     content="The Content 1",
@@ -146,7 +146,7 @@ async def test_import_existed_book(
                 clippings=[
                     mother.clipping(
                         id="clipping:42",
-                        page=1,
+                        page=(1, 1),
                         location=(10, 22),
                         type=ClippingType.HIGHLIGHT,
                         content="The Content 1",

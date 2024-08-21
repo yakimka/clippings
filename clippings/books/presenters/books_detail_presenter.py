@@ -17,8 +17,19 @@ if TYPE_CHECKING:
 
 
 @dataclass
+class InlineNoteDTO:
+    id: str
+    content: str
+
+
+@dataclass
 class ClippingDTO:
-    pass
+    content: str
+    type: str
+    page: str
+    location: str
+    added_at: str
+    inline_notes: list[InlineNoteDTO]
 
 
 @dataclass
@@ -30,6 +41,8 @@ class BooksDetailDTO:
     author: str
     rating: str
     review: str
+    notes_label: str
+    clippings: list[ClippingDTO]
 
     @property
     def actions_map(self) -> dict[str, ActionDTO]:
@@ -76,6 +89,21 @@ class BooksDetailPresenter:
             author=f"by {book.author_name}",
             rating="Rating: 10/10",
             review="My review for this book",
+            notes_label="Notes",
+            clippings=[
+                ClippingDTO(
+                    content=clipping.content,
+                    type=clipping.type.value.capitalize(),
+                    page=f"Page: {"-".join(map(str, clipping.page))}",
+                    location=f"Loc: {"-".join(map(str, clipping.location))}",
+                    added_at=f"Added: {clipping.added_at.date().isoformat()}",
+                    inline_notes=[
+                        InlineNoteDTO(id=inline_note.id, content=inline_note.content)
+                        for inline_note in clipping.inline_notes
+                    ],
+                )
+                for clipping in book.clippings
+            ],
         )
 
 
