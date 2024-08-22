@@ -14,152 +14,152 @@ Hexagonal Architecture Explained (Cockburn, Alistair)
 
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- La subrayado en la página 113 | posición 1300-1301 | Añadido el jueves, 22 de agosto de 2024 18:16:14
+- La subrayado en la página 112 | posición 1300-1301 | Añadido el jueves, 22 de agosto de 2024 18:16:14
 
 My highlight in Español
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- La nota en la página 113 | posición 1300 | Añadido el jueves, 22 de agosto de 2024 18:16:21
+- La nota en la página 112 | posición 1300 | Añadido el jueves, 22 de agosto de 2024 18:16:21
 
 My note in Español
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- El marcador en la página 113 | posición 1299 | Añadido el jueves, 22 de agosto de 2024 18:16:26
+- El marcador en la página 112 | posición 1299 | Añadido el jueves, 22 de agosto de 2024 18:16:26
 
 
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- Votre surlignement sur la page 114 | emplacement 1309-1309 | Ajouté le jeudi 22 août 2024 18:19:40
+- Votre surlignement sur la page 112 | emplacement 1309-1309 | Ajouté le jeudi 22 août 2024 18:19:40
 
 My highlight in Français
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- Votre note sur la page 114 | emplacement 1309 | Ajouté le jeudi 22 août 2024 18:19:46
+- Votre note sur la page 112 | emplacement 1309 | Ajouté le jeudi 22 août 2024 18:19:46
 
 My note in Français
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- Votre signet sur la page 114 | emplacement 1308 | Ajouté le jeudi 22 août 2024 18:19:49
+- Votre signet sur la page 112 | emplacement 1308 | Ajouté le jeudi 22 août 2024 18:19:49
 
 
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- La tua evidenziazione a pagina 115 | posizione 1315-1315 | Aggiunto in data giovedì 22 agosto 2024 18:23:12
+- La tua evidenziazione a pagina 112 | posizione 1315-1315 | Aggiunto in data giovedì 22 agosto 2024 18:23:12
 
 My highlight in Italiano
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- La tua nota a pagina 115 | posizione 1315 | Aggiunto in data giovedì 22 agosto 2024 18:23:23
+- La tua nota a pagina 112 | posizione 1315 | Aggiunto in data giovedì 22 agosto 2024 18:23:23
 
 My note in Italiano
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- Il tuo segnalibro a pagina 114 | posizione 1314 | Aggiunto in data giovedì 22 agosto 2024 18:23:27
+- Il tuo segnalibro a pagina 112 | posizione 1314 | Aggiunto in data giovedì 22 agosto 2024 18:23:27
 
 
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- 115ページ|位置No. 1323-1325のハイライト |作成日: 2024年8月22日木曜日 18:27:17
+- 112ページ|位置No. 1323-1325のハイライト |作成日: 2024年8月22日木曜日 18:27:17
 
 My highlight in Japanese
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- 115ページ|位置No. 1325のメモ |作成日: 2024年8月22日木曜日 18:27:27
+- 112ページ|位置No. 1325のメモ |作成日: 2024年8月22日木曜日 18:27:27
 
 My note in Japanese
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- 115ページ|位置No. 1320のブックマーク |作成日: 2024年8月22日木曜日 18:27:31
+- 112ページ|位置No. 1320のブックマーク |作成日: 2024年8月22日木曜日 18:27:31
 
 
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- Je highlight op pagina 116 | locatie 1332 t/m 1333 | Toegevoegd op donderdag 22 augustus 2024 18:30:26
+- Je highlight op pagina 112 | locatie 1332 t/m 1333 | Toegevoegd op donderdag 22 augustus 2024 18:30:26
 
 My highlight in Nederlands
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- Je notitie op pagina 116 | locatie 1333 | Toegevoegd op donderdag 22 augustus 2024 18:30:32
+- Je notitie op pagina 112 | locatie 1333 | Toegevoegd op donderdag 22 augustus 2024 18:30:32
 
 My note in Nederlands
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- Je bladwijzer op pagina 116 | locatie 1330 | Toegevoegd op donderdag 22 augustus 2024 18:30:36
+- Je bladwijzer op pagina 112 | locatie 1330 | Toegevoegd op donderdag 22 augustus 2024 18:30:36
 
 
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- Seu destaque na página 117 | posição 1342-1343 | Adicionado: quinta-feira, 22 de agosto de 2024 18:51:02
+- Seu destaque na página 112 | posição 1342-1343 | Adicionado: quinta-feira, 22 de agosto de 2024 18:51:02
 
 My highlight in Português (Brasil)
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- Sua nota na página 117 | posição 1343 | Adicionado: quinta-feira, 22 de agosto de 2024 18:51:08
+- Sua nota na página 112 | posição 1343 | Adicionado: quinta-feira, 22 de agosto de 2024 18:51:08
 
 My note in Português (Brasil)
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- Seu marcador na página 117 | posição 1336 | Adicionado: quinta-feira, 22 de agosto de 2024 18:51:15
+- Seu marcador na página 112 | posição 1336 | Adicionado: quinta-feira, 22 de agosto de 2024 18:51:15
 
 
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-– Ваш выделенный отрывок на странице 117 | Место 1349–1350 | Добавлено: четверг, 22 августа 2024 г. в 18:54:06
+– Ваш выделенный отрывок на странице 112 | Место 1349–1350 | Добавлено: четверг, 22 августа 2024 г. в 18:54:06
 
 My highlight in Russian
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-– Ваша заметка на странице 117 | Место 1350 | Добавлено: четверг, 22 августа 2024 г. в 18:54:12
+– Ваша заметка на странице 112 | Место 1350 | Добавлено: четверг, 22 августа 2024 г. в 18:54:12
 
 My note in Russian
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-– Ваша закладка на странице 117 | Место 1347 | Добавлено: четверг, 22 августа 2024 г. в 18:54:15
+– Ваша закладка на странице 112 | Место 1347 | Добавлено: четверг, 22 августа 2024 г. в 18:54:15
 
 
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- 您在第 119 页（位置 #1366-1367）的标注 | 添加于 2024年8月22日星期四 下午6:57:47
+- 您在第 112 页（位置 #1366-1367）的标注 | 添加于 2024年8月22日星期四 下午6:57:47
 
 My highlight in Chinese
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- 您在第 119 页（位置 #1367）的笔记 | 添加于 2024年8月22日星期四 下午6:57:54
+- 您在第 112 页（位置 #1367）的笔记 | 添加于 2024年8月22日星期四 下午6:57:54
 
 My note in Chinese
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- 您在第 119 页（位置 #1365）的书签 | 添加于 2024年8月22日星期四 下午6:57:57
+- 您在第 112 页（位置 #1365）的书签 | 添加于 2024年8月22日星期四 下午6:57:57
 
 
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- Your Highlight on page 119 | Location 1375-1376 | Added on Thursday, August 22, 2024 7:01:04 PM
+- Your Highlight on page 112 | Location 1375-1376 | Added on Thursday, August 22, 2024 7:01:04 PM
 
 My highlight in English (US)
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- Your Note on page 119 | Location 1376 | Added on Thursday, August 22, 2024 7:01:11 PM
+- Your Note on page 112 | Location 1376 | Added on Thursday, August 22, 2024 7:01:11 PM
 
 My note in English (US)
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- Your Bookmark on page 119 | Location 1375 | Added on Thursday, August 22, 2024 7:01:15 PM
+- Your Bookmark on page 112 | Location 1375 | Added on Thursday, August 22, 2024 7:01:15 PM
 
 
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- Your Highlight on page 121 | location 1398-1399 | Added on Thursday, 22 August 2024 19:04:38
+- Your Highlight on page 112 | location 1398-1399 | Added on Thursday, 22 August 2024 19:04:38
 
 My highlight in English (UK)
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- Your Note on page 121 | location 1399 | Added on Thursday, 22 August 2024 19:04:44
+- Your Note on page 112 | location 1399 | Added on Thursday, 22 August 2024 19:04:44
 
 My note in English (UK)
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-- Your Bookmark on page 121 | location 1396 | Added on Thursday, 22 August 2024 19:04:48
+- Your Bookmark on page 112 | location 1396 | Added on Thursday, 22 August 2024 19:04:48
 
 
 ==========
