@@ -104,7 +104,7 @@ Hexagonal Architecture Explained (Cockburn, Alistair)
 
 ==========
 Hexagonal Architecture Explained (Cockburn, Alistair)
-– Ваш выделенный отрывок на странице 112 | Место 1300-1301 | Добавлено: четверг, 22 августа 2024 г. в 18:10:53
+– Ваш выделенный отрывок на странице 112 | Место 1300–1301 | Добавлено: четверг, 22 августа 2024 г. в 18:10:53
 
 My highlight in Russian
 ==========
