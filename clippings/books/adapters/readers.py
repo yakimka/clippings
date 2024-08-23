@@ -472,13 +472,17 @@ class KindleClippingMetadataParser:
                 if char == ":" and prev_char.isdigit():
                     numbers_parts.append(char)
                 elif char in last_twelve_hour_chars:
-                    numbers_parts.extend(
+                    found_marks = [
                         "AM" if mark_i == 0 else "PM"
                         for marks in twelve_hour_marks
                         for mark_i, mark in enumerate(marks)
                         if date_meta[: i + 1].endswith(mark)
-                    )
-                    numbers_parts.append(" ")
+                    ]
+                    if len(found_marks) > 1:
+                        raise RuntimeError("Multiple twelve hour marks found")
+                    if found_marks:
+                        numbers_parts.extend(found_marks)
+                        numbers_parts.append(" ")
                 elif prev_char != " ":
                     numbers_parts.append(" ")
 
