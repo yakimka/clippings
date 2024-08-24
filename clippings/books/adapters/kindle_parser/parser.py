@@ -139,23 +139,20 @@ class KindleClippingMetadataParser:
         }
 
     def _parse_clipping_type(self, metadata: str) -> str | CantParseMetadataError:
-        original_metadata = metadata
-        metadata = metadata.lower()
-        search_langs = self._search_langs
-        for marker, langs in self._highlight_markers.items():
-            if (cross_langs := search_langs.intersection(langs)) and marker in metadata:
-                self._search_langs = cross_langs
-                return "highlight"
-        for marker, langs in self._note_markers.items():
-            if (cross_langs := search_langs.intersection(langs)) and marker in metadata:
-                self._search_langs = cross_langs
-                return "note"
-        for marker, langs in self._bookmark_markers.items():
-            if (cross_langs := search_langs.intersection(langs)) and marker in metadata:
-                self._search_langs = cross_langs
-                return "bookmark"
+        markers = [
+            (self._highlight_markers, "highlight"),
+            (self._note_markers, "note"),
+            (self._bookmark_markers, "bookmark"),
+        ]
+        lower_metadata = metadata.lower()
+        for markers_map, clipping_type in markers:
+            for marker, langs in markers_map.items():
+                cross_langs = self._search_langs.intersection(langs)
+                if cross_langs and marker in lower_metadata:
+                    self._search_langs = cross_langs
+                    return clipping_type
 
-        return CantParseMetadataError(f"Can't find clipping type: {original_metadata}")
+        return CantParseMetadataError(f"Can't find clipping type: {metadata}")
 
     def _parse_page_and_loc(
         self, metadata: str
