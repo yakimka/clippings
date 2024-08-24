@@ -151,7 +151,9 @@ async def test_can_parse_single_valued_locations(make_file_object, make_sut):
             id="dash",
         ),
         pytest.param(
-            make_metadata_string("- Je highlight op pagina 1-10 | locatie 2 t/m 20"),
+            make_metadata_string(
+                "- Je highlight op pagina 1 t/m 10 | locatie 2 t/m 20"
+            ),
             id="dutch",
         ),
     ],
