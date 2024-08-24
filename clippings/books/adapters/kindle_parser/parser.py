@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import itertools
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import TypeAlias, TypedDict
 
 from clippings.books.adapters.kindle_parser.language import (
@@ -169,83 +169,15 @@ class KindleClippingMetadataParser:
         return result
 
     def _parse_date(self, metadata: str) -> datetime:
-        _, date_meta = metadata.rsplit("|", 1)
-        date_map = {}
-        month_meta_parts = date_meta.lower().split()
-        for month, values in self._month_names.items():
-            if "month" in date_map:
-                break
-            for lang, value in values:
-                if lang in self._search_langs and month in month_meta_parts:
-                    date_map["month"] = value
-                    self._search_langs = {
-                        lang for lang, _ in values if lang in self._search_langs
-                    }
-                    break
-
-        twelve_hour_marks = {
-            val
-            for lang, val in self._twelve_hour_marks.items()
-            if lang in self._search_langs
-        }
-        numbers_parts = []
-        last_twelve_hour_chars = {
-            item[-1] for item in twelve_hour_marks for item in item
-        }
-        for i, char in enumerate(date_meta):
-            if char.isdigit():
-                numbers_parts.append(char)
-            elif numbers_parts:
-                prev_char = numbers_parts[-1]
-                if char == ":" and prev_char.isdigit():
-                    numbers_parts.append(char)
-                elif char in last_twelve_hour_chars:
-                    found_marks = [
-                        "AM" if mark_i == 0 else "PM"
-                        for marks in twelve_hour_marks
-                        for mark_i, mark in enumerate(marks)
-                        if date_meta[: i + 1].endswith(mark)
-                    ]
-                    if len(found_marks) > 1:
-                        raise RuntimeError("Multiple twelve hour marks found")
-                    if found_marks:
-                        numbers_parts.extend(found_marks)
-                        numbers_parts.append(" ")
-                elif prev_char != " ":
-                    numbers_parts.append(" ")
-
-        numbers = "".join(numbers_parts).strip().split(" ")
-        langs = list(self._search_langs)
-        if len(langs) > 1:
-            logger.warning("Multiple languages found, %s, using: %s", langs, langs[0])
-        for date_format in self._date_formats[langs[0]]:
-            if len(date_format) == len(numbers):
-                parsed_date = dict(zip(date_format, numbers))
-                for type, part_value in parsed_date.items():
-                    if type == DatePart.YEAR:
-                        date_map["year"] = int(part_value)
-                    elif type == DatePart.MONTH:
-                        date_map["month"] = int(part_value)
-                    elif type == DatePart.MONTH_ISO:
-                        date_map["month"] = int(part_value) + 1
-                    elif type == DatePart.DAY:
-                        date_map["day"] = int(part_value)
-                    elif type == DatePart.TIME:
-                        hour, minute, second = part_value.split(":")
-                        if mark := parsed_date.get(DatePart.TWElVE_HOUR_MARK):
-                            if hour == "12" and mark == "AM":
-                                hour = 0
-                            elif mark == "PM":
-                                hour = int(hour) + 12
-                        date_map["hour"] = int(hour)
-                        date_map["minute"] = int(minute)
-                        date_map["second"] = int(second)
-
-        try:
-            result = datetime(**date_map)
-        except (ValueError, TypeError):
-            logger.exception("Can't parse date from metadata: %s", metadata)
-            result = datetime(1970, 1, 1)
+        parser = DatetimeParser(
+            metadata=metadata,
+            search_langs=set(self._search_langs),
+            month_names=self._month_names,
+            twelve_hour_marks=self._twelve_hour_marks,
+            date_formats=self._date_formats,
+        )
+        result = parser.parse()
+        self._search_langs = set(parser.search_langs)
         return result
 
 
@@ -327,3 +259,117 @@ class PositionParser:
         if len(ints) == 1:
             return int(ints[0]), int(ints[0])
         return int(ints[0]), int(ints[1])
+
+
+class DatetimeParser:
+    def __init__(
+        self,
+        metadata: str,
+        search_langs: set[str],
+        month_names: dict[str, list[tuple[Lang, int]]],
+        twelve_hour_marks: dict[Lang, tuple[str, str]],
+        date_formats: dict[Lang, list[tuple[DatePart, ...]]],
+    ):
+        self._metadata = metadata
+        self._cleaned = ""
+        self.search_langs = search_langs
+        self._month_names = month_names
+        self._twelve_hour_marks_map = twelve_hour_marks
+        self._date_formats = date_formats
+
+    @property
+    def _twelve_hour_marks(self) -> set[tuple[str, str]]:
+        return {
+            val
+            for lang, val in self._twelve_hour_marks_map.items()
+            if lang in self.search_langs
+        }
+
+    def parse(self) -> datetime:
+        self._extract_date_part()
+        month = self._search_month_in_text()
+        self._clean_metadata()
+        datetime_parts = self._parse_datetime_parts()
+        if not datetime_parts:
+            return datetime(1970, 1, 1)
+        if "month" not in datetime_parts:
+            datetime_parts["month"] = month
+        return datetime(**datetime_parts)
+
+    def _extract_date_part(self) -> None:
+        self._metadata = self._metadata.rsplit("|", 1)[1]
+
+    def _clean_metadata(self) -> None:
+        numbers_parts = []
+        twelve_hour_marks = self._twelve_hour_marks
+        last_twelve_hour_chars = {
+            item[-1] for item in twelve_hour_marks for item in item
+        }
+        for i, char in enumerate(self._metadata):
+            if char.isdigit():
+                numbers_parts.append(char)
+            elif numbers_parts:
+                prev_char = numbers_parts[-1]
+                if char == ":" and prev_char.isdigit():
+                    numbers_parts.append(char)
+                elif char in last_twelve_hour_chars:
+                    found_marks = [
+                        "AM" if mark_i == 0 else "PM"
+                        for marks in twelve_hour_marks
+                        for mark_i, mark in enumerate(marks)
+                        if self._metadata[: i + 1].endswith(mark)
+                    ]
+                    if len(found_marks) > 1:
+                        raise RuntimeError("Multiple twelve hour marks found")
+                    if found_marks:
+                        numbers_parts.extend(found_marks)
+                        numbers_parts.append(" ")
+                elif prev_char != " ":
+                    numbers_parts.append(" ")
+
+        self._cleaned = "".join(numbers_parts).strip()
+
+    def _search_month_in_text(self) -> int | None:
+        month_meta_parts = self._metadata.lower().split()
+        for month, values in self._month_names.items():
+            for lang, value in values:
+                if lang in self.search_langs and month in month_meta_parts:
+                    self.search_langs = {
+                        lang for lang, _ in values if lang in self.search_langs
+                    }
+                    return value
+        return None
+
+    def _parse_datetime_parts(self) -> dict[str, int]:
+        numbers = self._cleaned.split(" ")
+        langs = list(self.search_langs)
+        if len(langs) > 1:
+            logger.warning("Multiple languages found, %s, using: %s", langs, langs[0])
+        for date_format in self._date_formats[langs[0]]:
+            result: dict[str, int] = {}
+            if len(date_format) != len(numbers):
+                continue
+            parsed_date = dict(zip(date_format, numbers))
+            for type, part_value in parsed_date.items():
+                if type == DatePart.YEAR:
+                    result["year"] = int(part_value)
+                elif type == DatePart.MONTH:
+                    result["month"] = int(part_value)
+                elif type == DatePart.MONTH_ISO:
+                    result["month"] = int(part_value) + 1
+                elif type == DatePart.DAY:
+                    result["day"] = int(part_value)
+                elif type == DatePart.TIME:
+                    hour, minute, second = part_value.split(":")
+                    if mark := parsed_date.get(DatePart.TWElVE_HOUR_MARK):
+                        if hour == "12" and mark == "AM":
+                            hour = 0
+                        elif mark == "PM":
+                            hour = int(hour) + 12
+                    result["hour"] = int(hour)
+                    result["minute"] = int(minute)
+                    result["second"] = int(second)
+            # TODO check result for validity
+            if result:
+                return result
+        return {}
