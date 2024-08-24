@@ -8,12 +8,12 @@ from datetime import datetime
 from enum import Enum, auto
 from typing import TYPE_CHECKING, TypedDict
 
+from clippings.books.dtos import ClippingImportCandidateDTO
+from clippings.books.entities import ClippingType
 from clippings.books.ports import ClippingsReaderABC
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
-
-    from clippings.books.dtos import ClippingImportCandidateDTO
 
 
 logger = logging.getLogger(__name__)
@@ -37,7 +37,15 @@ class KindleClippingsReader(ClippingsReaderABC):
         for line in self._file_object:
             parser.add_line(line)
             if clipping := parser.get_clipping():
-                yield clipping
+                if clipping["type"] in ClippingType:
+                    yield ClippingImportCandidateDTO(
+                        type=ClippingType(clipping["type"]),
+                        book_title=clipping["title"],
+                        content="\n".join(clipping["content"]).strip(),
+                        page=clipping["page"],
+                        location=clipping["location"],
+                        added_at=clipping["added_at"],
+                    )
 
 
 class DatePart(Enum):
@@ -366,7 +374,7 @@ class KindleClippingMetadataParser:
 
         self._possible_languages = frozenset(possible_langs)
 
-    def parse(self, metadata: str) -> KindleClippingMetadata | Exception:
+    def parse(self, metadata: str) -> ClippingMetadata | Exception:
         search_langs = set(self._possible_languages)
         clipping_res = self._parse_clipping_type(metadata, search_langs)
         if isinstance(clipping_res, Exception):
@@ -374,12 +382,12 @@ class KindleClippingMetadataParser:
         clipping_type, search_langs = clipping_res
         page, loc, search_langs = self._parse_page_and_loc(metadata, search_langs)
         datetime, search_langs = self._parse_date(metadata, search_langs)
-        return KindleClippingMetadata(
-            type=clipping_type,
-            page=page,
-            location=loc,
-            added_at=datetime,
-        )
+        return {
+            "type": clipping_type,
+            "page": page,
+            "location": loc,
+            "added_at": datetime,
+        }
 
     def _parse_clipping_type(
         self, metadata: str, search_langs: set[str]
@@ -521,15 +529,14 @@ class KindleClippingMetadataParser:
         return result, search_langs
 
 
-@dataclass(kw_only=True, frozen=True)
-class KindleClippingMetadata:
+class ClippingMetadata(TypedDict):
     type: str
     page: tuple[int, int]
     location: tuple[int, int]
     added_at: datetime
 
 
-class RawClipping(TypedDict):
+class RawClipping(ClippingMetadata):
     title: str
     metadata: str
     content: list[str]
@@ -541,6 +548,7 @@ class KindleClippingsParser:
         self._in_clipping = True
         self._separator = "=========="
         self._fsm = KindleClippingsFSM()
+        self._metadata_parser = KindleClippingMetadataParser(language_settings)
 
     def add_line(self, line: str) -> None:
         line = line.strip()
@@ -553,7 +561,7 @@ class KindleClippingsParser:
             self._fsm.next_state()
             return
         if self._fsm.current_state == "metadata" and line:
-            self._clippings[-1]["metadata"] = line
+            self._clippings[-1].update(self._metadata_parser.parse(line))
             self._fsm.next_state()
             return
         if self._fsm.current_state == "content":
