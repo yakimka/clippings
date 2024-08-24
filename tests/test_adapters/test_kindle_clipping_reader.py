@@ -1,6 +1,7 @@
 import io
 from dataclasses import asdict
 from datetime import datetime
+from pathlib import Path
 
 import pytest
 
@@ -45,7 +46,10 @@ def make_metadata_string(
 
 @pytest.fixture()
 def multilanguage_clippings():
-    with open("my_clippings_languages_examples.txt", encoding="utf-8-sig") as file:
+    this_dir = Path(__file__).parent
+    with open(
+        this_dir / "my_clippings_languages_examples.txt", encoding="utf-8-sig"
+    ) as file:
         yield file
 
 
