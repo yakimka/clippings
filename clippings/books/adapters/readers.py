@@ -6,7 +6,7 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum, auto
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, TypeAlias, TypedDict
 
 from clippings.books.dtos import ClippingImportCandidateDTO
 from clippings.books.entities import ClippingType
@@ -36,16 +36,15 @@ class KindleClippingsReader(ClippingsReaderABC):
         parser = KindleClippingsParser()
         for line in self._file_object:
             parser.add_line(line)
-            if clipping := parser.get_clipping():
-                if clipping["type"] in ClippingType:
-                    yield ClippingImportCandidateDTO(
-                        type=ClippingType(clipping["type"]),
-                        book_title=clipping["title"],
-                        content="\n".join(clipping["content"]).strip(),
-                        page=clipping["page"],
-                        location=clipping["location"],
-                        added_at=clipping["added_at"],
-                    )
+            if (clipping := parser.get_clipping()) and clipping["type"] in ClippingType:
+                yield ClippingImportCandidateDTO(
+                    type=ClippingType(clipping["type"]),
+                    book_title=clipping["title"],
+                    content="\n".join(clipping["content"]).strip(),
+                    page=clipping["page"],
+                    location=clipping["location"],
+                    added_at=clipping["added_at"],
+                )
 
 
 class DatePart(Enum):
@@ -334,8 +333,8 @@ class CantParseMetadataError(Exception):
     pass
 
 
-type Lang = str
-type Marker = str
+Lang: TypeAlias = str
+Marker: TypeAlias = str
 
 
 class KindleClippingMetadataParser:
@@ -436,9 +435,9 @@ class KindleClippingMetadataParser:
 
         def find_location_langs() -> set[str]:
             for name, langs in self._location_markers.items():
-                if cross_langs := search_langs.intersection(langs):
-                    if name in metadata:
-                        return cross_langs
+                cross_langs = search_langs.intersection(langs)
+                if cross_langs and name in metadata:
+                    return cross_langs
             return set()
 
         parts = [parse_int_pairs(item) for item in cleaned.split(";")]
@@ -450,7 +449,7 @@ class KindleClippingMetadataParser:
 
         return parts[0], parts[1], search_langs
 
-    def _parse_date(
+    def _parse_date(  # noqa: C901
         self, metadata: str, search_langs: set[str]
     ) -> tuple[datetime, set[str]]:
         _, date_meta = metadata.rsplit("|", 1)
@@ -501,17 +500,17 @@ class KindleClippingMetadataParser:
         for date_format in self._date_formats[langs[0]]:
             if len(date_format) == len(numbers):
                 parsed_date = dict(zip(date_format, numbers))
-                for type, value in parsed_date.items():
+                for type, part_value in parsed_date.items():
                     if type == DatePart.YEAR:
-                        date_map["year"] = int(value)
+                        date_map["year"] = int(part_value)
                     elif type == DatePart.MONTH:
-                        date_map["month"] = int(value)
+                        date_map["month"] = int(part_value)
                     elif type == DatePart.MONTH_ISO:
-                        date_map["month"] = int(value) + 1
+                        date_map["month"] = int(part_value) + 1
                     elif type == DatePart.DAY:
-                        date_map["day"] = int(value)
+                        date_map["day"] = int(part_value)
                     elif type == DatePart.TIME:
-                        hour, minute, second = value.split(":")
+                        hour, minute, second = part_value.split(":")
                         if mark := parsed_date.get(DatePart.TWElVE_HOUR_MARK):
                             if hour == "12" and mark == "AM":
                                 hour = 0
