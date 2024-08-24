@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import itertools
 import logging
+from builtins import TypeError
 from datetime import UTC, datetime
 from typing import TypeAlias, TypedDict
 
@@ -360,16 +361,24 @@ class DatetimeParser:
                 elif type == DatePart.DAY:
                     result["day"] = int(part_value)
                 elif type == DatePart.TIME:
-                    hour, minute, second = part_value.split(":")
+                    hour, minute, second = (int(num) for num in part_value.split(":"))
                     if mark := parsed_date.get(DatePart.TWElVE_HOUR_MARK):
-                        if hour == "12" and mark == "AM":
-                            hour = 0
-                        elif mark == "PM":
-                            hour = int(hour) + 12
-                    result["hour"] = int(hour)
-                    result["minute"] = int(minute)
-                    result["second"] = int(second)
-            # TODO check result for validity
-            if result:
+                        if mark == "PM":
+                            hour = (hour + 12) % 24
+                    result.update({"hour": hour, "minute": minute, "second": second})
+            if self._check_datetime_parts(result):
                 return result
         return {}
+
+    def _check_datetime_parts(self, parts: dict[str, int]) -> bool:
+        parts = parts.copy()
+        if "month" not in parts:
+            parts["month"] = 1
+        if set(parts) != {"year", "month", "day", "hour", "minute", "second"}:
+            return False
+
+        try:
+            datetime(**parts)
+        except (ValueError, TypeError):
+            return False
+        return True
