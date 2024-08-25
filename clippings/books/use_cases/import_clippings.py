@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
+from uuid import uuid4
 
 from clippings.books.entities import Book, Clipping, ClippingType
 
@@ -76,7 +77,7 @@ class ImportClippingsUseCase:
         for book_candidate in books:
             clippings = [
                 Clipping(
-                    id="clipping:new",
+                    id=f"clipping:{uuid4()}",
                     page=clipping.page,
                     location=clipping.location,
                     type=clipping.type,
@@ -89,7 +90,7 @@ class ImportClippingsUseCase:
 
             if isinstance(book_candidate, NewBookDTO):
                 book = Book(
-                    id="book:new",
+                    id=f"book:{uuid4()}",
                     title=book_candidate.title,
                     author_name=None,
                     clippings=clippings,

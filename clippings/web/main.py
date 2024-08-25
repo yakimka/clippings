@@ -1,10 +1,14 @@
+from collections.abc import AsyncGenerator
+from pathlib import Path
 from random import randint  # noqa: DUO102
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.responses import HTMLResponse, Response
 
 from clippings.books.adapters.finders import MockBooksFinder
+from clippings.books.adapters.readers import KindleClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage
+from clippings.books.ports import BooksFinderABC, BooksStorageABC, ClippingsReaderABC
 from clippings.books.presenters.books_detail_presenter import (
     BooksDetailHtmlRendered,
     BooksDetailPresenter,
@@ -14,6 +18,10 @@ from clippings.books.presenters.books_page_presenter import (
     BooksPagePresenter,
 )
 from clippings.books.presenters.pagination_presenter import classic_pagination_presenter
+from clippings.books.use_cases.import_clippings import (
+    ImportClippingsUseCase,
+    ParseBooksForImportUseCase,
+)
 from clippings.test.object_mother import ObjectMother
 
 app = FastAPI()
@@ -28,14 +36,29 @@ all_books = [
     for i in range(100)
 ]
 books_map = {book.id: book for book in all_books}
+books_map = {}
+
+
+async def get_books_finder() -> BooksFinderABC:
+    return MockBooksFinder(books_map)
+
+
+async def get_books_storage() -> BooksStorageABC:
+    return MockBooksStorage(books_map)
+
+
+async def get_clippings_reader() -> AsyncGenerator[ClippingsReaderABC, None]:
+    this_dir = Path(__file__).parent
+    with open(this_dir / "My Clippings.txt", encoding="utf-8-sig") as file:
+        yield KindleClippingsReader(file)
 
 
 @app.get("/books/", response_class=HTMLResponse)
 async def books(
     page: int = 1,
     on_page: int = 10,
+    books_finder: BooksFinderABC = Depends(get_books_finder),
 ) -> str:
-    books_finder = MockBooksFinder(books_map)
     books_presenter = BooksPagePresenter(
         finder=books_finder, pagination_presenter=classic_pagination_presenter
     )
@@ -44,14 +67,29 @@ async def books(
     return await books_page_rendered.render(books_dto)
 
 
+@app.get("/books/import", response_class=HTMLResponse)
+async def import_books(
+    books_storage: BooksStorageABC = Depends(get_books_storage),
+    clippings_reader: ClippingsReaderABC = Depends(get_clippings_reader),
+) -> str:
+    parse_use_case = ParseBooksForImportUseCase(
+        storage=books_storage, reader=clippings_reader
+    )
+    books = await parse_use_case.execute()
+    import_use_case = ImportClippingsUseCase(storage=books_storage)
+    await import_use_case.execute(books)
+    return "Books imported"
+
+
 @app.delete("/books/{book_id}", response_class=Response)
 async def delete_book(book_id: str) -> Response:  # noqa: U100
     return Response(status_code=200)
 
 
 @app.get("/books/{book_id}", response_class=HTMLResponse)
-async def book_detail(book_id: str) -> str:
-    books_storage = MockBooksStorage(books_map)
+async def book_detail(
+    book_id: str, books_storage: BooksStorageABC = Depends(get_books_storage)
+) -> str:
     book_presenter = BooksDetailPresenter(storage=books_storage)
     book_page_rendered = BooksDetailHtmlRendered()
     book_dto = await book_presenter.present(book_id=book_id)

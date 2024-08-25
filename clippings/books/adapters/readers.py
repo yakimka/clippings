@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TextIO
 
 from clippings.books.adapters.kindle_parser.parser import KindleClippingsParser
 from clippings.books.dtos import ClippingImportCandidateDTO
@@ -8,7 +8,6 @@ from clippings.books.entities import ClippingType
 from clippings.books.ports import ClippingsReaderABC
 
 if TYPE_CHECKING:
-    import io
     from collections.abc import AsyncGenerator
 
 
@@ -22,7 +21,7 @@ class MockClippingsReader(ClippingsReaderABC):
 
 
 class KindleClippingsReader(ClippingsReaderABC):
-    def __init__(self, file_object: io.TextIOWrapper) -> None:
+    def __init__(self, file_object: TextIO) -> None:
         self._file_object = file_object
 
     async def read(self) -> AsyncGenerator[ClippingImportCandidateDTO, None]:
