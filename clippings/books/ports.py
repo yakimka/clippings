@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import abc
 from dataclasses import dataclass
+from datetime import datetime
 from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
     from clippings.books.dtos import ClippingImportCandidateDTO
-    from clippings.books.entities import Book
+    from clippings.books.entities import Book, ClippingType
 
 
 class BooksStorageABC(abc.ABC):
@@ -18,10 +19,6 @@ class BooksStorageABC(abc.ABC):
 
     @abc.abstractmethod
     async def get_many(self, ids: list[str]) -> list[Book]:
-        pass
-
-    @abc.abstractmethod
-    async def get_titles_map(self, titles: list[str]) -> dict[str, Book]:
         pass
 
     @abc.abstractmethod
@@ -58,7 +55,24 @@ class ClippingsReaderABC(abc.ABC):
         pass
 
 
-class IdGenerator(Protocol):
-    @abc.abstractmethod
-    def __call__(self, text: str) -> str:
+class BookForGenerateId(Protocol):
+    title: str
+    author: str
+
+
+class BookIdGenerator(Protocol):
+    def __call__(self, book: BookForGenerateId) -> str:
+        pass
+
+
+class ClippingForGenerateId(Protocol):
+    page: tuple[int, int]
+    location: tuple[int, int]
+    content: str
+    type: ClippingType
+    added_at: datetime
+
+
+class ClippingIdGenerator(Protocol):
+    def __call__(self, book: ClippingForGenerateId) -> str:
         pass

@@ -6,6 +6,10 @@ from fastapi import Depends, FastAPI
 from fastapi.responses import HTMLResponse, Response
 
 from clippings.books.adapters.finders import MockBooksFinder
+from clippings.books.adapters.id_generators import (
+    book_id_generator,
+    clipping_id_generator,
+)
 from clippings.books.adapters.readers import KindleClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage
 from clippings.books.ports import BooksFinderABC, BooksStorageABC, ClippingsReaderABC
@@ -18,10 +22,7 @@ from clippings.books.presenters.books_page_presenter import (
     BooksPagePresenter,
 )
 from clippings.books.presenters.pagination_presenter import classic_pagination_presenter
-from clippings.books.use_cases.import_clippings import (
-    ImportClippingsUseCase,
-    ParseBooksForImportUseCase,
-)
+from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
 from clippings.test.object_mother import ObjectMother
 
 app = FastAPI()
@@ -72,12 +73,13 @@ async def import_books(
     books_storage: BooksStorageABC = Depends(get_books_storage),
     clippings_reader: ClippingsReaderABC = Depends(get_clippings_reader),
 ) -> str:
-    parse_use_case = ParseBooksForImportUseCase(
-        storage=books_storage, reader=clippings_reader
+    import_use_case = ImportClippingsUseCase(
+        storage=books_storage,
+        reader=clippings_reader,
+        book_id_generator=book_id_generator,
+        clipping_id_generator=clipping_id_generator,
     )
-    books = await parse_use_case.execute()
-    import_use_case = ImportClippingsUseCase(storage=books_storage)
-    await import_use_case.execute(books)
+    await import_use_case.execute()
     return "Books imported"
 
 
@@ -104,4 +106,5 @@ if __name__ == "__main__":
         host="0.0.0.0",  # noqa: S104
         port=8000,
         reload=True,
+        reload_dirs=["/opt/project/clippings/"],
     )

@@ -9,9 +9,15 @@ if TYPE_CHECKING:
     from clippings.books.entities import ClippingType
 
 
-@dataclass(kw_only=True, frozen=True)
+@dataclass
+class BookDTO:
+    title: str
+    author: str
+
+
+@dataclass
 class ClippingImportCandidateDTO:
-    book_title: str
+    book: BookDTO
     page: tuple[int, int]
     location: tuple[int, int]
     type: ClippingType

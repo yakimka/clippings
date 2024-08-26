@@ -31,8 +31,9 @@
                     {% for note in clipping.inline_notes %}
                     <section>
                         <small>{{ note.content }}</small>
-                        <small><a href="#" class="secondary">edit</a></small>
-                        <small><a href="#" class="secondary">delete</a></small>
+                        {% for action in note.actions %}
+                        {% include "action_link.jinja2" %}
+                        {% endfor %}
                     </section>
                     {% endfor %}
                     <footer style="display: flex; justify-content: space-between; align-items: center;">
@@ -43,9 +44,9 @@
                             <kbd>{{ clipping.added_at }}</kbd>
                         </div>
                         <div>
-                            <small><a href="#" class="secondary">add note</a></small>
-                            <small><a href="#" class="secondary">edit</a></small>
-                            <small><a href="#" class="secondary">delete</a></small>
+                            {% for action in clipping.actions %}
+                            {% include "action_link.jinja2" %}
+                            {% endfor %}
                         </div>
                     </footer>
 

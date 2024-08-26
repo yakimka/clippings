@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 class InlineNoteDTO:
     id: str
     content: str
+    actions: list[ActionDTO]
 
 
 @dataclass
@@ -30,6 +31,7 @@ class ClippingDTO:
     location: str
     added_at: str
     inline_notes: list[InlineNoteDTO]
+    actions: list[ActionDTO]
 
 
 @dataclass
@@ -62,12 +64,109 @@ class BooksDetailPresenter:
         find_cover_url: UrlTemplateDTO = UrlTemplateDTO(
             template="/books/{book_id}/find_cover", method="post"
         ),
+        add_clipping: UrlTemplateDTO = UrlTemplateDTO(
+            template="/books/{book_id}/clippings", method="post"
+        ),
+        add_inline_note: UrlTemplateDTO = UrlTemplateDTO(
+            template="/books/{book_id}/clippings/{clipping_id}/inline_notes", method="post"
+        ),
+        edit_clipping_url: UrlTemplateDTO = UrlTemplateDTO(
+            template="/books/{book_id}/clippings/{clipping_id}", method="put"
+        ),
+        delete_clipping_url: UrlTemplateDTO = UrlTemplateDTO(
+            template="/books/{book_id}/clippings/{clipping_id}", method="delete"
+        ),
+        unlink_inline_note_url: UrlTemplateDTO = UrlTemplateDTO(
+            template="/books/{book_id}/clippings/{clipping_id}", method="post"
+        ),
     ) -> BooksDetailDTO | NotFoundDTO:
         book = await self._storage.get(book_id)
         if book is None:
             return NotFoundDTO(
                 page_title="Book not found",
                 message="The book you are looking for does not exist.",
+            )
+
+        clippings = []
+        for clipping in book.clippings:
+            inline_notes = []
+            for inline_note in clipping.inline_notes:
+                inline_note_dto = InlineNoteDTO(
+                    id=inline_note.id,
+                    content=inline_note.content,
+                    actions=[
+                        ActionDTO(
+                            id="edit_clipping",
+                            label="edit",
+                            url=UrlDTO.from_template(
+                                edit_clipping_url,
+                                book_id=book_id,
+                                clipping_id=inline_note.id,
+                            ),
+                        ),
+                        ActionDTO(
+                            id="delete_clipping",
+                            label="delete",
+                            url=UrlDTO.from_template(
+                                delete_clipping_url,
+                                book_id=book_id,
+                                clipping_id=inline_note.id,
+                            ),
+                        ),
+                    ],
+                )
+                if inline_note.automatically_linked:
+                    inline_note_dto.actions.append(
+                        ActionDTO(
+                            id="unlink_inline_note",
+                            label="unlink",
+                            url=UrlDTO.from_template(
+                                unlink_inline_note_url,
+                                book_id=book_id,
+                                clipping_id=inline_note.id,
+                            ),
+                        )
+                    )
+                inline_notes.append(inline_note_dto)
+
+            clippings.append(
+                ClippingDTO(
+                    content=clipping.content,
+                    type=clipping.type.value.capitalize(),
+                    page=f"Page: {"-".join(map(str, clipping.page))}",
+                    location=f"Loc: {"-".join(map(str, clipping.location))}",
+                    added_at=f"Added: {clipping.added_at.date().isoformat()}",
+                    inline_notes=inline_notes,
+                    actions=[
+                        ActionDTO(
+                            id="add_inline_note",
+                            label="add note",
+                            url=UrlDTO.from_template(
+                                add_inline_note,
+                                book_id=book_id,
+                                clipping_id=clipping.id,
+                            )
+                        ),
+                        ActionDTO(
+                            id="edit_clipping",
+                            label="edit",
+                            url=UrlDTO.from_template(
+                                edit_clipping_url,
+                                book_id=book_id,
+                                clipping_id=clipping.id,
+                            ),
+                        ),
+                        ActionDTO(
+                            id="delete_clipping",
+                            label="delete",
+                            url=UrlDTO.from_template(
+                                delete_clipping_url,
+                                book_id=book_id,
+                                clipping_id=clipping.id,
+                            ),
+                        ),
+                    ]
+                )
             )
 
         return BooksDetailDTO(
@@ -90,20 +189,7 @@ class BooksDetailPresenter:
             rating="Rating: 10/10",
             review="My review for this book",
             notes_label="Notes",
-            clippings=[
-                ClippingDTO(
-                    content=clipping.content,
-                    type=clipping.type.value.capitalize(),
-                    page=f"Page: {"-".join(map(str, clipping.page))}",
-                    location=f"Loc: {"-".join(map(str, clipping.location))}",
-                    added_at=f"Added: {clipping.added_at.date().isoformat()}",
-                    inline_notes=[
-                        InlineNoteDTO(id=inline_note.id, content=inline_note.content)
-                        for inline_note in clipping.inline_notes
-                    ],
-                )
-                for clipping in book.clippings
-            ],
+            clippings=clippings,
         )
 
 

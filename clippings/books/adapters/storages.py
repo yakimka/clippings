@@ -22,11 +22,6 @@ class MockBooksStorage(BooksStorageABC):
                 books.append(book)
         return books
 
-    async def get_titles_map(self, titles: list[str]) -> dict[str, Book]:
-        return {
-            book.title: book for book in self.books.values() if book.title in titles
-        }
-
     async def add(self, book: Book) -> None:
         self.books[book.id] = book
 

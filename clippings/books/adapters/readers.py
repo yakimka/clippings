@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, TextIO
 
 from clippings.books.adapters.kindle_parser.parser import KindleClippingsParser
-from clippings.books.dtos import ClippingImportCandidateDTO
+from clippings.books.dtos import BookDTO, ClippingImportCandidateDTO
 from clippings.books.entities import ClippingType
 from clippings.books.ports import ClippingsReaderABC
 
@@ -30,8 +30,11 @@ class KindleClippingsReader(ClippingsReaderABC):
             parser.add_line(line)
             if (clipping := parser.get_clipping()) and clipping["type"] in ClippingType:
                 yield ClippingImportCandidateDTO(
+                    book=BookDTO(
+                        title=clipping["title"],
+                        author="",
+                    ),
                     type=ClippingType(clipping["type"]),
-                    book_title=clipping["title"],
                     content="\n".join(clipping["content"]).strip(),
                     page=clipping["page"],
                     location=clipping["location"],
