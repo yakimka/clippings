@@ -1,0 +1,61 @@
+<div hx-target="this" style="display: flex; align-items: center; gap: var(--pico-spacing);">
+    <div>
+        <img src="{{ data.cover_url }}" width="400" alt="Book Image" class="book-cover">
+    </div>
+    <form
+            hx-{{ data.actions_map.edit_book_info.url.method }}="{{ data.actions_map.edit_book_info.url.value }}"
+            hx-swap="outerHTML">
+        <fieldset>
+            {% with fields=data.fields_meta %}
+            <label>
+                {{ fields.title.label }}
+                <input
+                        name="title"
+                        placeholder="{{ fields.title.label }}"
+                        value="{{ data.title }}"
+                />
+            </label>
+            <label>
+                {{ fields.author.label }}
+                <input
+                        name="author"
+                        placeholder="{{ fields.author.label }}"
+                        value="{{ data.author }}"
+                />
+            </label>
+            <label>
+                {{ fields.rating.label }}
+                <input
+                        name="rating"
+                        placeholder="{{ fields.rating.label }}"
+                        value="{{ data.rating }}"
+                        type="number"
+                        min="{{ fields.rating.min }}"
+                        max="{{ fields.rating.max }}"
+                />
+            </label>
+            <label>
+                {{ fields.cover.label }}
+                <input
+                        name="cover"
+                        placeholder="{{ fields.cover.label }}"
+                        type="file"
+                />
+            </label>
+            {% endwith %}
+        </fieldset>
+
+        <div role="group">
+            <input
+                    type="submit"
+                    value="{{ data.actions_map.edit_book_info.label }}"
+            />
+            <button
+                    class="secondary"
+                    hx-{{ data.actions_map.cancel_edit.url.method }}="{{ data.actions_map.cancel_edit.url.value }}"
+            >
+                {{ data.actions_map.cancel_edit.label }}
+            </button>
+        </div>
+    </form>
+</div>

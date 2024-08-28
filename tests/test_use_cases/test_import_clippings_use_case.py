@@ -93,7 +93,7 @@ async def test_import_new_book(
             mother.book(
                 id=ANY,
                 title="Book 1",
-                author_name=None,
+                author=None,
                 clippings=[
                     mother.clipping(
                         id=ANY,
@@ -116,7 +116,7 @@ async def test_import_existed_book(
         mother.book(
             id="book:42",
             title="Book 1",
-            author_name="The Author",
+            author="The Author",
             clippings=[
                 mother.clipping(
                     id="clipping:42",
@@ -142,7 +142,7 @@ async def test_import_existed_book(
             mother.book(
                 id=ANY,
                 title="Book 1",
-                author_name="The Author",
+                author="The Author",
                 clippings=[
                     mother.clipping(
                         id="clipping:42",

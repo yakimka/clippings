@@ -1,7 +1,5 @@
-<small class="action-link">
-    <span
-        hx-{{ action.url.method }}="{{ action.url.value }}"
-        hx-target="closest small">
-        {{ action.label }}
-    </span>
-</small>
+<span
+    class="action-link"
+    hx-{{ action.url.method }}="{{ action.url.value }}">
+    <small>{{ action.label }}</small>
+</span>

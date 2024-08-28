@@ -11,12 +11,15 @@ class ObjectMother:  # noqa: PIE798
         *,
         id: str = "book:id",
         title: str = "The Book",
-        author_name: str | None = "The Author",
+        author: str | None = "The Author",
+        cover_url: str | None = "https://placehold.co/400x600",
         clippings: list[Clipping] | None = None,
     ) -> Book:
         if clippings is None:
             clippings = []
-        return Book(id=id, title=title, author_name=author_name, clippings=clippings)
+        return Book(
+            id=id, title=title, author=author, cover_url=cover_url, clippings=clippings
+        )
 
     @classmethod
     def clipping(

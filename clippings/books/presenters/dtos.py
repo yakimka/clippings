@@ -7,7 +7,7 @@ from typing import Any, Literal
 @dataclass(frozen=True)
 class UrlTemplateDTO:
     template: str
-    method: Literal["get", "post", "put", "delete"] = "get"
+    method: Literal["get", "post", "put", "patch", "delete"] = "get"
 
 
 @dataclass

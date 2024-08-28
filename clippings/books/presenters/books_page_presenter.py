@@ -72,7 +72,7 @@ class BooksPagePresenter:
             books=[
                 BookOnPageDTO(
                     cover_url="https://placehold.co/400x600",
-                    name=f"{book.title} by {book.author_name}",
+                    name=f"{book.title} by {book.author}",
                     clippings_count=len(book.clippings),
                     last_clipping_added_at="-",
                     rating=10,

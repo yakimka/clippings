@@ -2,8 +2,9 @@ from collections.abc import AsyncGenerator
 from pathlib import Path
 from random import randint  # noqa: DUO102
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Form
 from fastapi.responses import HTMLResponse, Response
+from starlette.responses import RedirectResponse
 
 from clippings.books.adapters.finders import MockBooksFinder
 from clippings.books.adapters.id_generators import (
@@ -14,14 +15,19 @@ from clippings.books.adapters.readers import KindleClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage
 from clippings.books.ports import BooksFinderABC, BooksStorageABC, ClippingsReaderABC
 from clippings.books.presenters.books_detail_presenter import (
+    BookInfoHtmlRendered,
+    BookReviewHtmlRendered,
     BooksDetailHtmlRendered,
     BooksDetailPresenter,
+    EditInfoFormHtmlRendered,
+    EditReviewFormHtmlRendered,
 )
 from clippings.books.presenters.books_page_presenter import (
     BooksPageHtmlRendered,
     BooksPagePresenter,
 )
 from clippings.books.presenters.pagination_presenter import classic_pagination_presenter
+from clippings.books.use_cases.edit_book import BookFieldsDTO, EditBookUseCase
 from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
 from clippings.test.object_mother import ObjectMother
 
@@ -96,6 +102,82 @@ async def book_detail(
     book_page_rendered = BooksDetailHtmlRendered()
     book_dto = await book_presenter.present(book_id=book_id)
     return await book_page_rendered.render(book_dto)
+
+
+@app.get("/books/{book_id}/review", response_class=HTMLResponse)
+async def book_detail(
+    book_id: str, books_storage: BooksStorageABC = Depends(get_books_storage)
+) -> str:
+    form_presenter = BooksDetailPresenter(storage=books_storage)
+    dto = await form_presenter.review(book_id=book_id)
+    rendered = BookReviewHtmlRendered()
+    return await rendered.render(dto)
+
+
+@app.get("/books/{book_id}/review/edit", response_class=HTMLResponse)
+async def book_detail(
+    book_id: str, books_storage: BooksStorageABC = Depends(get_books_storage)
+) -> str:
+    form_presenter = BooksDetailPresenter(storage=books_storage)
+    dto = await form_presenter.edit_review(book_id=book_id)
+    rendered = EditReviewFormHtmlRendered()
+    return await rendered.render(dto)
+
+
+@app.patch("/books/{book_id}/review", response_class=RedirectResponse, status_code=303)
+async def edit_review(
+    book_id: str,
+    review: str = Form(""),
+    books_storage: BooksStorageABC = Depends(get_books_storage),
+) -> str:
+    use_case = EditBookUseCase(book_storage=books_storage)
+    await use_case.execute(
+        BookFieldsDTO(
+            id=book_id,
+            review=review,
+        )
+    )
+    return f"/books/{book_id}/review"
+
+
+@app.get("/books/{book_id}/info", response_class=HTMLResponse)
+async def book_info(
+    book_id: str, books_storage: BooksStorageABC = Depends(get_books_storage)
+) -> str:
+    form_presenter = BooksDetailPresenter(storage=books_storage)
+    dto = await form_presenter.book_info(book_id=book_id)
+    rendered = BookInfoHtmlRendered()
+    return await rendered.render(dto)
+
+
+@app.get("/books/{book_id}/info/edit", response_class=HTMLResponse)
+async def book_detail(
+    book_id: str, books_storage: BooksStorageABC = Depends(get_books_storage)
+) -> str:
+    form_presenter = BooksDetailPresenter(storage=books_storage)
+    dto = await form_presenter.edit_book_info(book_id=book_id)
+    rendered = EditInfoFormHtmlRendered()
+    return await rendered.render(dto)
+
+
+@app.patch("/books/{book_id}/info", response_class=RedirectResponse, status_code=303)
+async def edit_info(
+    book_id: str,
+    title: str = Form(),
+    author: str = Form(),
+    rating: int = Form(),
+    books_storage: BooksStorageABC = Depends(get_books_storage),
+) -> str:
+    use_case = EditBookUseCase(book_storage=books_storage)
+    await use_case.execute(
+        BookFieldsDTO(
+            id=book_id,
+            title=title,
+            author=author,
+            rating=rating,
+        )
+    )
+    return f"/books/{book_id}/info"
 
 
 if __name__ == "__main__":

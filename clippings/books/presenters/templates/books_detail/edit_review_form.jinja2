@@ -1,0 +1,23 @@
+<form
+        hx-{{ data.actions_map.edit_review.url.method }}="{{ data.actions_map.edit_review.url.value }}"
+        hx-target="this"
+        hx-swap="outerHTML">
+  <textarea
+          name="review"
+          placeholder="Write a review about this book"
+          aria-label="My review"
+  >{{ data.review }}</textarea>
+
+    <div role="group">
+        <input
+                type="submit"
+                value="{{ data.actions_map.edit_review.label }}"
+        />
+        <button
+                class="secondary"
+                hx-{{ data.actions_map.cancel_edit.url.method }}="{{ data.actions_map.cancel_edit.url.value }}"
+        >
+            {{ data.actions_map.cancel_edit.label }}
+        </button>
+    </div>
+</form>

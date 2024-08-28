@@ -1,0 +1,6 @@
+<p hx-target="this">
+    {{ data.review }}
+    {% with action=data.actions_map.edit_review %}
+    {% include "action_link.jinja2" %}
+    {% endwith %}
+</p>

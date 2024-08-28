@@ -12,8 +12,11 @@ if TYPE_CHECKING:
 class Book:
     id: str
     title: str
-    author_name: str | None
+    author: str | None
+    cover_url: str | None
     clippings: list[Clipping]
+    review: str = ""
+    rating: int | None = None
 
     def __post_init__(self):
         self.link_notes()

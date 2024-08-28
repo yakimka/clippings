@@ -35,7 +35,8 @@ class ImportClippingsUseCase:
                 book_id_to_book_map[book_id] = Book(
                     id=book_id,
                     title=candidate.book.title,
-                    author_name=candidate.book.author,
+                    author=candidate.book.author,
+                    cover_url=None,
                     clippings=[],
                 )
             book_id_to_book_map[book_id].clippings.append(

@@ -5,21 +5,13 @@
 {% endblock %}
 {% block body %}
     <main class="container">
-        <section style="display: flex; align-items: center; gap: var(--pico-spacing);">
-            <div>
-                <img src="{{ data.cover_url }}" width="100" alt="Book Image" class="book-cover">
-            </div>
-            <hgroup>
-                <h1>{{ data.title }}</h1>
-                <h3>{{ data.author }}</h3>
-                <p>{{ data.rating }}</p>
-            </hgroup>
+        <section>
+        {% include "books_detail/book_info.jinja2" %}
         </section>
 
         <section>
-            <p>{{ data.review }}</p>
+        {% include "books_detail/review.jinja2" %}
         </section>
-
         <section>
             {% for clipping in data.clippings %}
                 <article>

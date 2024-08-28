@@ -39,12 +39,12 @@ async def test_can_present_books_content(make_sut, mother):
         mother.book(
             id="book:1",
             title="The Book",
-            author_name="The Author",
+            author="The Author",
         ),
         mother.book(
             id="book:2",
             title="Another Book",
-            author_name="Another Author",
+            author="Another Author",
         ),
     ]
     sut = make_sut(books)
