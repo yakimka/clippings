@@ -1,6 +1,5 @@
 from collections.abc import AsyncGenerator
 from pathlib import Path
-from random import randint  # noqa: DUO102
 
 from fastapi import Depends, FastAPI, Form
 from fastapi.responses import HTMLResponse, Response
@@ -14,36 +13,18 @@ from clippings.books.adapters.id_generators import (
 from clippings.books.adapters.readers import KindleClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage
 from clippings.books.ports import BooksFinderABC, BooksStorageABC, ClippingsReaderABC
-from clippings.books.presenters.books_detail_presenter import (
-    BookInfoHtmlRendered,
-    BookReviewHtmlRendered,
-    BooksDetailHtmlRendered,
-    BooksDetailPresenter,
-    EditInfoFormHtmlRendered,
-    EditReviewFormHtmlRendered,
-)
-from clippings.books.presenters.books_page_presenter import (
-    BooksPageHtmlRendered,
-    BooksPagePresenter,
-)
-from clippings.books.presenters.pagination_presenter import classic_pagination_presenter
+from clippings.books.presenters import html_renderers
+from clippings.books.presenters.book_detail.presenters import BookDetailPresenter
+from clippings.books.presenters.book_list import BooksPagePresenter
+from clippings.books.presenters.pagination import classic_pagination_presenter
+from clippings.books.presenters.urls import UrlsManager, make_books_urls_builder
 from clippings.books.use_cases.edit_book import BookFieldsDTO, EditBookUseCase
 from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
-from clippings.test.object_mother import ObjectMother
 
 app = FastAPI()
-
-mother = ObjectMother()
-all_books = [
-    mother.book(
-        id=f"book:{i}",
-        title=f"The Book {i}",
-        clippings=[mother.clipping() for _ in range(randint(0, 10))],  # noqa: S311
-    )
-    for i in range(100)
-]
-books_map = {book.id: book for book in all_books}
 books_map = {}
+book_urls_builder = make_books_urls_builder()
+urls_manager = UrlsManager(book_urls_builder())
 
 
 async def get_books_finder() -> BooksFinderABC:
@@ -60,6 +41,12 @@ async def get_clippings_reader() -> AsyncGenerator[ClippingsReaderABC, None]:
         yield KindleClippingsReader(file)
 
 
+async def get_book_detail_presenter(
+    books_storage: BooksStorageABC = Depends(get_books_storage),
+) -> BookDetailPresenter:
+    return BookDetailPresenter(storage=books_storage, urls_manager=urls_manager)
+
+
 @app.get("/books/", response_class=HTMLResponse)
 async def books(
     page: int = 1,
@@ -67,11 +54,12 @@ async def books(
     books_finder: BooksFinderABC = Depends(get_books_finder),
 ) -> str:
     books_presenter = BooksPagePresenter(
-        finder=books_finder, pagination_presenter=classic_pagination_presenter
+        finder=books_finder,
+        pagination_presenter=classic_pagination_presenter,
+        urls_manager=urls_manager,
     )
-    books_page_rendered = BooksPageHtmlRendered()
     books_dto = await books_presenter.present(page=page, on_page=on_page)
-    return await books_page_rendered.render(books_dto)
+    return html_renderers.book_list(books_dto)
 
 
 @app.get("/books/import", response_class=HTMLResponse)
@@ -96,35 +84,32 @@ async def delete_book(book_id: str) -> Response:  # noqa: U100
 
 @app.get("/books/{book_id}", response_class=HTMLResponse)
 async def book_detail(
-    book_id: str, books_storage: BooksStorageABC = Depends(get_books_storage)
+    book_id: str,
+    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
 ) -> str:
-    book_presenter = BooksDetailPresenter(storage=books_storage)
-    book_page_rendered = BooksDetailHtmlRendered()
-    book_dto = await book_presenter.present(book_id=book_id)
-    return await book_page_rendered.render(book_dto)
+    book_dto = await detail_presenter.page(book_id=book_id)
+    return html_renderers.book_detail(book_dto)
 
 
 @app.get("/books/{book_id}/review", response_class=HTMLResponse)
 async def book_detail(
-    book_id: str, books_storage: BooksStorageABC = Depends(get_books_storage)
+    book_id: str,
+    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
 ) -> str:
-    form_presenter = BooksDetailPresenter(storage=books_storage)
-    dto = await form_presenter.review(book_id=book_id)
-    rendered = BookReviewHtmlRendered()
-    return await rendered.render(dto)
+    dto = await detail_presenter.review(book_id=book_id)
+    return html_renderers.book_review(dto)
 
 
 @app.get("/books/{book_id}/review/edit", response_class=HTMLResponse)
 async def book_detail(
-    book_id: str, books_storage: BooksStorageABC = Depends(get_books_storage)
+    book_id: str,
+    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
 ) -> str:
-    form_presenter = BooksDetailPresenter(storage=books_storage)
-    dto = await form_presenter.edit_review(book_id=book_id)
-    rendered = EditReviewFormHtmlRendered()
-    return await rendered.render(dto)
+    dto = await detail_presenter.edit_review(book_id=book_id)
+    return html_renderers.book_review_update_form(dto)
 
 
-@app.patch("/books/{book_id}/review", response_class=RedirectResponse, status_code=303)
+@app.put("/books/{book_id}/review", response_class=RedirectResponse, status_code=303)
 async def edit_review(
     book_id: str,
     review: str = Form(""),
@@ -142,25 +127,23 @@ async def edit_review(
 
 @app.get("/books/{book_id}/info", response_class=HTMLResponse)
 async def book_info(
-    book_id: str, books_storage: BooksStorageABC = Depends(get_books_storage)
+    book_id: str,
+    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
 ) -> str:
-    form_presenter = BooksDetailPresenter(storage=books_storage)
-    dto = await form_presenter.book_info(book_id=book_id)
-    rendered = BookInfoHtmlRendered()
-    return await rendered.render(dto)
+    dto = await detail_presenter.book_info(book_id=book_id)
+    return html_renderers.book_info(dto)
 
 
 @app.get("/books/{book_id}/info/edit", response_class=HTMLResponse)
 async def book_detail(
-    book_id: str, books_storage: BooksStorageABC = Depends(get_books_storage)
+    book_id: str,
+    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
 ) -> str:
-    form_presenter = BooksDetailPresenter(storage=books_storage)
-    dto = await form_presenter.edit_book_info(book_id=book_id)
-    rendered = EditInfoFormHtmlRendered()
-    return await rendered.render(dto)
+    dto = await detail_presenter.edit_book_info(book_id=book_id)
+    return html_renderers.book_info_update_form(dto)
 
 
-@app.patch("/books/{book_id}/info", response_class=RedirectResponse, status_code=303)
+@app.put("/books/{book_id}/info", response_class=RedirectResponse, status_code=303)
 async def edit_info(
     book_id: str,
     title: str = Form(),

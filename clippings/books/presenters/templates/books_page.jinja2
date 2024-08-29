@@ -7,18 +7,18 @@
 <main class="container">
     <h1>{{ data.page_title }}</h1>
 
-    <div role="group">
-        <button>{{ data.actions_map.import_clippings.label }}</button>
-        <a role="button" href="{{ data.actions_map.add_book.url.value }}">
-            {{ data.actions_map.add_book.label }}
-        </a>
-    </div>
+{#    <div role="group">#}
+{#        <button>{{ data.actions_map.import_clippings.label }}</button>#}
+{#        <a role="button" href="{{ data.actions_map.add_book.url.value }}">#}
+{#            {{ data.actions_map.add_book.label }}#}
+{#        </a>#}
+{#    </div>#}
 
     <table>
         <thead>
         <tr>
-            {% for field_id, field_name in data.field_labels %}
-            <th scope="col">{{ field_name }}</th>
+            {% for field_meta in data.fields_meta.values() %}
+            <th scope="col">{{ field_meta.label }}</th>
             {% endfor %}
         </tr>
         </thead>
@@ -26,12 +26,12 @@
         {% for book in data.books %}
         <tr>
             <th scope="row">
-                <a href="{{ book.actions_map.view_book.url.value }}">
+                <a href="{{ book.actions_map.book_detail_page.url.value }}">
                     <img src="{{ book.cover_url }}" width="100" alt="Book Image" class="book-cover">
                 </a>
             </th>
             <td>
-                <a class="contrast" href="{{ book.actions_map.view_book.url.value }}">
+                <a class="contrast" href="{{ book.actions_map.book_detail_page.url.value }}">
                     {{ book.name }}
                 </a>
             </td>
@@ -43,8 +43,8 @@
                 <div role="group">
                     <button
                         class="secondary"
-                        hx-{{ book.actions_map.delete_book.url.method }}="{{ book.actions_map.delete_book.url.value }}"
-                        hx-target="closest tr">{{ book.actions_map.delete_book.label }}
+                        {{ hx_link(book.actions_map.book_delete.url) }}
+                        hx-target="closest tr">{{ book.actions_map.book_delete.label }}
                     </button>
                 </div>
             </td>

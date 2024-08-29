@@ -7,19 +7,16 @@ import pytest
 
 from clippings.books.adapters.storages import MockBooksStorage
 from clippings.books.entities import Book, ClippingType
-from clippings.books.presenters.books_detail_presenter import (
-    BooksDetailDTO,
-    BooksDetailPresenter,
-    ClippingDTO,
-)
+from clippings.books.presenters.book_detail.dtos import BookDetailDTO, ClippingDTO
+from clippings.books.presenters.book_detail.presenters import BookDetailPresenter
 
 
 @pytest.fixture()
 def make_sut():
-    def _make_sut(books: list[Book] | None = None) -> BooksDetailPresenter:
+    def _make_sut(books: list[Book] | None = None) -> BookDetailPresenter:
         books_map = {book.id: book for book in books or []}
         storage = MockBooksStorage(books_map)
-        return BooksDetailPresenter(storage)
+        return BookDetailPresenter(storage)
 
     return _make_sut
 
@@ -44,7 +41,7 @@ async def test_can_present_book_content(make_sut, mother):
 
     result = await sut.present(book_id="book:1")
 
-    assert result == BooksDetailDTO(
+    assert result == BookDetailDTO(
         cover_url="https://placehold.co/400x600",
         title="The Book",
         author="by The Author",

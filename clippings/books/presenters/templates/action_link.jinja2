@@ -1,5 +1,5 @@
 <span
     class="action-link"
-    hx-{{ action.url.method }}="{{ action.url.value }}">
+    {{ hx_link(action.url) }}>
     <small>{{ action.label }}</small>
 </span>

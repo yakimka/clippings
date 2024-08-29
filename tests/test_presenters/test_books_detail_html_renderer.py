@@ -3,9 +3,9 @@ from __future__ import annotations
 import pytest
 
 from clippings.books.adapters.storages import MockBooksStorage
+from clippings.books.presenters.book_detail.presenters import BookDetailPresenter
 from clippings.books.presenters.books_detail_presenter import (
     BooksDetailHtmlRendered,
-    BooksDetailPresenter,
     BooksDetailStringRenderedABC,
 )
 
@@ -14,7 +14,7 @@ from clippings.books.presenters.books_detail_presenter import (
 def page_detail_presenter(mother):
     books = [mother.book(id=f"b:{i}") for i in range(5)]
     storage = MockBooksStorage({book.id: book for book in books})
-    return BooksDetailPresenter(storage)
+    return BookDetailPresenter(storage)
 
 
 @pytest.fixture()

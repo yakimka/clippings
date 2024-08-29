@@ -6,12 +6,9 @@ from unittest.mock import ANY, create_autospec
 import pytest
 
 from clippings.books.adapters.finders import MockBooksFinder
-from clippings.books.presenters.books_page_presenter import (
-    BookOnPageDTO,
-    BooksPagePresenter,
-)
+from clippings.books.presenters.book_list import BookOnPageDTO, BooksPagePresenter
 from clippings.books.presenters.dtos import PaginationItemDTO
-from clippings.books.presenters.pagination_presenter import PaginationPresenter
+from clippings.books.presenters.pagination import PaginationPresenter
 
 if TYPE_CHECKING:
     from clippings.books.entities import Book

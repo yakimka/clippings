@@ -5,12 +5,12 @@ from unittest.mock import create_autospec
 import pytest
 
 from clippings.books.adapters.finders import MockBooksFinder
-from clippings.books.presenters.books_page_presenter import (
+from clippings.books.presenters.book_list import (
     BooksPageHtmlRendered,
     BooksPagePresenter,
     BooksPageStringRenderedABC,
 )
-from clippings.books.presenters.pagination_presenter import PaginationPresenter
+from clippings.books.presenters.pagination import PaginationPresenter
 
 
 @pytest.fixture()

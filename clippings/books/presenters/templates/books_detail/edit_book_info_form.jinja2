@@ -3,7 +3,7 @@
         <img src="{{ data.cover_url }}" width="400" alt="Book Image" class="book-cover">
     </div>
     <form
-            hx-{{ data.actions_map.edit_book_info.url.method }}="{{ data.actions_map.edit_book_info.url.value }}"
+            {{ hx_link(data.actions_map.save.url) }}
             hx-swap="outerHTML">
         <fieldset>
             {% with fields=data.fields_meta %}
@@ -48,13 +48,13 @@
         <div role="group">
             <input
                     type="submit"
-                    value="{{ data.actions_map.edit_book_info.label }}"
+                    value="{{ data.actions_map.save.label }}"
             />
             <button
                     class="secondary"
-                    hx-{{ data.actions_map.cancel_edit.url.method }}="{{ data.actions_map.cancel_edit.url.value }}"
+                    {{ hx_link(data.actions_map.cancel.url) }}
             >
-                {{ data.actions_map.cancel_edit.label }}
+                {{ data.actions_map.cancel.label }}
             </button>
         </div>
     </form>
