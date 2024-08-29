@@ -7,6 +7,8 @@ from clippings.books.presenters.book_detail.dtos import (
     BookEditInfoDTO,
     BookInfoDTO,
     BookReviewDTO,
+    ClippingDTO,
+    ClippingEditDTO,
 )
 from clippings.books.presenters.dtos import ActionDTO
 from clippings.books.presenters.urls import UrlsManager
@@ -100,3 +102,49 @@ class BookDetailPresenter:
                 ),
             ],
         )
+
+    async def clippings(self, book_id: str) -> list[ClippingDTO] | None:
+        builder = await self._retrieve_builder(book_id)
+        if builder is None:
+            return None
+
+        return builder.clippings_dtos()
+
+    async def clipping(self, book_id: str, clipping_id: str) -> ClippingDTO | None:
+        builder = await self._retrieve_builder(book_id)
+        if builder is None:
+            return None
+
+        return builder.clipping_dto(clipping_id)
+
+    async def edit_clipping(self, book_id: str, clipping_id: str) -> ClippingDTO | None:
+        builder = await self._retrieve_builder(book_id)
+        if builder is None:
+            return None
+
+        book = builder.book
+        clipping = book.get_clipping(clipping_id)
+        if clipping is None:
+            return None
+
+        builder = BookDetailBuilder(book, self._urls_manager)
+        clipping_dto = builder.clipping_dto(clipping_id)
+        clipping_dto.content = clipping.content
+        clipping_dto.actions = [
+            ActionDTO(
+                id="save",
+                label="Save",
+                url=self._urls_manager.build_url(
+                    "clipping_update", book_id=book_id, clipping_id=clipping_id
+                ),
+            ),
+            ActionDTO(
+                id="cancel",
+                label="Cancel",
+                url=self._urls_manager.build_url(
+                    "clipping_detail", book_id=book_id, clipping_id=clipping_id
+                ),
+            ),
+        ]
+
+        return clipping_dto

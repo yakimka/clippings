@@ -19,8 +19,23 @@ class ClippingDTO:
     page: str
     location: str
     added_at: str
+    notes_label: str
     inline_notes: list[InlineNoteDTO]
     actions: list[ActionDTO]
+
+    @property
+    def actions_map(self) -> dict[str, ActionDTO]:
+        return {action.id: action for action in self.actions}
+
+
+@dataclass
+class ClippingEditDTO:
+    content: str
+    actions: list[ActionDTO]
+
+    @property
+    def actions_map(self) -> dict[str, ActionDTO]:
+        return {action.id: action for action in self.actions}
 
 
 @dataclass
@@ -32,7 +47,6 @@ class BookDetailDTO:
     author: str
     rating: str
     review: str
-    notes_label: str
     clippings: list[ClippingDTO]
 
     @property
@@ -61,6 +75,19 @@ class BookEditInfoDTO(BookInfoDTO):
 @dataclass
 class BookReviewDTO:
     review: str
+    actions: list[ActionDTO]
+
+    @property
+    def actions_map(self) -> dict[str, ActionDTO]:
+        return {action.id: action for action in self.actions}
+
+
+@dataclass
+class ClippingAddDTO:
+    type: str
+    page: str
+    location: str
+    book_id: str
     actions: list[ActionDTO]
 
     @property

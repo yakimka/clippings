@@ -12,38 +12,9 @@
         <section>
         {% include "books_detail/review.jinja2" %}
         </section>
-        <section>
-            {% for clipping in data.clippings %}
-                <article>
-                    <section>{{ clipping.content }}</section>
-                    {% if clipping.inline_notes %}
-                    <h6>{{ data.notes_label }}</h6>
-                    <hr>
-                    {% endif %}
-                    {% for note in clipping.inline_notes %}
-                    <section>
-                        <small>{{ note.content }}</small>
-                        {% for action in note.actions %}
-                        {% include "action_link.jinja2" %}
-                        {% endfor %}
-                    </section>
-                    {% endfor %}
-                    <footer style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <kbd>{{ clipping.type }}</kbd>
-                            <kbd>{{ clipping.page }}</kbd>
-                            <kbd>{{ clipping.location }}</kbd>
-                            <kbd>{{ clipping.added_at }}</kbd>
-                        </div>
-                        <div>
-                            {% for action in clipping.actions %}
-                            {% include "action_link.jinja2" %}
-                            {% endfor %}
-                        </div>
-                    </footer>
 
-                </article>
-            {% endfor %}
-        </section>
+        {% with data=data.clippings %}
+        {% include "books_detail/clipping_list.jinja2" %}
+        {% endwith %}
     </main>
 {% endblock %}

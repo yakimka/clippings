@@ -38,3 +38,30 @@ class EditBookUseCase:
             setattr(book, field, value)
 
         await self._book_storage.add(book)
+
+
+@dataclass
+class ClippingFieldsDTO:
+    id: str
+    book_id: str
+    content: str | None = None
+
+
+class EditClippingUseCase:
+    def __init__(self, book_storage: BooksStorageABC):
+        self._book_storage = book_storage
+
+    async def execute(self, data: ClippingFieldsDTO) -> None:
+        book = await self._book_storage.get(data.book_id)
+        clipping = book.get_clipping(data.id)
+        to_patch = {}
+        if data.content is not None:
+            to_patch["content"] = data.content
+
+        if not to_patch:
+            return
+
+        for field, value in to_patch.items():
+            setattr(clipping, field, value)
+
+        await self._book_storage.add(book)

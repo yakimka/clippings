@@ -1,0 +1,7 @@
+<section>
+    {% for clipping in data %}
+    {% with data=clipping %}
+    {% include "books_detail/clipping.jinja2" %}
+    {% endwith %}
+    {% endfor %}
+</section>

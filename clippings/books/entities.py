@@ -21,6 +21,12 @@ class Book:
     def __post_init__(self):
         self.link_notes()
 
+    def get_clipping(self, clipping_id: str) -> Clipping | None:
+        for clipping in self.clippings:
+            if clipping.id == clipping_id:
+                return clipping
+        return None
+
     def add_clippings(self, clippings: list[Clipping]) -> None:
         existed_ids = set()
         for clipping in self.clippings:

@@ -18,7 +18,12 @@ from clippings.books.presenters.book_detail.presenters import BookDetailPresente
 from clippings.books.presenters.book_list import BooksPagePresenter
 from clippings.books.presenters.pagination import classic_pagination_presenter
 from clippings.books.presenters.urls import UrlsManager, make_books_urls_builder
-from clippings.books.use_cases.edit_book import BookFieldsDTO, EditBookUseCase
+from clippings.books.use_cases.edit_book import (
+    BookFieldsDTO,
+    ClippingFieldsDTO,
+    EditBookUseCase,
+    EditClippingUseCase,
+)
 from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
 
 app = FastAPI()
@@ -48,7 +53,7 @@ async def get_book_detail_presenter(
 
 
 @app.get("/books/", response_class=HTMLResponse)
-async def books(
+async def book_list(
     page: int = 1,
     on_page: int = 10,
     books_finder: BooksFinderABC = Depends(get_books_finder),
@@ -63,7 +68,7 @@ async def books(
 
 
 @app.get("/books/import", response_class=HTMLResponse)
-async def import_books(
+async def clippings_import(
     books_storage: BooksStorageABC = Depends(get_books_storage),
     clippings_reader: ClippingsReaderABC = Depends(get_clippings_reader),
 ) -> str:
@@ -92,7 +97,7 @@ async def book_detail(
 
 
 @app.get("/books/{book_id}/review", response_class=HTMLResponse)
-async def book_detail(
+async def book_review(
     book_id: str,
     detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
 ) -> str:
@@ -101,7 +106,7 @@ async def book_detail(
 
 
 @app.get("/books/{book_id}/review/edit", response_class=HTMLResponse)
-async def book_detail(
+async def book_review_update_form(
     book_id: str,
     detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
 ) -> str:
@@ -110,7 +115,7 @@ async def book_detail(
 
 
 @app.put("/books/{book_id}/review", response_class=RedirectResponse, status_code=303)
-async def edit_review(
+async def save_book_review(
     book_id: str,
     review: str = Form(""),
     books_storage: BooksStorageABC = Depends(get_books_storage),
@@ -135,7 +140,7 @@ async def book_info(
 
 
 @app.get("/books/{book_id}/info/edit", response_class=HTMLResponse)
-async def book_detail(
+async def book_info_update_form(
     book_id: str,
     detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
 ) -> str:
@@ -144,7 +149,7 @@ async def book_detail(
 
 
 @app.put("/books/{book_id}/info", response_class=RedirectResponse, status_code=303)
-async def edit_info(
+async def book_info_save(
     book_id: str,
     title: str = Form(),
     author: str = Form(),
@@ -161,6 +166,62 @@ async def edit_info(
         )
     )
     return f"/books/{book_id}/info"
+
+
+@app.get("/books/{book_id}/clippings", response_class=HTMLResponse)
+async def clipping_list(
+    book_id: str,
+    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
+) -> str:
+    dto = await detail_presenter.clippings(book_id=book_id)
+    return html_renderers.clipping_list(dto)
+
+
+@app.get("/books/{book_id}/clippings/{clipping_id}", response_class=HTMLResponse)
+async def clipping_detail(
+    book_id: str,
+    clipping_id: str,
+    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
+) -> str:
+    dto = await detail_presenter.clipping(book_id=book_id, clipping_id=clipping_id)
+    return html_renderers.clipping_detail(dto)
+
+
+@app.get("/books/{book_id}/clippings/{clipping_id}/edit", response_class=HTMLResponse)
+async def edit_clipping_form(
+    book_id: str,
+    clipping_id: str,
+    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
+) -> str:
+    dto = await detail_presenter.edit_clipping(book_id=book_id, clipping_id=clipping_id)
+    return html_renderers.clipping_update_form(dto)
+
+
+@app.put(
+    "/books/{book_id}/clippings/{clipping_id}",
+    response_class=RedirectResponse,
+    status_code=303,
+)
+async def save_clipping(
+    book_id: str,
+    clipping_id: str,
+    content: str = Form(),
+    books_storage: BooksStorageABC = Depends(get_books_storage),
+) -> str:
+    use_case = EditClippingUseCase(book_storage=books_storage)
+    await use_case.execute(
+        ClippingFieldsDTO(
+            id=clipping_id,
+            book_id=book_id,
+            content=content,
+        )
+    )
+    return f"/books/{book_id}/clippings/{clipping_id}"
+
+
+@app.delete("/books/{book_id}/clippings/{clipping_id}", response_class=Response)
+def delete_clipping(book_id: str, clipping_id: str) -> Response:
+    return Response(status_code=200)
 
 
 if __name__ == "__main__":

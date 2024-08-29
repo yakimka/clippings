@@ -30,21 +30,23 @@ class BookDetailBuilder:
             author=main_info_dto.author,
             rating=main_info_dto.rating,
             review=review_dto.review,
-            notes_label="Notes",
             clippings=self.clippings_dtos(),
         )
 
     def clippings_dtos(self) -> list[ClippingDTO]:
         return [self.clipping_dto(clipping.id) for clipping in self.book.clippings]
 
-    def clipping_dto(self, clipping_id: str) -> ClippingDTO:
-        clipping = self.clippings_by_id[clipping_id]
+    def clipping_dto(self, clipping_id: str) -> ClippingDTO | None:
+        clipping = self.clippings_by_id.get(clipping_id)
+        if clipping is None:
+            return None
         return ClippingDTO(
             content=clipping.content,
             type=clipping.type.value.capitalize(),
             page=f"Page: {"-".join(map(str, clipping.page))}",
             location=f"Loc: {"-".join(map(str, clipping.location))}",
             added_at=f"Added: {clipping.added_at.date().isoformat()}",
+            notes_label="Notes",
             inline_notes=self.inline_notes_dtos(clipping.id),
             actions=[
                 ActionDTO(
