@@ -19,10 +19,14 @@ from clippings.books.presenters.book_list import BooksPagePresenter
 from clippings.books.presenters.pagination import classic_pagination_presenter
 from clippings.books.presenters.urls import UrlsManager, make_books_urls_builder
 from clippings.books.use_cases.edit_book import (
+    AddInlineNoteUseCase,
     BookFieldsDTO,
     ClippingFieldsDTO,
+    DeleteInlineNoteUseCase,
     EditBookUseCase,
     EditClippingUseCase,
+    EditInlineNoteUseCase,
+    UnlinkInlineNoteUseCase,
 )
 from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
 
@@ -222,6 +226,115 @@ async def save_clipping(
 @app.delete("/books/{book_id}/clippings/{clipping_id}", response_class=Response)
 def delete_clipping(book_id: str, clipping_id: str) -> Response:
     return Response(status_code=200)
+
+
+@app.get(
+    "/books/{book_id}/clippings/{clipping_id}/inline_notes/add",
+    response_class=HTMLResponse,
+)
+async def add_inline_note(
+    book_id: str,
+    clipping_id: str,
+    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
+) -> str:
+    dto = await detail_presenter.add_inline_note(
+        book_id=book_id, clipping_id=clipping_id
+    )
+    return html_renderers.inline_note_add_form(dto)
+
+
+@app.post(
+    "/books/{book_id}/clippings/{clipping_id}/inline_notes",
+    response_class=RedirectResponse,
+    status_code=303,
+)
+async def add_inline_note(
+    book_id: str,
+    clipping_id: str,
+    content: str = Form(),
+    books_storage: BooksStorageABC = Depends(get_books_storage),
+) -> str:
+    use_case = AddInlineNoteUseCase(book_storage=books_storage)
+    await use_case.execute(book_id=book_id, clipping_id=clipping_id, content=content)
+    return f"/books/{book_id}/clippings/{clipping_id}"
+
+
+@app.get(
+    "/books/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}/edit",
+    response_class=HTMLResponse,
+)
+async def edit_inline_note_form(
+    book_id: str,
+    clipping_id: str,
+    inline_note_id: str,
+    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
+) -> Response:
+    dto = await detail_presenter.edit_inline_note(
+        book_id=book_id, clipping_id=clipping_id, inline_note_id=inline_note_id
+    )
+    return html_renderers.inline_note_update_form(dto)
+
+
+@app.put(
+    "/books/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}",
+    response_class=RedirectResponse,
+    status_code=303,
+)
+async def save_inline_note(
+    book_id: str,
+    clipping_id: str,
+    inline_note_id: str,
+    content: str = Form(),
+    books_storage: BooksStorageABC = Depends(get_books_storage),
+) -> str:
+    use_case = EditInlineNoteUseCase(book_storage=books_storage)
+    await use_case.execute(
+        book_id=book_id,
+        clipping_id=clipping_id,
+        inline_note_id=inline_note_id,
+        content=content,
+    )
+    return f"/books/{book_id}/clippings/{clipping_id}"
+
+
+@app.delete(
+    "/books/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}",
+    response_class=RedirectResponse,
+    status_code=303,
+)
+async def delete_inline_note(
+    book_id: str,
+    clipping_id: str,
+    inline_note_id: str,
+    books_storage: BooksStorageABC = Depends(get_books_storage),
+) -> str:
+    use_case = DeleteInlineNoteUseCase(book_storage=books_storage)
+    await use_case.execute(
+        book_id=book_id,
+        clipping_id=clipping_id,
+        inline_note_id=inline_note_id,
+    )
+    return f"/books/{book_id}/clippings/{clipping_id}"
+
+
+@app.post(
+    "/books/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}/unlink",
+    response_class=RedirectResponse,
+    status_code=303,
+)
+async def unlink_inline_note(
+    book_id: str,
+    clipping_id: str,
+    inline_note_id: str,
+    books_storage: BooksStorageABC = Depends(get_books_storage),
+) -> str:
+    use_case = UnlinkInlineNoteUseCase(book_storage=books_storage)
+    await use_case.execute(
+        book_id=book_id,
+        clipping_id=clipping_id,
+        inline_note_id=inline_note_id,
+    )
+    return f"/books/{book_id}/clippings"
 
 
 if __name__ == "__main__":

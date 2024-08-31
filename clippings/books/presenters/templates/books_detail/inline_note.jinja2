@@ -1,0 +1,16 @@
+<section hx-target="this">
+    <small>{{ data.content }}</small>
+    {% for action in data.actions %}
+    {% if action.id == "delete" %}
+        {% with hx_target="closest .clipping-item" %}
+        {% include "action_link.jinja2" %}
+        {% endwith %}
+    {% elif action.id == "unlink" %}
+        {% with hx_target="closest .clipping-list" %}
+        {% include "action_link.jinja2" %}
+        {% endwith %}
+    {% else %}
+        {% include "action_link.jinja2" %}
+    {% endif %}
+    {% endfor %}
+</section>

@@ -93,3 +93,13 @@ class ClippingAddDTO:
     @property
     def actions_map(self) -> dict[str, ActionDTO]:
         return {action.id: action for action in self.actions}
+
+
+@dataclass
+class EditInlineNoteDTO:
+    content: str
+    actions: list[ActionDTO]
+
+    @property
+    def actions_map(self) -> dict[str, ActionDTO]:
+        return {action.id: action for action in self.actions}

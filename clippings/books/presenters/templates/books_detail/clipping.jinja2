@@ -1,16 +1,14 @@
 <article class="clipping-item" hx-target="this" hx-swap="outerHTML">
     <section>{% block clipping_content %}{{ data.content }}{% endblock %}</section>
+    {% block after_clipping_content %}{% endblock %}
     {% if data.inline_notes %}
     <h6>{{ data.notes_label }}</h6>
     <hr>
     {% endif %}
     {% for note in data.inline_notes %}
-    <section>
-        <small>{{ note.content }}</small>
-        {% for action in note.actions %}
-        {% include "action_link.jinja2" %}
-        {% endfor %}
-    </section>
+    {% with data=note %}
+    {% include "books_detail/inline_note.jinja2" %}
+    {% endwith %}
     {% endfor %}
     <footer style="display: flex; justify-content: space-between; align-items: center;">
         <div>

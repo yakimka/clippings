@@ -40,3 +40,7 @@ book_info_update_form = make_jinja_renderer("books_detail/edit_book_info_form.ji
 clipping_list = make_jinja_renderer("books_detail/clipping_list.jinja2")
 clipping_detail = make_jinja_renderer("books_detail/clipping.jinja2")
 clipping_update_form = make_jinja_renderer("books_detail/edit_clipping_form.jinja2")
+inline_note_add_form = make_jinja_renderer("books_detail/add_clipping_note_form.jinja2")
+inline_note_update_form = make_jinja_renderer(
+    "books_detail/edit_clipping_note_form.jinja2"
+)

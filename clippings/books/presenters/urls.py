@@ -101,14 +101,16 @@ def make_books_urls_builder(base_url: str = "/"):
                 method="get",
             ),
             UrlTemplateDTO(
-                id="inline_note_update", template=clipping_detail_url, method="put"
+                id="inline_note_update", template=inline_note_detail_url, method="put"
             ),
             UrlTemplateDTO(
-                id="inline_note_delete", template=clipping_detail_url, method="delete"
+                id="inline_note_delete",
+                template=inline_note_detail_url,
+                method="delete",
             ),
             UrlTemplateDTO(
                 id="inline_note_unlink",
-                template=f"{clipping_detail_url}/{clipping_unlink_segment}",
+                template=f"{inline_note_detail_url}/{clipping_unlink_segment}",
                 method="post",
             ),
         ]

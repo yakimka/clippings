@@ -9,6 +9,7 @@ from clippings.books.presenters.book_detail.dtos import (
     BookReviewDTO,
     ClippingDTO,
     ClippingEditDTO,
+    EditInlineNoteDTO,
 )
 from clippings.books.presenters.dtos import ActionDTO
 from clippings.books.presenters.urls import UrlsManager
@@ -148,3 +149,74 @@ class BookDetailPresenter:
         ]
 
         return clipping_dto
+
+    async def add_inline_note(
+        self, book_id: str, clipping_id: str
+    ) -> ClippingDTO | None:
+        builder = await self._retrieve_builder(book_id)
+        if builder is None:
+            return None
+
+        book = builder.book
+        clipping = book.get_clipping(clipping_id)
+        if clipping is None:
+            return None
+
+        builder = BookDetailBuilder(book, self._urls_manager)
+        clipping_dto = builder.clipping_dto(clipping_id)
+        clipping_dto.actions = [
+            ActionDTO(
+                id="save",
+                label="Save",
+                url=self._urls_manager.build_url(
+                    "inline_note_add", book_id=book_id, clipping_id=clipping_id
+                ),
+            ),
+            ActionDTO(
+                id="cancel",
+                label="Cancel",
+                url=self._urls_manager.build_url(
+                    "clipping_detail", book_id=book_id, clipping_id=clipping_id
+                ),
+            ),
+        ]
+
+        return clipping_dto
+
+    async def edit_inline_note(
+        self, book_id: str, clipping_id: str, inline_note_id: str
+    ) -> EditInlineNoteDTO | None:
+        book = await self._storage.get(book_id)
+        if book is None:
+            return None
+
+        clipping = book.get_clipping(clipping_id)
+        if clipping is None:
+            return None
+
+        inline_note = clipping.get_inline_note(inline_note_id)
+        if inline_note is None:
+            return None
+
+        return EditInlineNoteDTO(
+            content=inline_note.content,
+            actions=[
+                ActionDTO(
+                    id="save",
+                    label="Save",
+                    url=self._urls_manager.build_url(
+                        "inline_note_update",
+                        book_id=book_id,
+                        clipping_id=clipping_id,
+                        inline_note_id=inline_note_id,
+                    ),
+                ),
+                ActionDTO(
+                    id="cancel",
+                    label="Cancel",
+                    url=self._urls_manager.build_url(
+                        "clipping_detail", book_id=book_id, clipping_id=clipping_id
+                    ),
+                ),
+            ],
+        )

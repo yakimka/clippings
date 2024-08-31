@@ -1,0 +1,25 @@
+<section>
+<form
+        {{ hx_link(data.actions_map.save.url) }}
+        hx-target="closest .clipping-item">
+    <fieldset>
+    <textarea
+            name="content"
+            aria-label="Edit note"
+    >{{ data.content }}</textarea>
+    </fieldset>
+
+    <div role="group">
+        <input
+                type="submit"
+                value="{{ data.actions_map.save.label }}"
+        />
+        <button
+                class="secondary"
+                {{ hx_link(data.actions_map.cancel.url) }}
+        >
+            {{ data.actions_map.cancel.label }}
+        </button>
+    </div>
+</form>
+</section>

@@ -1,11 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from datetime import datetime
 
 
 @dataclass
@@ -31,8 +28,8 @@ class Book:
         existed_ids = set()
         for clipping in self.clippings:
             existed_ids.add(clipping.id)
-            for inline_note in clipping.inline_notes:
-                existed_ids.add(inline_note.id)
+            # for inline_note in clipping.inline_notes:
+            #     existed_ids.add(inline_note.id)
 
         for clipping in clippings:
             if clipping.id not in existed_ids:
@@ -50,7 +47,6 @@ class Book:
                 position_to_highlight[clipping.position_id] = clipping
                 if prev := position_to_note.pop(clipping.position_id, None):
                     prev_note, note_i = prev
-                    print(prev_note.content)
                     clipping.inline_notes.append(
                         InlineNote(
                             id=prev_note.id,
@@ -62,7 +58,6 @@ class Book:
                     to_delete.append(note_i)
             elif clipping.type == ClippingType.NOTE:
                 if prev_hl := position_to_highlight.get(clipping.position_id):
-                    print(clipping.content)
                     prev_hl.inline_notes.append(
                         InlineNote(
                             id=clipping.id,
@@ -82,6 +77,7 @@ class Book:
 class ClippingType(Enum):
     HIGHLIGHT = "highlight"
     NOTE = "note"
+    UNLINKED_NOTE = "unlinked_note"
 
 
 @dataclass
@@ -105,3 +101,22 @@ class Clipping:
     @property
     def position_id(self) -> tuple[int, int]:
         return self.page[0], self.location[0]
+
+    def get_inline_note(self, note_id: str) -> InlineNote | None:
+        for note in self.inline_notes:
+            if note.id == note_id:
+                return note
+        return None
+
+    def add_inline_note(self, content: str) -> None:
+        self.inline_notes.append(
+            InlineNote(
+                id=str(len(self.inline_notes) + 1),
+                content=content,
+                automatically_linked=False,
+                added_at=datetime.now(),
+            )
+        )
+
+    def remove_inline_note(self, note_id: str) -> None:
+        self.inline_notes = [note for note in self.inline_notes if note.id != note_id]

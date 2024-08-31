@@ -53,7 +53,7 @@ class BookDetailBuilder:
                     id="inline_note_add",
                     label="add note",
                     url=self.urls_manager.build_url(
-                        "inline_note_add",
+                        "inline_note_add_form",
                         book_id=self.book.id,
                         clipping_id=clipping.id,
                     ),
@@ -94,7 +94,7 @@ class BookDetailBuilder:
             content=inline_note.content,
             actions=[
                 ActionDTO(
-                    id="inline_note_update_form",
+                    id="edit",
                     label="edit",
                     url=self.urls_manager.build_url(
                         "inline_note_update_form",
@@ -104,7 +104,7 @@ class BookDetailBuilder:
                     ),
                 ),
                 ActionDTO(
-                    id="inline_note_delete",
+                    id="delete",
                     label="delete",
                     url=self.urls_manager.build_url(
                         "inline_note_delete",
@@ -118,7 +118,7 @@ class BookDetailBuilder:
         if inline_note.automatically_linked:
             inline_note_dto.actions.append(
                 ActionDTO(
-                    id="inline_note_unlink",
+                    id="unlink",
                     label="unlink",
                     url=self.urls_manager.build_url(
                         "inline_note_unlink",

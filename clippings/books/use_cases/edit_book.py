@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from clippings.books.entities import Clipping, ClippingType
 from clippings.books.ports import BooksStorageABC
 
 
@@ -64,4 +65,69 @@ class EditClippingUseCase:
         for field, value in to_patch.items():
             setattr(clipping, field, value)
 
+        await self._book_storage.add(book)
+
+
+class AddInlineNoteUseCase:
+    def __init__(self, book_storage: BooksStorageABC):
+        self._book_storage = book_storage
+
+    async def execute(self, book_id: str, clipping_id: str, content: str) -> None:
+        book = await self._book_storage.get(book_id)
+        clipping = book.get_clipping(clipping_id)
+        clipping.add_inline_note(content)
+        await self._book_storage.add(book)
+
+
+class EditInlineNoteUseCase:
+    def __init__(self, book_storage: BooksStorageABC):
+        self._book_storage = book_storage
+
+    async def execute(
+        self, book_id: str, clipping_id: str, inline_note_id: str, content: str
+    ) -> None:
+        book = await self._book_storage.get(book_id)
+        clipping = book.get_clipping(clipping_id)
+        inline_note = clipping.get_inline_note(inline_note_id)
+        inline_note.content = content
+        await self._book_storage.add(book)
+
+
+class DeleteInlineNoteUseCase:
+    def __init__(self, book_storage: BooksStorageABC):
+        self._book_storage = book_storage
+
+    async def execute(
+        self, book_id: str, clipping_id: str, inline_note_id: str
+    ) -> None:
+        book = await self._book_storage.get(book_id)
+        clipping = book.get_clipping(clipping_id)
+        clipping.remove_inline_note(inline_note_id)
+        await self._book_storage.add(book)
+
+
+class UnlinkInlineNoteUseCase:
+    def __init__(self, book_storage: BooksStorageABC):
+        self._book_storage = book_storage
+
+    async def execute(
+        self, book_id: str, clipping_id: str, inline_note_id: str
+    ) -> None:
+        book = await self._book_storage.get(book_id)
+        clipping = book.get_clipping(clipping_id)
+        inline_note = clipping.get_inline_note(inline_note_id)
+        book.add_clippings(
+            [
+                Clipping(
+                    id=inline_note.id,
+                    page=clipping.page,
+                    location=clipping.location,
+                    type=ClippingType.UNLINKED_NOTE,
+                    content=inline_note.content,
+                    inline_notes=[],
+                    added_at=inline_note.added_at,
+                )
+            ]
+        )
+        clipping.remove_inline_note(inline_note_id)
         await self._book_storage.add(book)
