@@ -14,110 +14,151 @@ class UrlTemplateDTO:
         return UrlDTO(value=self.template.format(**kwargs), method=self.method)
 
 
-def make_books_urls_builder(base_url: str = "/"):
-    def build_books_urls(
-        book_list: str = "books",
-        book_lookup: str = "{book_id}",
-        clipping_list: str = "clippings",
-        clipping_lookup: str = "{clipping_id}",
-        clipping_unlink_segment: str = "unlink",
-        inline_note_list: str = "inline_notes",
-        inline_note_lookup: str = "{inline_note_id}",
-        info_segment: str = "info",
-        review_segment: str = "review",
-        add_form_segment: str = "add",
-        update_form_segment: str = "edit",
-    ):
-        book_list_url = f"{base_url.rstrip("/")}/{book_list}"
-        book_detail_url = f"{book_list_url}/{book_lookup}"
-        clipping_list_url = f"{book_detail_url}/{clipping_list}"
-        clipping_detail_url = f"{clipping_list_url}/{clipping_lookup}"
-        inline_note_list_url = f"{clipping_detail_url}/{inline_note_list}"
-        inline_note_detail_url = f"{inline_note_list_url}/{inline_note_lookup}"
-        book_info_url = f"{book_detail_url}/{info_segment}"
-        book_review_url = f"{book_detail_url}/{review_segment}"
+def make_book_urls(base_url: str = "/books") -> list[UrlTemplateDTO]:
+    def make_template(template: str) -> str:
+        return f"{base_url.rstrip("/")}{template}"
 
-        templates = [
-            UrlTemplateDTO(
-                id="book_add_form",
-                template=f"{book_list_url}/{add_form_segment}",
-                method="post",
+    templates = [
+        UrlTemplateDTO(
+            id="book_add",
+            template=make_template(""),
+            method="post",
+        ),
+        UrlTemplateDTO(
+            id="book_add_form",
+            template=make_template("/add"),
+            method="post",
+        ),
+        UrlTemplateDTO(
+            id="book_delete",
+            template=make_template("/{book_id}"),
+            method="delete",
+        ),
+        UrlTemplateDTO(
+            id="book_detail_page",
+            template=make_template("/{book_id}"),
+            method="get",
+        ),
+        UrlTemplateDTO(
+            id="book_info",
+            template=make_template("/{book_id}/info"),
+            method="get",
+        ),
+        UrlTemplateDTO(
+            id="book_info_update",
+            template=make_template("/{book_id}/info"),
+            method="put",
+        ),
+        UrlTemplateDTO(
+            id="book_info_update_form",
+            template=make_template("/{book_id}/info/edit"),
+            method="get",
+        ),
+        UrlTemplateDTO(
+            id="book_list_page",
+            template=make_template(""),
+            method="get",
+        ),
+        UrlTemplateDTO(
+            id="book_review",
+            template=make_template("/{book_id}/review"),
+            method="get",
+        ),
+        UrlTemplateDTO(
+            id="book_review_update",
+            template=make_template("/{book_id}/review"),
+            method="put",
+        ),
+        UrlTemplateDTO(
+            id="book_review_update_form",
+            template=make_template("/{book_id}/review/edit"),
+            method="get",
+        ),
+        UrlTemplateDTO(
+            id="clipping_add",
+            template=make_template("/{book_id}/clippings"),
+            method="post",
+        ),
+        UrlTemplateDTO(
+            id="clipping_add_form",
+            template=make_template("/{book_id}/clippings/add"),
+            method="get",
+        ),
+        UrlTemplateDTO(
+            id="clipping_delete",
+            template=make_template("/{book_id}/clippings/{clipping_id}"),
+            method="delete",
+        ),
+        UrlTemplateDTO(
+            id="clipping_detail",
+            template=make_template("/{book_id}/clippings/{clipping_id}"),
+            method="get",
+        ),
+        UrlTemplateDTO(
+            id="clipping_import_page",
+            template=make_template("/import"),
+            method="get",
+        ),
+        UrlTemplateDTO(
+            id="clipping_upload",
+            template=make_template("/import"),
+            method="post",
+        ),
+        UrlTemplateDTO(
+            id="clipping_update",
+            template=make_template("/{book_id}/clippings/{clipping_id}"),
+            method="put",
+        ),
+        UrlTemplateDTO(
+            id="clipping_update_form",
+            template=make_template("/{book_id}/clippings/{clipping_id}/edit"),
+            method="get",
+        ),
+        UrlTemplateDTO(
+            id="inline_note_add",
+            template=make_template(
+                "/books/{book_id}/clippings/{clipping_id}/inline_notes"
             ),
-            UrlTemplateDTO(id="book_add", template=book_list_url, method="post"),
-            UrlTemplateDTO(id="book_list_page", template=book_list_url, method="get"),
-            UrlTemplateDTO(
-                id="book_detail_page", template=book_detail_url, method="get"
+            method="post",
+        ),
+        UrlTemplateDTO(
+            id="inline_note_add_form",
+            template=make_template(
+                "/books/{book_id}/clippings/{clipping_id}/inline_notes/add"
             ),
-            UrlTemplateDTO(id="book_info", template=book_info_url, method="get"),
-            UrlTemplateDTO(
-                id="book_info_update_form",
-                template=f"{book_info_url}/{update_form_segment}",
-                method="get",
+            method="get",
+        ),
+        UrlTemplateDTO(
+            id="inline_note_delete",
+            template=make_template(
+                "/books/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}"
             ),
-            UrlTemplateDTO(id="book_info_update", template=book_info_url, method="put"),
-            UrlTemplateDTO(id="book_review", template=book_review_url, method="get"),
-            UrlTemplateDTO(
-                id="book_review_update_form",
-                template=f"{book_review_url}/{update_form_segment}",
-                method="get",
+            method="delete",
+        ),
+        UrlTemplateDTO(
+            id="inline_note_unlink",
+            template=make_template(
+                "/books/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}/unlink"
             ),
-            UrlTemplateDTO(
-                id="book_review_update", template=book_review_url, method="put"
+            method="post",
+        ),
+        UrlTemplateDTO(
+            id="inline_note_update",
+            template=make_template(
+                "/books/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}"
             ),
-            UrlTemplateDTO(id="book_delete", template=book_detail_url, method="delete"),
-            UrlTemplateDTO(
-                id="clipping_add_form",
-                template=f"{clipping_list_url}/{add_form_segment}",
-                method="get",
+            method="put",
+        ),
+        UrlTemplateDTO(
+            id="inline_note_update_form",
+            template=make_template(
+                "/books/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}/edit"
             ),
-            UrlTemplateDTO(
-                id="clipping_add", template=clipping_list_url, method="post"
-            ),
-            UrlTemplateDTO(
-                id="clipping_detail", template=clipping_detail_url, method="get"
-            ),
-            UrlTemplateDTO(
-                id="clipping_update_form",
-                template=f"{clipping_detail_url}/{update_form_segment}",
-                method="get",
-            ),
-            UrlTemplateDTO(
-                id="clipping_update", template=clipping_detail_url, method="put"
-            ),
-            UrlTemplateDTO(
-                id="clipping_delete", template=clipping_detail_url, method="delete"
-            ),
-            UrlTemplateDTO(
-                id="inline_note_add_form",
-                template=f"{inline_note_list_url}/{add_form_segment}",
-                method="get",
-            ),
-            UrlTemplateDTO(
-                id="inline_note_add", template=inline_note_list_url, method="post"
-            ),
-            UrlTemplateDTO(
-                id="inline_note_update_form",
-                template=f"{inline_note_detail_url}/{update_form_segment}",
-                method="get",
-            ),
-            UrlTemplateDTO(
-                id="inline_note_update", template=inline_note_detail_url, method="put"
-            ),
-            UrlTemplateDTO(
-                id="inline_note_delete",
-                template=inline_note_detail_url,
-                method="delete",
-            ),
-            UrlTemplateDTO(
-                id="inline_note_unlink",
-                template=f"{inline_note_detail_url}/{clipping_unlink_segment}",
-                method="post",
-            ),
-        ]
-        check_url_templates(templates)
-        return templates
-
-    return build_books_urls
+            method="get",
+        ),
+    ]
+    check_url_templates(templates)
+    return templates
 
 
 def check_url_templates(templates: list[UrlTemplateDTO]) -> None:

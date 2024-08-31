@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TextIO
+from typing import TYPE_CHECKING, BinaryIO
 
 from clippings.books.adapters.kindle_parser.parser import KindleClippingsParser
 from clippings.books.dtos import BookDTO, ClippingImportCandidateDTO
@@ -21,12 +21,14 @@ class MockClippingsReader(ClippingsReaderABC):
 
 
 class KindleClippingsReader(ClippingsReaderABC):
-    def __init__(self, file_object: TextIO) -> None:
+    def __init__(self, file_object: BinaryIO) -> None:
         self._file_object = file_object
+        self._encoding = "utf-8"
 
     async def read(self) -> AsyncGenerator[ClippingImportCandidateDTO, None]:
         parser = KindleClippingsParser()
         for line in self._file_object:
+            line = line.decode(self._encoding)
             parser.add_line(line)
             if (clipping := parser.get_clipping()) and clipping["type"] in ClippingType:
                 yield ClippingImportCandidateDTO(

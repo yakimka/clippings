@@ -44,3 +44,4 @@ inline_note_add_form = make_jinja_renderer("books_detail/add_clipping_note_form.
 inline_note_update_form = make_jinja_renderer(
     "books_detail/edit_clipping_note_form.jinja2"
 )
+clipping_import = make_jinja_renderer("import_page.jinja2")

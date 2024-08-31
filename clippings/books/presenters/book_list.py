@@ -84,7 +84,13 @@ class BooksPagePresenter:
                 )
                 for book in books
             ],
-            actions=[],
+            actions=[
+                ActionDTO(
+                    id="import_clippings",
+                    label="Import",
+                    url=self._urls_manager.build_url("clipping_import_page"),
+                )
+            ],
             fields_meta={
                 "cover_url": {"label": "Cover"},
                 "name": {"label": "Book"},

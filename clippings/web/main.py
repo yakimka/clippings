@@ -1,7 +1,7 @@
 from collections.abc import AsyncGenerator
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, Form
+from fastapi import Depends, FastAPI, Form, UploadFile
 from fastapi.responses import HTMLResponse, Response
 from starlette.responses import RedirectResponse
 
@@ -15,9 +15,10 @@ from clippings.books.adapters.storages import MockBooksStorage
 from clippings.books.ports import BooksFinderABC, BooksStorageABC, ClippingsReaderABC
 from clippings.books.presenters import html_renderers
 from clippings.books.presenters.book_detail.presenters import BookDetailPresenter
+from clippings.books.presenters.book_import import ImportPagePresenter
 from clippings.books.presenters.book_list import BooksPagePresenter
 from clippings.books.presenters.pagination import classic_pagination_presenter
-from clippings.books.presenters.urls import UrlsManager, make_books_urls_builder
+from clippings.books.presenters.urls import UrlsManager, make_book_urls
 from clippings.books.use_cases.edit_book import (
     AddInlineNoteUseCase,
     BookFieldsDTO,
@@ -32,8 +33,8 @@ from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
 
 app = FastAPI()
 books_map = {}
-book_urls_builder = make_books_urls_builder()
-urls_manager = UrlsManager(book_urls_builder())
+print(make_book_urls())
+urls_manager = UrlsManager(make_book_urls())
 
 
 async def get_books_finder() -> BooksFinderABC:
@@ -56,6 +57,30 @@ async def get_book_detail_presenter(
     return BookDetailPresenter(storage=books_storage, urls_manager=urls_manager)
 
 
+@app.get("/books/import", response_class=HTMLResponse)
+async def import_page() -> str:
+    presenter = ImportPagePresenter(urls_manager=urls_manager)
+    dto = await presenter.page()
+    return html_renderers.clipping_import(dto)
+
+
+@app.post("/books/import", response_class=HTMLResponse)
+async def import_clippings(
+    file: UploadFile,
+    books_storage: BooksStorageABC = Depends(get_books_storage),
+) -> str:
+    with file.file as fp:
+        clippings_reader = KindleClippingsReader(fp)
+        import_use_case = ImportClippingsUseCase(
+            storage=books_storage,
+            reader=clippings_reader,
+            book_id_generator=book_id_generator,
+            clipping_id_generator=clipping_id_generator,
+        )
+        await import_use_case.execute()
+    return "Books imported"
+
+
 @app.get("/books/", response_class=HTMLResponse)
 async def book_list(
     page: int = 1,
@@ -69,21 +94,6 @@ async def book_list(
     )
     books_dto = await books_presenter.present(page=page, on_page=on_page)
     return html_renderers.book_list(books_dto)
-
-
-@app.get("/books/import", response_class=HTMLResponse)
-async def clippings_import(
-    books_storage: BooksStorageABC = Depends(get_books_storage),
-    clippings_reader: ClippingsReaderABC = Depends(get_clippings_reader),
-) -> str:
-    import_use_case = ImportClippingsUseCase(
-        storage=books_storage,
-        reader=clippings_reader,
-        book_id_generator=book_id_generator,
-        clipping_id_generator=clipping_id_generator,
-    )
-    await import_use_case.execute()
-    return "Books imported"
 
 
 @app.delete("/books/{book_id}", response_class=Response)
