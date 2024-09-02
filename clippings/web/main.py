@@ -14,6 +14,7 @@ from clippings.books.adapters.readers import KindleClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage
 from clippings.books.ports import BooksFinderABC, BooksStorageABC, ClippingsReaderABC
 from clippings.books.presenters import html_renderers
+from clippings.books.presenters.book_detail.page import BookDetailPagePresenter
 from clippings.books.presenters.book_detail.presenters import BookDetailPresenter
 from clippings.books.presenters.books_list_page import BooksListPagePresenter
 from clippings.books.presenters.clippings_import_page import (
@@ -89,12 +90,12 @@ async def book_list(
     on_page: int = 10,
     books_finder: BooksFinderABC = Depends(get_books_finder),
 ) -> str:
-    books_presenter = BooksListPagePresenter(
+    presenter = BooksListPagePresenter(
         finder=books_finder,
         pagination_presenter=classic_pagination_presenter,
         urls_manager=urls_manager,
     )
-    result = await books_presenter.present(page=page, on_page=on_page)
+    result = await presenter.present(page=page, on_page=on_page)
     return result.render()
 
 
@@ -106,10 +107,11 @@ async def delete_book(book_id: str) -> Response:  # noqa: U100
 @app.get("/books/{book_id}", response_class=HTMLResponse)
 async def book_detail(
     book_id: str,
-    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
+    storage: BooksStorageABC = Depends(get_books_storage),
 ) -> str:
-    book_dto = await detail_presenter.page(book_id=book_id)
-    return html_renderers.book_detail(book_dto)
+    presenter = BookDetailPagePresenter(storage, urls_manager)
+    book_dto = await presenter.present(book_id=book_id)
+    return book_dto.render()
 
 
 @app.get("/books/{book_id}/review", response_class=HTMLResponse)

@@ -1,10 +1,13 @@
+from __future__ import annotations
+
 from collections.abc import Callable
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 from jinja2 import Environment, PackageLoader, StrictUndefined
 from markupsafe import Markup
 
-from clippings.books.presenters.dtos import UrlDTO
+if TYPE_CHECKING:
+    from clippings.books.presenters.dtos import UrlDTO
 
 jinja_env = Environment(
     loader=PackageLoader(__name__, "templates"),
@@ -25,6 +28,10 @@ def make_html_renderer(template_name: str) -> Callable[[Any], str]:
         return jinja_env.get_template(template_name).render(data=data)
 
     return render
+
+
+def not_found_page_renderer(data: Any) -> str:
+    return "Not found"
 
 
 class HtmlRenderer(Protocol):

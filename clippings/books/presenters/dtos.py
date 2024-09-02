@@ -4,6 +4,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Generic, Literal, TypeVar
 
+from clippings.books.presenters.html_renderers import not_found_page_renderer
+
 T: TypeVar = TypeVar("T")
 
 
@@ -14,6 +16,13 @@ class PresenterResult(Generic[T]):
 
     def render(self) -> str:
         return self.renderer(self.data)
+
+    @classmethod
+    def not_found(cls) -> NotFoundPresenterResult:
+        return cls(None, not_found_page_renderer)
+
+
+NotFoundPresenterResult = PresenterResult[None]
 
 
 @dataclass
