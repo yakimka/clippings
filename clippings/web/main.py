@@ -16,7 +16,7 @@ from clippings.books.ports import BooksFinderABC, BooksStorageABC, ClippingsRead
 from clippings.books.presenters import html_renderers
 from clippings.books.presenters.book_detail.page import (
     BookDetailPagePart,
-    BookDetailPagePresenter,
+    BookDetailPagePresenter, ClippingPart, ClippingPresenter,
 )
 from clippings.books.presenters.books_list_page import BooksListPagePresenter
 from clippings.books.presenters.clippings_import_page import (
@@ -60,6 +60,12 @@ async def get_book_detail_presenter(
     books_storage: BooksStorageABC = Depends(get_books_storage),
 ) -> BookDetailPagePresenter:
     return BookDetailPagePresenter(storage=books_storage, urls_manager=urls_manager)
+
+
+async def get_clipping_presenter(
+    books_storage: BooksStorageABC = Depends(get_books_storage),
+) -> ClippingPresenter:
+    return ClippingPresenter(storage=books_storage, urls_manager=urls_manager)
 
 
 @app.get("/books/import", response_class=HTMLResponse)
@@ -112,7 +118,7 @@ async def book_detail(
     detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
 ) -> str:
     result = await detail_presenter.present(
-        book_id=book_id, page_part=BookDetailPagePart.ALL
+        book_id=book_id, part=BookDetailPagePart.ALL
     )
     return result.render()
 
@@ -123,7 +129,7 @@ async def book_info(
     detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
 ) -> str:
     result = await detail_presenter.present(
-        book_id=book_id, page_part=BookDetailPagePart.INFO
+        book_id=book_id, part=BookDetailPagePart.INFO
     )
     return result.render()
 
@@ -134,7 +140,7 @@ async def book_review(
     detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
 ) -> str:
     result = await detail_presenter.present(
-        book_id=book_id, page_part=BookDetailPagePart.REVIEW
+        book_id=book_id, part=BookDetailPagePart.REVIEW
     )
     return result.render()
 
@@ -145,7 +151,19 @@ async def clipping_list(
     detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
 ) -> str:
     result = await detail_presenter.present(
-        book_id=book_id, page_part=BookDetailPagePart.CLIPPINGS
+        book_id=book_id, part=BookDetailPagePart.CLIPPINGS
+    )
+    return result.render()
+
+
+@app.get("/books/{book_id}/clippings/{clipping_id}", response_class=HTMLResponse)
+async def clipping_detail(
+    book_id: str,
+    clipping_id: str,
+    clipping_presenter: ClippingPresenter = Depends(get_clipping_presenter),
+) -> str:
+    result = await clipping_presenter.present(
+        book_id=book_id, clipping_id=clipping_id, part=ClippingPart.ALL
     )
     return result.render()
 
@@ -202,16 +220,6 @@ async def book_info_save(
         )
     )
     return f"/books/{book_id}/info"
-
-
-@app.get("/books/{book_id}/clippings/{clipping_id}", response_class=HTMLResponse)
-async def clipping_detail(
-    book_id: str,
-    clipping_id: str,
-    detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
-) -> str:
-    dto = await detail_presenter.clipping(book_id=book_id, clipping_id=clipping_id)
-    return html_renderers.clipping_detail(dto)
 
 
 @app.get("/books/{book_id}/clippings/{clipping_id}/edit", response_class=HTMLResponse)

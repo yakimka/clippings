@@ -6,15 +6,13 @@
 {% block body %}
     <main class="container">
         <section>
-        {% include "book_detail/book_info.jinja2" %}
+        {% include "book_detail/info.jinja2" %}
         </section>
 
         <section>
         {% include "book_detail/review.jinja2" %}
         </section>
 
-        {% with data=data.clippings %}
-        {% include "book_detail/clipping_list.jinja2" %}
-        {% endwith %}
+        {% include "book_detail/clippings.jinja2" %}
     </main>
 {% endblock %}
