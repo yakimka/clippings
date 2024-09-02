@@ -12,8 +12,8 @@ class InlineNoteDTO:
     actions: list[ActionDTO]
 
 
-@dataclass
-class ClippingDTO:
+@dataclass(kw_only=True)
+class ClippingDataDTO:
     content: str
     type: str
     page: str
@@ -21,6 +21,29 @@ class ClippingDTO:
     added_at: str
     notes_label: str
     inline_notes: list[InlineNoteDTO]
+
+
+@dataclass(kw_only=True)
+class ClippingDTO(ClippingDataDTO):
+    actions: list[ActionDTO]
+
+    @property
+    def actions_map(self) -> dict[str, ActionDTO]:
+        return {action.id: action for action in self.actions}
+
+
+@dataclass(kw_only=True)
+class EditClippingDTO(ClippingDataDTO):
+    content: str
+    actions: list[ActionDTO]
+
+    @property
+    def actions_map(self) -> dict[str, ActionDTO]:
+        return {action.id: action for action in self.actions}
+
+
+@dataclass(kw_only=True)
+class AddInlineNoteDTO(ClippingDataDTO):
     actions: list[ActionDTO]
 
     @property

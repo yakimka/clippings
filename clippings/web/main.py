@@ -13,10 +13,18 @@ from clippings.books.adapters.id_generators import (
 from clippings.books.adapters.readers import KindleClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage
 from clippings.books.ports import BooksFinderABC, BooksStorageABC, ClippingsReaderABC
-from clippings.books.presenters import html_renderers
+from clippings.books.presenters.book_detail.forms import (
+    AddInlineNoteFormPresenter,
+    EditBookInfoFormPresenter,
+    EditBookReviewFormPresenter,
+    EditClippingFormPresenter,
+    EditInlineNoteFormPresenter,
+)
 from clippings.books.presenters.book_detail.page import (
     BookDetailPagePart,
-    BookDetailPagePresenter, ClippingPart, ClippingPresenter,
+    BookDetailPagePresenter,
+    ClippingPart,
+    ClippingPresenter,
 )
 from clippings.books.presenters.books_list_page import BooksListPagePresenter
 from clippings.books.presenters.clippings_import_page import (
@@ -168,13 +176,66 @@ async def clipping_detail(
     return result.render()
 
 
-@app.get("/books/{book_id}/review/edit", response_class=HTMLResponse)
-async def book_review_update_form(
+@app.get("/books/{book_id}/info/edit", response_class=HTMLResponse)
+async def book_info_form(
     book_id: str,
-    detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
+    storage: BooksStorageABC = Depends(get_books_storage),
 ) -> str:
-    dto = await detail_presenter.edit_review(book_id=book_id)
-    return html_renderers.book_review_update_form(dto)
+    presenter = EditBookInfoFormPresenter(storage=storage, urls_manager=urls_manager)
+    result = await presenter.present(book_id=book_id)
+    return result.render()
+
+
+@app.get("/books/{book_id}/review/edit", response_class=HTMLResponse)
+async def book_review_form(
+    book_id: str,
+    storage: BooksStorageABC = Depends(get_books_storage),
+) -> str:
+    presenter = EditBookReviewFormPresenter(storage=storage, urls_manager=urls_manager)
+    result = await presenter.present(book_id=book_id)
+    return result.render()
+
+
+@app.get("/books/{book_id}/clippings/{clipping_id}/edit", response_class=HTMLResponse)
+async def edit_clipping_form(
+    book_id: str,
+    clipping_id: str,
+    storage: BooksStorageABC = Depends(get_books_storage),
+) -> str:
+    presenter = EditClippingFormPresenter(storage=storage, urls_manager=urls_manager)
+    result = await presenter.present(book_id=book_id, clipping_id=clipping_id)
+    return result.render()
+
+
+@app.get(
+    "/books/{book_id}/clippings/{clipping_id}/inline_notes/add",
+    response_class=HTMLResponse,
+)
+async def add_inline_note(
+    book_id: str,
+    clipping_id: str,
+    storage: BooksStorageABC = Depends(get_books_storage),
+) -> str:
+    presenter = AddInlineNoteFormPresenter(storage=storage, urls_manager=urls_manager)
+    result = await presenter.present(book_id=book_id, clipping_id=clipping_id)
+    return result.render()
+
+
+@app.get(
+    "/books/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}/edit",
+    response_class=HTMLResponse,
+)
+async def edit_inline_note_form(
+    book_id: str,
+    clipping_id: str,
+    inline_note_id: str,
+    storage: BooksStorageABC = Depends(get_books_storage),
+) -> Response:
+    presenter = EditInlineNoteFormPresenter(storage=storage, urls_manager=urls_manager)
+    result = await presenter.present(
+        book_id=book_id, clipping_id=clipping_id, inline_note_id=inline_note_id
+    )
+    return result.render()
 
 
 @app.put("/books/{book_id}/review", response_class=RedirectResponse, status_code=303)
@@ -191,15 +252,6 @@ async def save_book_review(
         )
     )
     return f"/books/{book_id}/review"
-
-
-@app.get("/books/{book_id}/info/edit", response_class=HTMLResponse)
-async def book_info_update_form(
-    book_id: str,
-    detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
-) -> str:
-    dto = await detail_presenter.edit_book_info(book_id=book_id)
-    return html_renderers.book_info_update_form(dto)
 
 
 @app.put("/books/{book_id}/info", response_class=RedirectResponse, status_code=303)
@@ -220,16 +272,6 @@ async def book_info_save(
         )
     )
     return f"/books/{book_id}/info"
-
-
-@app.get("/books/{book_id}/clippings/{clipping_id}/edit", response_class=HTMLResponse)
-async def edit_clipping_form(
-    book_id: str,
-    clipping_id: str,
-    detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
-) -> str:
-    dto = await detail_presenter.edit_clipping(book_id=book_id, clipping_id=clipping_id)
-    return html_renderers.clipping_update_form(dto)
 
 
 @app.put(
@@ -259,21 +301,6 @@ def delete_clipping(book_id: str, clipping_id: str) -> Response:
     return Response(status_code=200)
 
 
-@app.get(
-    "/books/{book_id}/clippings/{clipping_id}/inline_notes/add",
-    response_class=HTMLResponse,
-)
-async def add_inline_note(
-    book_id: str,
-    clipping_id: str,
-    detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
-) -> str:
-    dto = await detail_presenter.add_inline_note(
-        book_id=book_id, clipping_id=clipping_id
-    )
-    return html_renderers.inline_note_add_form(dto)
-
-
 @app.post(
     "/books/{book_id}/clippings/{clipping_id}/inline_notes",
     response_class=RedirectResponse,
@@ -288,22 +315,6 @@ async def add_inline_note(
     use_case = AddInlineNoteUseCase(book_storage=books_storage)
     await use_case.execute(book_id=book_id, clipping_id=clipping_id, content=content)
     return f"/books/{book_id}/clippings/{clipping_id}"
-
-
-@app.get(
-    "/books/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}/edit",
-    response_class=HTMLResponse,
-)
-async def edit_inline_note_form(
-    book_id: str,
-    clipping_id: str,
-    inline_note_id: str,
-    detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
-) -> Response:
-    dto = await detail_presenter.edit_inline_note(
-        book_id=book_id, clipping_id=clipping_id, inline_note_id=inline_note_id
-    )
-    return html_renderers.inline_note_update_form(dto)
 
 
 @app.put(

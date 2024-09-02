@@ -3,6 +3,7 @@ from clippings.books.presenters.book_detail.dtos import (
     BookDetailDTO,
     BookInfoDTO,
     BookReviewDTO,
+    ClippingDataDTO,
     ClippingDTO,
     InlineNoteDTO,
 )
@@ -36,11 +37,11 @@ class BookDetailBuilder:
     def clippings_dtos(self) -> list[ClippingDTO]:
         return [self.clipping_dto(clipping.id) for clipping in self.book.clippings]
 
-    def clipping_dto(self, clipping_id: str) -> ClippingDTO | None:
+    def clipping_data_dto(self, clipping_id: str) -> ClippingDataDTO | None:
         clipping = self.clippings_by_id.get(clipping_id)
         if clipping is None:
             return None
-        return ClippingDTO(
+        return ClippingDataDTO(
             content=clipping.content,
             type=clipping.type.value.capitalize(),
             page=f"Page: {"-".join(map(str, clipping.page))}",
@@ -48,6 +49,20 @@ class BookDetailBuilder:
             added_at=f"Added: {clipping.added_at.date().isoformat()}",
             notes_label="Notes",
             inline_notes=self.inline_notes_dtos(clipping.id),
+        )
+
+    def clipping_dto(self, clipping_id: str) -> ClippingDTO | None:
+        clipping_data = self.clipping_data_dto(clipping_id)
+        if clipping_data is None:
+            return None
+        return ClippingDTO(
+            content=clipping_data.content,
+            type=clipping_data.type,
+            page=clipping_data.page,
+            location=clipping_data.location,
+            added_at=clipping_data.added_at,
+            notes_label=clipping_data.notes_label,
+            inline_notes=clipping_data.inline_notes,
             actions=[
                 ActionDTO(
                     id="inline_note_add",
@@ -55,7 +70,7 @@ class BookDetailBuilder:
                     url=self.urls_manager.build_url(
                         "inline_note_add_form",
                         book_id=self.book.id,
-                        clipping_id=clipping.id,
+                        clipping_id=clipping_id,
                     ),
                 ),
                 ActionDTO(
@@ -64,7 +79,7 @@ class BookDetailBuilder:
                     url=self.urls_manager.build_url(
                         "clipping_update_form",
                         book_id=self.book.id,
-                        clipping_id=clipping.id,
+                        clipping_id=clipping_id,
                     ),
                 ),
                 ActionDTO(
@@ -73,7 +88,7 @@ class BookDetailBuilder:
                     url=self.urls_manager.build_url(
                         "clipping_delete",
                         book_id=self.book.id,
-                        clipping_id=clipping.id,
+                        clipping_id=clipping_id,
                     ),
                 ),
             ],
@@ -132,7 +147,7 @@ class BookDetailBuilder:
 
     def main_info_dto(self) -> BookInfoDTO:
         return BookInfoDTO(
-            cover_url="https://placehold.co/400x600",
+            cover_url=self.cover_url(),
             title=self.book.title,
             author=f"by {self.book.author}",
             rating=(
@@ -150,6 +165,9 @@ class BookDetailBuilder:
                 )
             ],
         )
+
+    def cover_url(self) -> str:
+        return self.book.cover_url or "https://placehold.co/400x600"
 
     def review_dto(self) -> BookReviewDTO:
         return BookReviewDTO(

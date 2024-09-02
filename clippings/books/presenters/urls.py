@@ -116,43 +116,41 @@ def make_book_urls(base_url: str = "/books") -> list[UrlTemplateDTO]:
         ),
         UrlTemplateDTO(
             id="inline_note_add",
-            template=make_template(
-                "/books/{book_id}/clippings/{clipping_id}/inline_notes"
-            ),
+            template=make_template("/{book_id}/clippings/{clipping_id}/inline_notes"),
             method="post",
         ),
         UrlTemplateDTO(
             id="inline_note_add_form",
             template=make_template(
-                "/books/{book_id}/clippings/{clipping_id}/inline_notes/add"
+                "/{book_id}/clippings/{clipping_id}/inline_notes/add"
             ),
             method="get",
         ),
         UrlTemplateDTO(
             id="inline_note_delete",
             template=make_template(
-                "/books/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}"
+                "/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}"
             ),
             method="delete",
         ),
         UrlTemplateDTO(
             id="inline_note_unlink",
             template=make_template(
-                "/books/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}/unlink"
+                "/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}/unlink"
             ),
             method="post",
         ),
         UrlTemplateDTO(
             id="inline_note_update",
             template=make_template(
-                "/books/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}"
+                "/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}"
             ),
             method="put",
         ),
         UrlTemplateDTO(
             id="inline_note_update_form",
             template=make_template(
-                "/books/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}/edit"
+                "/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}/edit"
             ),
             method="get",
         ),
