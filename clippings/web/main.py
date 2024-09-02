@@ -9,6 +9,7 @@ from clippings.books.adapters.finders import MockBooksFinder
 from clippings.books.adapters.id_generators import (
     book_id_generator,
     clipping_id_generator,
+    inline_note_id_generator,
 )
 from clippings.books.adapters.readers import KindleClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage
@@ -95,6 +96,7 @@ async def import_clippings(
             reader=clippings_reader,
             book_id_generator=book_id_generator,
             clipping_id_generator=clipping_id_generator,
+            inline_note_id_generator=inline_note_id_generator,
         )
         await import_use_case.execute()
     return "Books imported"
@@ -317,7 +319,9 @@ async def add_inline_note(
     content: str = Form(),
     books_storage: BooksStorageABC = Depends(get_books_storage),
 ) -> str:
-    use_case = AddInlineNoteUseCase(book_storage=books_storage)
+    use_case = AddInlineNoteUseCase(
+        book_storage=books_storage, inline_note_id_generator=inline_note_id_generator
+    )
     await use_case.execute(book_id=book_id, clipping_id=clipping_id, content=content)
     return f"/books/{book_id}/clippings/{clipping_id}"
 

@@ -49,9 +49,17 @@ class ObjectMother:  # noqa: PIE798
         *,
         id: str = "inline_note:id",
         content: str = "some note",
+        original_id: str = "inline_note:original_id",
+        automatically_linked: bool = False,
         added_at: datetime = datetime(2024, 8, 9),  # noqa: B008
     ) -> InlineNote:
-        return InlineNote(id=id, content=content, added_at=added_at)
+        return InlineNote(
+            id=id,
+            content=content,
+            original_id=original_id,
+            automatically_linked=automatically_linked,
+            added_at=added_at,
+        )
 
     @classmethod
     def clipping_import_candidate_dto(

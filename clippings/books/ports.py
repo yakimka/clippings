@@ -76,3 +76,8 @@ class ClippingForGenerateId(Protocol):
 class ClippingIdGenerator(Protocol):
     def __call__(self, book: ClippingForGenerateId) -> str:
         pass
+
+
+class InlineNoteIdGenerator(Protocol):
+    def __call__(self) -> str:
+        pass

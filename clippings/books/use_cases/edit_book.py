@@ -1,7 +1,8 @@
 from dataclasses import dataclass
+from datetime import datetime
 
-from clippings.books.entities import Clipping, ClippingType
-from clippings.books.ports import BooksStorageABC
+from clippings.books.entities import InlineNote
+from clippings.books.ports import BooksStorageABC, InlineNoteIdGenerator
 
 
 @dataclass
@@ -69,13 +70,23 @@ class EditClippingUseCase:
 
 
 class AddInlineNoteUseCase:
-    def __init__(self, book_storage: BooksStorageABC):
+    def __init__(
+        self,
+        book_storage: BooksStorageABC,
+        inline_note_id_generator: InlineNoteIdGenerator,
+    ):
         self._book_storage = book_storage
+        self._inline_note_id_generator = inline_note_id_generator
 
     async def execute(self, book_id: str, clipping_id: str, content: str) -> None:
         book = await self._book_storage.get(book_id)
         clipping = book.get_clipping(clipping_id)
-        clipping.add_inline_note(content)
+        inline_note = InlineNote.create(
+            content=content,
+            added_at=datetime.now(),
+            id_generator=self._inline_note_id_generator,
+        )
+        clipping.add_inline_note(inline_note)
         await self._book_storage.add(book)
 
 
@@ -114,20 +125,6 @@ class UnlinkInlineNoteUseCase:
         self, book_id: str, clipping_id: str, inline_note_id: str
     ) -> None:
         book = await self._book_storage.get(book_id)
-        clipping = book.get_clipping(clipping_id)
-        inline_note = clipping.get_inline_note(inline_note_id)
-        book.add_clippings(
-            [
-                Clipping(
-                    id=inline_note.id,
-                    page=clipping.page,
-                    location=clipping.location,
-                    type=ClippingType.UNLINKED_NOTE,
-                    content=inline_note.content,
-                    inline_notes=[],
-                    added_at=inline_note.added_at,
-                )
-            ]
-        )
-        clipping.remove_inline_note(inline_note_id)
+
+        book.unlink_inline_note(clipping_id, inline_note_id)
         await self._book_storage.add(book)
