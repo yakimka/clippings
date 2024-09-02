@@ -16,7 +16,7 @@ from clippings.books.ports import BooksFinderABC, BooksStorageABC, ClippingsRead
 from clippings.books.presenters import html_renderers
 from clippings.books.presenters.book_detail.presenters import BookDetailPresenter
 from clippings.books.presenters.book_import import ImportPagePresenter
-from clippings.books.presenters.book_list import BooksPagePresenter
+from clippings.books.presenters.books_list_page import BooksListPagePresenter
 from clippings.books.presenters.pagination import classic_pagination_presenter
 from clippings.books.presenters.urls import UrlsManager, make_book_urls
 from clippings.books.use_cases.edit_book import (
@@ -87,13 +87,13 @@ async def book_list(
     on_page: int = 10,
     books_finder: BooksFinderABC = Depends(get_books_finder),
 ) -> str:
-    books_presenter = BooksPagePresenter(
+    books_presenter = BooksListPagePresenter(
         finder=books_finder,
         pagination_presenter=classic_pagination_presenter,
         urls_manager=urls_manager,
     )
-    books_dto = await books_presenter.present(page=page, on_page=on_page)
-    return html_renderers.book_list(books_dto)
+    result = await books_presenter.present(page=page, on_page=on_page)
+    return result.render()
 
 
 @app.delete("/books/{book_id}", response_class=Response)

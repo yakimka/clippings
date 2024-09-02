@@ -6,7 +6,7 @@ from unittest.mock import ANY, create_autospec
 import pytest
 
 from clippings.books.adapters.finders import MockBooksFinder
-from clippings.books.presenters.book_list import BookOnPageDTO, BooksPagePresenter
+from clippings.books.presenters.books_list_page import BookOnPageDTO, BooksListPagePresenter
 from clippings.books.presenters.dtos import PaginationItemDTO
 from clippings.books.presenters.pagination import PaginationPresenter
 
@@ -23,10 +23,10 @@ def pagination_presenter():
 
 @pytest.fixture()
 def make_sut(pagination_presenter):
-    def _make_sut(books: list[Book] | None = None) -> BooksPagePresenter:
+    def _make_sut(books: list[Book] | None = None) -> BooksListPagePresenter:
         books_map = {book.id: book for book in books or []}
         finder = MockBooksFinder(books_map)
-        return BooksPagePresenter(finder, pagination_presenter=pagination_presenter)
+        return BooksListPagePresenter(finder, pagination_presenter=pagination_presenter)
 
     return _make_sut
 

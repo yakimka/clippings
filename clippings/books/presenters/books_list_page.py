@@ -4,7 +4,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from clippings.books.ports import BooksFinderABC, FinderQuery
-from clippings.books.presenters.dtos import ActionDTO, PaginationItemDTO, UrlDTO
+from clippings.books.presenters.dtos import ActionDTO, PaginationItemDTO, PresenterResult
+from clippings.books.presenters.html_renderers import make_html_renderer
 from clippings.books.presenters.urls import UrlsManager
 
 if TYPE_CHECKING:
@@ -39,23 +40,25 @@ class BooksPageDTO:
         return {action.id: action for action in self.actions}
 
 
-class BooksPagePresenter:
+class BooksListPagePresenter:
     def __init__(
         self,
         finder: BooksFinderABC,
         pagination_presenter: PaginationPresenter,
         urls_manager: UrlsManager,
+        html_template: str = "books_list_page.jinja2",
     ) -> None:
         self._finder = finder
         self._pagination_presenter = pagination_presenter
         self._urls_manager = urls_manager
+        self._rendered = make_html_renderer(html_template)
 
-    async def present(self, page: int, on_page: int) -> BooksPageDTO:
+    async def present(self, page: int, on_page: int) -> PresenterResult[BooksPageDTO]:
         query = FinderQuery(start=(page - 1) * on_page, limit=on_page)
         books = await self._finder.find(query)
         books_count = await self._finder.count(FinderQuery(start=0, limit=None))
         books_url = self._urls_manager.build_url("book_list_page")
-        return BooksPageDTO(
+        dto = BooksPageDTO(
             page_title="Books",
             books=[
                 BookOnPageDTO(
@@ -106,4 +109,8 @@ class BooksPagePresenter:
                 on_page=on_page,
                 books_page_url=books_url.value,
             ),
+        )
+        return PresenterResult(
+            data=dto,
+            renderer=self._rendered,
         )

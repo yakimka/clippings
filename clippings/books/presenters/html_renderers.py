@@ -1,4 +1,4 @@
-from typing import Any, Protocol
+from typing import Any, Callable, Protocol
 
 from jinja2 import Environment, PackageLoader, StrictUndefined
 from markupsafe import Markup
@@ -17,6 +17,13 @@ def hx_link(url: UrlDTO) -> Markup:
 
 
 jinja_env.globals.update(hx_link=hx_link)
+
+
+def make_html_renderer(template_name: str) -> Callable[[Any], str]:
+    def render(data: Any) -> str:
+        return jinja_env.get_template(template_name).render(data=data)
+
+    return render
 
 
 class HtmlRenderer(Protocol):

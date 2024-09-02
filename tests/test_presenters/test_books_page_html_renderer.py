@@ -5,9 +5,9 @@ from unittest.mock import create_autospec
 import pytest
 
 from clippings.books.adapters.finders import MockBooksFinder
-from clippings.books.presenters.book_list import (
+from clippings.books.presenters.books_list_page import (
     BooksPageHtmlRendered,
-    BooksPagePresenter,
+    BooksListPagePresenter,
     BooksPageStringRenderedABC,
 )
 from clippings.books.presenters.pagination import PaginationPresenter
@@ -24,7 +24,7 @@ def pagination_presenter():
 def page_presenter(mother, pagination_presenter):
     books = [mother.book(id=f"b:{i}") for i in range(5)]
     finder = MockBooksFinder({book.id: book for book in books})
-    return BooksPagePresenter(finder, pagination_presenter=pagination_presenter)
+    return BooksListPagePresenter(finder, pagination_presenter=pagination_presenter)
 
 
 @pytest.fixture()

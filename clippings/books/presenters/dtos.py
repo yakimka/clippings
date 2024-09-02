@@ -1,7 +1,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Literal
+from typing import Callable, Generic, Literal, TypeVar
+
+T: TypeVar = TypeVar("T")
+
+
+@dataclass
+class PresenterResult(Generic[T]):
+    data: T
+    renderer: Callable[[T], str]
+
+    def render(self) -> str:
+        return self.renderer(self.data)
 
 
 @dataclass
