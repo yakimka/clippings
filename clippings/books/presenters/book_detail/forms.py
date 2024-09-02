@@ -1,12 +1,8 @@
+from dataclasses import dataclass
+
 from clippings.books.ports import BooksStorageABC
-from clippings.books.presenters.book_detail.dto_builder import BookDetailBuilder
-from clippings.books.presenters.book_detail.dtos import (
-    AddInlineNoteDTO,
-    BookEditInfoDTO,
-    BookReviewDTO,
-    EditClippingDTO,
-    EditInlineNoteDTO,
-)
+from clippings.books.presenters.book_detail.dtos import ClippingDataDTO
+from clippings.books.presenters.book_detail.page import BookDetailBuilder
 from clippings.books.presenters.dtos import (
     ActionDTO,
     NotFoundPresenterResult,
@@ -14,6 +10,20 @@ from clippings.books.presenters.dtos import (
 )
 from clippings.books.presenters.html_renderers import make_html_renderer
 from clippings.books.presenters.urls import UrlsManager
+
+
+@dataclass(kw_only=True)
+class EditBookInfoDTO:
+    cover_url: str
+    title: str
+    author: str
+    rating: str
+    actions: list[ActionDTO]
+    fields_meta: dict[str, dict[str, str]]
+
+    @property
+    def actions_map(self) -> dict[str, ActionDTO]:
+        return {action.id: action for action in self.actions}
 
 
 class EditBookInfoFormPresenter:
@@ -27,13 +37,13 @@ class EditBookInfoFormPresenter:
 
     async def present(
         self, book_id: str
-    ) -> PresenterResult[BookEditInfoDTO] | NotFoundPresenterResult:
+    ) -> PresenterResult[EditBookInfoDTO] | NotFoundPresenterResult:
         book = await self._storage.get(book_id)
         if book is None:
             return PresenterResult.not_found()
         builder = BookDetailBuilder(book, self._urls_manager)
 
-        data = BookEditInfoDTO(
+        data = EditBookInfoDTO(
             cover_url=builder.cover_url(),
             title=book.title,
             author=book.author,
@@ -64,6 +74,16 @@ class EditBookInfoFormPresenter:
         )
 
 
+@dataclass
+class EditBookReviewDTO:
+    review: str
+    actions: list[ActionDTO]
+
+    @property
+    def actions_map(self) -> dict[str, ActionDTO]:
+        return {action.id: action for action in self.actions}
+
+
 class EditBookReviewFormPresenter:
     def __init__(
         self,
@@ -75,11 +95,11 @@ class EditBookReviewFormPresenter:
 
     async def present(
         self, book_id: str
-    ) -> PresenterResult[BookReviewDTO] | NotFoundPresenterResult:
+    ) -> PresenterResult[EditBookReviewDTO] | NotFoundPresenterResult:
         book = await self._storage.get(book_id)
         if book is None:
             return PresenterResult.not_found()
-        data = BookReviewDTO(
+        data = EditBookReviewDTO(
             review=book.review,
             actions=[
                 ActionDTO(
@@ -100,6 +120,16 @@ class EditBookReviewFormPresenter:
             data=data,
             renderer=make_html_renderer("book_detail/forms/edit_review.jinja2"),
         )
+
+
+@dataclass(kw_only=True)
+class EditClippingDTO(ClippingDataDTO):
+    content: str
+    actions: list[ActionDTO]
+
+    @property
+    def actions_map(self) -> dict[str, ActionDTO]:
+        return {action.id: action for action in self.actions}
 
 
 class EditClippingFormPresenter:
@@ -155,6 +185,15 @@ class EditClippingFormPresenter:
         )
 
 
+@dataclass(kw_only=True)
+class AddInlineNoteDTO(ClippingDataDTO):
+    actions: list[ActionDTO]
+
+    @property
+    def actions_map(self) -> dict[str, ActionDTO]:
+        return {action.id: action for action in self.actions}
+
+
 class AddInlineNoteFormPresenter:
     def __init__(
         self,
@@ -204,6 +243,16 @@ class AddInlineNoteFormPresenter:
             data=data,
             renderer=make_html_renderer("book_detail/forms/add_inline_note.jinja2"),
         )
+
+
+@dataclass
+class EditInlineNoteDTO:
+    content: str
+    actions: list[ActionDTO]
+
+    @property
+    def actions_map(self) -> dict[str, ActionDTO]:
+        return {action.id: action for action in self.actions}
 
 
 class EditInlineNoteFormPresenter:
