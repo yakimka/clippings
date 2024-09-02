@@ -115,6 +115,11 @@ async def book_list(
     return result.render()
 
 
+@app.get("/", response_class=RedirectResponse, status_code=302)
+async def redirect_to_books() -> str:
+    return "/books/"
+
+
 @app.delete("/books/{book_id}", response_class=Response)
 async def delete_book(book_id: str) -> Response:  # noqa: U100
     return Response(status_code=200)

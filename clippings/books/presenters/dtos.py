@@ -19,10 +19,26 @@ class PresenterResult(Generic[T]):
 
     @classmethod
     def not_found(cls) -> NotFoundPresenterResult:
-        return cls(None, not_found_page_renderer)
+        data = NotFoundDTO(
+            page_title="Not Found",
+            message="Sorry, the page you are looking for does not exist.",
+            go_to_home_action=ActionDTO(
+                id="go_to_home",
+                label="Go to the home page",
+                url=UrlDTO(value="/"),
+            ),
+        )
+        return cls(data, not_found_page_renderer)
 
 
-NotFoundPresenterResult = PresenterResult[None]
+@dataclass
+class NotFoundDTO:
+    page_title: str
+    message: str
+    go_to_home_action: ActionDTO
+
+
+NotFoundPresenterResult = PresenterResult[NotFoundDTO]
 
 
 @dataclass
@@ -42,9 +58,3 @@ class ActionDTO:
 class PaginationItemDTO:
     text: str
     url: str | None
-
-
-@dataclass
-class NotFoundDTO:
-    page_title: str
-    message: str
