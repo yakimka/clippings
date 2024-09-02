@@ -1,5 +1,5 @@
 <section class="clipping-list">
-    {% for clipping in data %}
+    {% for clipping in data.clippings %}
     {% with data=clipping %}
     {% include "book_detail/clipping.jinja2" %}
     {% endwith %}

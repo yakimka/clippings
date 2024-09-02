@@ -14,8 +14,10 @@ from clippings.books.adapters.readers import KindleClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage
 from clippings.books.ports import BooksFinderABC, BooksStorageABC, ClippingsReaderABC
 from clippings.books.presenters import html_renderers
-from clippings.books.presenters.book_detail.page import BookDetailPagePresenter
-from clippings.books.presenters.book_detail.presenters import BookDetailPresenter
+from clippings.books.presenters.book_detail.page import (
+    BookDetailPagePart,
+    BookDetailPagePresenter,
+)
 from clippings.books.presenters.books_list_page import BooksListPagePresenter
 from clippings.books.presenters.clippings_import_page import (
     ClippingsImportPagePresenter,
@@ -56,8 +58,8 @@ async def get_clippings_reader() -> AsyncGenerator[ClippingsReaderABC, None]:
 
 async def get_book_detail_presenter(
     books_storage: BooksStorageABC = Depends(get_books_storage),
-) -> BookDetailPresenter:
-    return BookDetailPresenter(storage=books_storage, urls_manager=urls_manager)
+) -> BookDetailPagePresenter:
+    return BookDetailPagePresenter(storage=books_storage, urls_manager=urls_manager)
 
 
 @app.get("/books/import", response_class=HTMLResponse)
@@ -107,26 +109,51 @@ async def delete_book(book_id: str) -> Response:  # noqa: U100
 @app.get("/books/{book_id}", response_class=HTMLResponse)
 async def book_detail(
     book_id: str,
-    storage: BooksStorageABC = Depends(get_books_storage),
+    detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
 ) -> str:
-    presenter = BookDetailPagePresenter(storage, urls_manager)
-    book_dto = await presenter.present(book_id=book_id)
-    return book_dto.render()
+    result = await detail_presenter.present(
+        book_id=book_id, page_part=BookDetailPagePart.ALL
+    )
+    return result.render()
+
+
+@app.get("/books/{book_id}/info", response_class=HTMLResponse)
+async def book_info(
+    book_id: str,
+    detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
+) -> str:
+    result = await detail_presenter.present(
+        book_id=book_id, page_part=BookDetailPagePart.INFO
+    )
+    return result.render()
 
 
 @app.get("/books/{book_id}/review", response_class=HTMLResponse)
 async def book_review(
     book_id: str,
-    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
+    detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
 ) -> str:
-    dto = await detail_presenter.review(book_id=book_id)
-    return html_renderers.book_review(dto)
+    result = await detail_presenter.present(
+        book_id=book_id, page_part=BookDetailPagePart.REVIEW
+    )
+    return result.render()
+
+
+@app.get("/books/{book_id}/clippings", response_class=HTMLResponse)
+async def clipping_list(
+    book_id: str,
+    detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
+) -> str:
+    result = await detail_presenter.present(
+        book_id=book_id, page_part=BookDetailPagePart.CLIPPINGS
+    )
+    return result.render()
 
 
 @app.get("/books/{book_id}/review/edit", response_class=HTMLResponse)
 async def book_review_update_form(
     book_id: str,
-    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
+    detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
 ) -> str:
     dto = await detail_presenter.edit_review(book_id=book_id)
     return html_renderers.book_review_update_form(dto)
@@ -148,19 +175,10 @@ async def save_book_review(
     return f"/books/{book_id}/review"
 
 
-@app.get("/books/{book_id}/info", response_class=HTMLResponse)
-async def book_info(
-    book_id: str,
-    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
-) -> str:
-    dto = await detail_presenter.book_info(book_id=book_id)
-    return html_renderers.book_info(dto)
-
-
 @app.get("/books/{book_id}/info/edit", response_class=HTMLResponse)
 async def book_info_update_form(
     book_id: str,
-    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
+    detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
 ) -> str:
     dto = await detail_presenter.edit_book_info(book_id=book_id)
     return html_renderers.book_info_update_form(dto)
@@ -186,20 +204,11 @@ async def book_info_save(
     return f"/books/{book_id}/info"
 
 
-@app.get("/books/{book_id}/clippings", response_class=HTMLResponse)
-async def clipping_list(
-    book_id: str,
-    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
-) -> str:
-    dto = await detail_presenter.clippings(book_id=book_id)
-    return html_renderers.clipping_list(dto)
-
-
 @app.get("/books/{book_id}/clippings/{clipping_id}", response_class=HTMLResponse)
 async def clipping_detail(
     book_id: str,
     clipping_id: str,
-    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
+    detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
 ) -> str:
     dto = await detail_presenter.clipping(book_id=book_id, clipping_id=clipping_id)
     return html_renderers.clipping_detail(dto)
@@ -209,7 +218,7 @@ async def clipping_detail(
 async def edit_clipping_form(
     book_id: str,
     clipping_id: str,
-    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
+    detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
 ) -> str:
     dto = await detail_presenter.edit_clipping(book_id=book_id, clipping_id=clipping_id)
     return html_renderers.clipping_update_form(dto)
@@ -249,7 +258,7 @@ def delete_clipping(book_id: str, clipping_id: str) -> Response:
 async def add_inline_note(
     book_id: str,
     clipping_id: str,
-    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
+    detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
 ) -> str:
     dto = await detail_presenter.add_inline_note(
         book_id=book_id, clipping_id=clipping_id
@@ -281,7 +290,7 @@ async def edit_inline_note_form(
     book_id: str,
     clipping_id: str,
     inline_note_id: str,
-    detail_presenter: BookDetailPresenter = Depends(get_book_detail_presenter),
+    detail_presenter: BookDetailPagePresenter = Depends(get_book_detail_presenter),
 ) -> Response:
     dto = await detail_presenter.edit_inline_note(
         book_id=book_id, clipping_id=clipping_id, inline_note_id=inline_note_id
