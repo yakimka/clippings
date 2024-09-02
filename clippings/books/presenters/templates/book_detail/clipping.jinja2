@@ -6,9 +6,22 @@
     <hr>
     {% endif %}
     {% for note in data.inline_notes %}
-    {% with data=note %}
-    {% include "book_detail/inline_note.jinja2" %}
-    {% endwith %}
+    <section hx-target="this">
+        <small>{{ note.content }}</small>
+        {% for action in note.actions %}
+        {% if action.id == "delete" %}
+            {% with hx_target="closest .clipping-item" %}
+            {% include "action_link.jinja2" %}
+            {% endwith %}
+        {% elif action.id == "unlink" %}
+            {% with hx_target="closest .clipping-list" %}
+            {% include "action_link.jinja2" %}
+            {% endwith %}
+        {% else %}
+            {% include "action_link.jinja2" %}
+        {% endif %}
+        {% endfor %}
+    </section>
     {% endfor %}
     <footer style="display: flex; justify-content: space-between; align-items: center;">
         <div>

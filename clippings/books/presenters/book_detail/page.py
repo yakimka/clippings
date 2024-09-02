@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 
 from clippings.books.ports import BooksStorageABC
-from clippings.books.presenters.book_detail.builders import BookDetailBuilder
+from clippings.books.presenters.book_detail.dto_builder import BookDetailBuilder
 from clippings.books.presenters.book_detail.dtos import BookDetailDTO, ClippingDTO
 from clippings.books.presenters.dtos import NotFoundPresenterResult, PresenterResult
 from clippings.books.presenters.html_renderers import make_html_renderer

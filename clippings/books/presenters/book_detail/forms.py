@@ -1,5 +1,5 @@
 from clippings.books.ports import BooksStorageABC
-from clippings.books.presenters.book_detail.builders import BookDetailBuilder
+from clippings.books.presenters.book_detail.dto_builder import BookDetailBuilder
 from clippings.books.presenters.book_detail.dtos import (
     AddInlineNoteDTO,
     BookEditInfoDTO,
