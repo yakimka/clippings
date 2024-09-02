@@ -15,8 +15,10 @@ from clippings.books.adapters.storages import MockBooksStorage
 from clippings.books.ports import BooksFinderABC, BooksStorageABC, ClippingsReaderABC
 from clippings.books.presenters import html_renderers
 from clippings.books.presenters.book_detail.presenters import BookDetailPresenter
-from clippings.books.presenters.book_import import ImportPagePresenter
 from clippings.books.presenters.books_list_page import BooksListPagePresenter
+from clippings.books.presenters.clippings_import_page import (
+    ClippingsImportPagePresenter,
+)
 from clippings.books.presenters.pagination import classic_pagination_presenter
 from clippings.books.presenters.urls import UrlsManager, make_book_urls
 from clippings.books.use_cases.edit_book import (
@@ -59,9 +61,9 @@ async def get_book_detail_presenter(
 
 @app.get("/books/import", response_class=HTMLResponse)
 async def import_page() -> str:
-    presenter = ImportPagePresenter(urls_manager=urls_manager)
-    dto = await presenter.page()
-    return html_renderers.clipping_import(dto)
+    presenter = ClippingsImportPagePresenter(urls_manager=urls_manager)
+    result = await presenter.present()
+    return result.render()
 
 
 @app.post("/books/import", response_class=HTMLResponse)

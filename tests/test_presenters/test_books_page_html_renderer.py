@@ -6,8 +6,8 @@ import pytest
 
 from clippings.books.adapters.finders import MockBooksFinder
 from clippings.books.presenters.books_list_page import (
-    BooksPageHtmlRendered,
     BooksListPagePresenter,
+    BooksPageHtmlRendered,
     BooksPageStringRenderedABC,
 )
 from clippings.books.presenters.pagination import PaginationPresenter

@@ -4,7 +4,11 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from clippings.books.ports import BooksFinderABC, FinderQuery
-from clippings.books.presenters.dtos import ActionDTO, PaginationItemDTO, PresenterResult
+from clippings.books.presenters.dtos import (
+    ActionDTO,
+    PaginationItemDTO,
+    PresenterResult,
+)
 from clippings.books.presenters.html_renderers import make_html_renderer
 from clippings.books.presenters.urls import UrlsManager
 
@@ -51,14 +55,14 @@ class BooksListPagePresenter:
         self._finder = finder
         self._pagination_presenter = pagination_presenter
         self._urls_manager = urls_manager
-        self._rendered = make_html_renderer(html_template)
+        self._renderer = make_html_renderer(html_template)
 
     async def present(self, page: int, on_page: int) -> PresenterResult[BooksPageDTO]:
         query = FinderQuery(start=(page - 1) * on_page, limit=on_page)
         books = await self._finder.find(query)
         books_count = await self._finder.count(FinderQuery(start=0, limit=None))
         books_url = self._urls_manager.build_url("book_list_page")
-        dto = BooksPageDTO(
+        data = BooksPageDTO(
             page_title="Books",
             books=[
                 BookOnPageDTO(
@@ -111,6 +115,6 @@ class BooksListPagePresenter:
             ),
         )
         return PresenterResult(
-            data=dto,
-            renderer=self._rendered,
+            data=data,
+            renderer=self._renderer,
         )
