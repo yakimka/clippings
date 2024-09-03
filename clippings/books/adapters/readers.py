@@ -23,7 +23,7 @@ class MockClippingsReader(ClippingsReaderABC):
 class KindleClippingsReader(ClippingsReaderABC):
     def __init__(self, file_object: BinaryIO) -> None:
         self._file_object = file_object
-        self._encoding = "utf-8"
+        self._encoding = "utf-8-sig"
 
     async def read(self) -> AsyncGenerator[ClippingImportCandidateDTO, None]:
         parser = KindleClippingsParser()

@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from clippings.books.adapters.readers import KindleClippingsReader
-from clippings.books.dtos import ClippingImportCandidateDTO
+from clippings.books.dtos import BookDTO, ClippingImportCandidateDTO
 from clippings.books.entities import ClippingType
 
 
@@ -28,9 +28,9 @@ def make_file_object():
             " | location 1300-1301 | Added on Thursday, 22 August 2024 18:10:53"
         ),
         content: str = "My highlight",
-    ) -> io.StringIO:
+    ) -> io.BytesIO:
         clipping = [f"{title} ({author})", metadata, "", content, "=========="]
-        return io.StringIO("\n".join(clipping))
+        return io.BytesIO("\n".join(clipping).encode("utf-8"))
 
     return _make_file_object
 
@@ -47,9 +47,8 @@ def make_metadata_string(
 @pytest.fixture()
 def multilanguage_clippings():
     this_dir = Path(__file__).parent
-    with open(
-        this_dir / "my_clippings_languages_examples.txt", encoding="utf-8-sig"
-    ) as file:
+    fixture = this_dir / "my_clippings_languages_examples.txt"
+    with open(fixture, "rb") as file:
         yield file
 
 
@@ -62,7 +61,7 @@ async def test_parse_book_title(make_file_object, make_sut):
     clippings = [clipping async for clipping in sut.read()]
 
     assert len(clippings) == 1
-    title = clippings[0].book_title
+    title = clippings[0].book.title
     assert title == "Hexagonal Architecture Explained (Cockburn, Alistair)"
 
 
@@ -203,27 +202,35 @@ async def test_parsing_languages(make_sut, multilanguage_clippings):
     sut = make_sut(multilanguage_clippings)
 
     clippings = []
+    unique_clippings = []
     async for clipping in sut.read():
-        clippings.append(
-            ClippingImportCandidateDTO(**(asdict(clipping) | {"content": "content"}))
+        clipping = ClippingImportCandidateDTO(
+            **(asdict(clipping) | {"content": "content", "book": clipping.book})
         )
+        clippings.append(clipping)
+        if clipping not in unique_clippings:
+            unique_clippings.append(clipping)
 
     assert len(clippings) == 22
-    assert set(clippings) == {
+    assert unique_clippings == [
         ClippingImportCandidateDTO(
-            book_title="Hexagonal Architecture Explained (Cockburn, Alistair)",
-            page=(112, 112),
-            location=(1300, 1300),
-            type=ClippingType.NOTE,
-            content="content",
-            added_at=datetime(2024, 8, 22, 18, 10, 53),
-        ),
-        ClippingImportCandidateDTO(
-            book_title="Hexagonal Architecture Explained (Cockburn, Alistair)",
+            BookDTO(
+                title="Hexagonal Architecture Explained (Cockburn, Alistair)", author=""
+            ),
             page=(112, 112),
             location=(1300, 1301),
             type=ClippingType.HIGHLIGHT,
             content="content",
             added_at=datetime(2024, 8, 22, 18, 10, 53),
         ),
-    }
+        ClippingImportCandidateDTO(
+            BookDTO(
+                title="Hexagonal Architecture Explained (Cockburn, Alistair)", author=""
+            ),
+            page=(112, 112),
+            location=(1300, 1300),
+            type=ClippingType.NOTE,
+            content="content",
+            added_at=datetime(2024, 8, 22, 18, 10, 53),
+        ),
+    ]
