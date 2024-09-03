@@ -147,10 +147,8 @@ class BookDetailBuilder:
     def cover_url(self) -> str:
         return self.book.cover_url or "https://placehold.co/400x600"
 
-    def clipping_data_dto(self, clipping_id: str) -> ClippingDataDTO | None:
-        clipping = self.clippings_by_id.get(clipping_id)
-        if clipping is None:
-            return None
+    def clipping_data_dto(self, clipping_id: str) -> ClippingDataDTO:
+        clipping = self.clippings_by_id[clipping_id]
         return ClippingDataDTO(
             content=clipping.content,
             type=clipping.type.value.capitalize(),
@@ -164,10 +162,8 @@ class BookDetailBuilder:
             ],
         )
 
-    def clipping_dto(self, clipping_id: str) -> ClippingDTO | None:
+    def clipping_dto(self, clipping_id: str) -> ClippingDTO:
         clipping_data = self.clipping_data_dto(clipping_id)
-        if clipping_data is None:
-            return None
         return ClippingDTO(
             content=clipping_data.content,
             type=clipping_data.type,

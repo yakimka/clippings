@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic, Literal, TypeVar
+from typing import TYPE_CHECKING, Generic, Literal, TypeAlias, TypeVar
 
 from clippings.books.presenters.html_renderers import not_found_page_renderer
 
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
 
-T: TypeVar = TypeVar("T")
+T = TypeVar("T")
 
 
 @dataclass
@@ -31,7 +31,7 @@ class PresenterResult(Generic[T]):
                 url=UrlDTO(value="/"),
             ),
         )
-        return cls(data, not_found_page_renderer)
+        return PresenterResult(data, not_found_page_renderer)
 
 
 @dataclass
@@ -41,7 +41,7 @@ class NotFoundDTO:
     go_to_home_action: ActionDTO
 
 
-NotFoundPresenterResult = PresenterResult[NotFoundDTO]
+NotFoundPresenterResult: TypeAlias = PresenterResult[NotFoundDTO]
 
 
 @dataclass

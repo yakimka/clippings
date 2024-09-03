@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING
 
+from clippings.books.exceptions import CantFindEntityError, DomainError
+
 if TYPE_CHECKING:
     from datetime import datetime
 
@@ -74,11 +76,17 @@ class Book:
 
     def unlink_inline_note(
         self, clipping_id: str, inline_note_id: str
-    ) -> None | Exception:
+    ) -> None | DomainError:
         clipping = self.get_clipping(clipping_id)
+        if clipping is None:
+            return CantFindEntityError(f"Clipping with id {clipping_id} not found")
         inline_note = clipping.get_inline_note(inline_note_id)
+        if inline_note is None:
+            return CantFindEntityError(f"Inline note with id {inline_note_id} not found")
 
         new_clipping = clipping.restore(inline_note)
+        if isinstance(new_clipping, DomainError):
+            return new_clipping
         clipping.remove_inline_note(inline_note_id)
         self.add_clippings([new_clipping])
         return None
@@ -146,7 +154,9 @@ class Clipping:
     def add_inline_note(self, inline_note: InlineNote) -> None:
         self.inline_notes.append(inline_note)
 
-    def restore(self, inline_note: InlineNote) -> Clipping:
+    def restore(self, inline_note: InlineNote) -> Clipping | DomainError:
+        if not inline_note.automatically_linked or not inline_note.original_id:
+            return DomainError("Can't restore not autolinked note")
         return Clipping(
             id=inline_note.original_id,
             page=self.page,

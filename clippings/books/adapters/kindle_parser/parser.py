@@ -11,6 +11,7 @@ from clippings.books.adapters.kindle_parser.language import (
     LanguageSettings,
     presets,
 )
+from clippings.books.exceptions import DomainError
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ class KindleClippingsParser:
         self._fsm = KindleClippingsFSM()
         self._metadata_parser = KindleClippingMetadataParser(presets)
 
-    def add_line(self, line: str) -> None:
+    def add_line(self, line: str) -> None | DomainError:
         line = line.strip()
         if self._fsm.current_state == "title":
             self._clippings.append({})  # type: ignore[typeddict-item]
@@ -51,14 +52,18 @@ class KindleClippingsParser:
             self._clippings[-1]["title"] = line
             self._fsm.next_state()
         elif self._fsm.current_state == "metadata" and line:
-            self._clippings[-1].update(self._metadata_parser.parse(line))
+            metadata = self._metadata_parser.parse(line)
+            if isinstance(metadata, DomainError):
+                return metadata
+            self._clippings[-1].update(metadata)
             self._fsm.next_state()
         elif self._fsm.current_state == "content":
             if line == self._separator:
                 self._fsm.next_state()
                 self._in_clipping = False
-                return
+                return None
             self._clippings[-1].setdefault("content", []).append(line)
+        return None
 
     def get_clipping(self) -> RawClipping | None:
         if self._in_clipping:
@@ -83,10 +88,6 @@ class KindleClippingsFSM:
 
     def next_state(self) -> None:
         self.current_state = next(self._states)
-
-
-class CantParseMetadataError(Exception):
-    pass
 
 
 class KindleClippingMetadataParser:
@@ -126,10 +127,10 @@ class KindleClippingMetadataParser:
 
         self._possible_languages = frozenset(possible_langs)
 
-    def parse(self, metadata: str) -> ClippingMetadata | Exception:
+    def parse(self, metadata: str) -> ClippingMetadata | DomainError:
         self._search_langs = set(self._possible_languages)
         clipping_type = self._parse_clipping_type(metadata)
-        if isinstance(clipping_type, Exception):
+        if isinstance(clipping_type, DomainError):
             return clipping_type
         page, loc = self._parse_page_and_loc(metadata)
         added_at = self._parse_date(metadata)
@@ -140,7 +141,7 @@ class KindleClippingMetadataParser:
             "added_at": added_at,
         }
 
-    def _parse_clipping_type(self, metadata: str) -> str | CantParseMetadataError:
+    def _parse_clipping_type(self, metadata: str) -> str | DomainError:
         markers = [
             (self._highlight_markers, "highlight"),
             (self._note_markers, "note"),
@@ -154,7 +155,7 @@ class KindleClippingMetadataParser:
                     self._search_langs = cross_langs
                     return clipping_type
 
-        return CantParseMetadataError(f"Can't find clipping type: {metadata}")
+        return DomainError(f"Can't find clipping type: {metadata}")
 
     def _parse_page_and_loc(self, metadata: str) -> tuple[Position, Position]:
         parser = PositionParser(
@@ -293,9 +294,9 @@ class DatetimeParser:
         datetime_parts = self._parse_datetime_parts()
         if not datetime_parts:
             return datetime(1970, 1, 1)
-        if "month" not in datetime_parts:
+        if "month" not in datetime_parts and month:
             datetime_parts["month"] = month
-        return datetime(**datetime_parts)
+        return datetime(**datetime_parts, tzinfo=None)
 
     def _extract_date_part(self) -> None:
         self._metadata = self._metadata.rsplit("|", 1)[1]
@@ -304,7 +305,7 @@ class DatetimeParser:
         numbers_parts = []
         twelve_hour_marks = self._twelve_hour_marks
         last_twelve_hour_chars = {
-            item[-1] for item in twelve_hour_marks for item in item
+            mark[-1] for marks in twelve_hour_marks for mark in marks
         }
         for i, char in enumerate(self._metadata):
             if char.isdigit():
@@ -377,7 +378,7 @@ class DatetimeParser:
             return False
 
         try:
-            datetime(**parts)
+            datetime(**parts, tzinfo=None)
         except (ValueError, TypeError):
             return False
         return True

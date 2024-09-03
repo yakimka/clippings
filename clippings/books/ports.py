@@ -74,7 +74,7 @@ class ClippingForGenerateId(Protocol):
 
 
 class ClippingIdGenerator(Protocol):
-    def __call__(self, book: ClippingForGenerateId) -> str:
+    def __call__(self, clipping: ClippingForGenerateId) -> str:
         pass
 
 

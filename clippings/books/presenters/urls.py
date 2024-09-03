@@ -10,7 +10,7 @@ class UrlTemplateDTO:
     template: str
     method: Literal["get", "post", "put", "patch", "delete"]
 
-    def to_url_dto(self, **kwargs) -> UrlDTO:
+    def to_url_dto(self, **kwargs: str) -> UrlDTO:
         return UrlDTO(value=self.template.format(**kwargs), method=self.method)
 
 
@@ -178,6 +178,6 @@ class UrlsManager:
         except KeyError:
             raise ValueError(f"Unknown URL ID: {url_id}") from None
 
-    def build_url(self, url_id: str, **kwargs) -> UrlDTO:
+    def build_url(self, url_id: str, **kwargs: str) -> UrlDTO:
         template = self.get_template(url_id)
         return template.to_url_dto(**kwargs)

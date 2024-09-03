@@ -51,12 +51,12 @@ class EditBookInfoFormPresenter:
         data = EditBookInfoDTO(
             cover_url=builder.cover_url(),
             title=book.title,
-            author=book.author,
+            author=book.author or "",
             rating=str(book.rating),
             fields_meta={
                 "title": {"label": "Book Title"},
                 "author": {"label": "Author"},
-                "rating": {"label": "Rating", "min": 0, "max": 10},
+                "rating": {"label": "Rating", "min": "0", "max": "10"},
                 "cover": {"label": "Upload cover"},
             },
             actions=[
@@ -212,12 +212,11 @@ class AddInlineNoteFormPresenter:
         self, book_id: str, clipping_id: str
     ) -> PresenterResult[AddInlineNoteDTO] | NotFoundPresenterResult:
         book = await self._storage.get(book_id)
-        if book is None:
+        if book is None or book.get_clipping(clipping_id) is None:
             return PresenterResult.not_found()
+
         builder = BookDetailBuilder(book, self._urls_manager)
         clipping_data = builder.clipping_data_dto(clipping_id)
-        if clipping_data is None:
-            return PresenterResult.not_found()
 
         data = AddInlineNoteDTO(
             actions=[

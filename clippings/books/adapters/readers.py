@@ -27,8 +27,8 @@ class KindleClippingsReader(ClippingsReaderABC):
 
     async def read(self) -> AsyncGenerator[ClippingImportCandidateDTO, None]:
         parser = KindleClippingsParser()
-        for line in self._file_object:
-            line = line.decode(self._encoding)
+        for raw_line in self._file_object:
+            line = raw_line.decode(self._encoding)
             parser.add_line(line)
             if (clipping := parser.get_clipping()) and clipping["type"] in ClippingType:
                 yield ClippingImportCandidateDTO(

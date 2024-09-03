@@ -10,6 +10,7 @@ from clippings.books.adapters.id_generators import (
 )
 from clippings.books.adapters.readers import KindleClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage
+from clippings.books.entities import Book
 from clippings.books.ports import BooksFinderABC, BooksStorageABC
 from clippings.books.presenters.book_detail.forms import (
     AddInlineNoteFormPresenter,
@@ -43,7 +44,7 @@ from clippings.books.use_cases.edit_book import (
 from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
 
 app = FastAPI()
-books_map = {}
+books_map: dict[str, Book] = {}
 print(make_book_urls())
 urls_manager = UrlsManager(make_book_urls())
 

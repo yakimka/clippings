@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from clippings.books.entities import InlineNote
+from clippings.books.exceptions import CantFindEntityError, DomainError
 
 if TYPE_CHECKING:
     from clippings.books.ports import BooksStorageABC, InlineNoteIdGenerator
@@ -24,54 +25,47 @@ class EditBookUseCase:
     def __init__(self, book_storage: BooksStorageABC):
         self._book_storage = book_storage
 
-    async def execute(self, data: BookFieldsDTO) -> None:
+    async def execute(self, data: BookFieldsDTO) -> None | DomainError:
         book = await self._book_storage.get(data.id)
-        to_patch = {}
+        if book is None:
+            return DomainError(f"Can't find book with id: {data.id}")
+
         if data.title is not None:
-            to_patch["title"] = data.title
+            book.title = data.title
         if data.author is not None:
-            to_patch["author"] = data.author
+            book.author = data.author
         if data.cover_url is not None:
-            to_patch["cover_url"] = data.cover_url
+            book.cover_url = data.cover_url
         if data.rating is not None:
-            to_patch["rating"] = data.rating
+            book.rating = data.rating
         if data.review is not None:
-            to_patch["review"] = data.review
-
-        if not to_patch:
-            return
-
-        for field, value in to_patch.items():
-            setattr(book, field, value)
+            book.review = data.review
 
         await self._book_storage.add(book)
+        return None
 
 
 @dataclass
 class ClippingFieldsDTO:
     id: str
     book_id: str
-    content: str | None = None
+    content: str
 
 
 class EditClippingUseCase:
     def __init__(self, book_storage: BooksStorageABC):
         self._book_storage = book_storage
 
-    async def execute(self, data: ClippingFieldsDTO) -> None:
+    async def execute(self, data: ClippingFieldsDTO) -> None | DomainError:
         book = await self._book_storage.get(data.book_id)
+        if book is None:
+            return CantFindEntityError(f"Can't find book with id: {data.book_id}")
         clipping = book.get_clipping(data.id)
-        to_patch = {}
-        if data.content is not None:
-            to_patch["content"] = data.content
-
-        if not to_patch:
-            return
-
-        for field, value in to_patch.items():
-            setattr(clipping, field, value)
-
+        if clipping is None:
+            return CantFindEntityError(f"Can't find clipping with id: {data.id} in book with id: {data.book_id}")
+        clipping.content = data.content
         await self._book_storage.add(book)
+        return None
 
 
 class AddInlineNoteUseCase:
@@ -83,9 +77,13 @@ class AddInlineNoteUseCase:
         self._book_storage = book_storage
         self._inline_note_id_generator = inline_note_id_generator
 
-    async def execute(self, book_id: str, clipping_id: str, content: str) -> None:
+    async def execute(self, book_id: str, clipping_id: str, content: str) -> None | DomainError:
         book = await self._book_storage.get(book_id)
+        if book is None:
+            return CantFindEntityError(f"Can't find book with id: {book_id}")
         clipping = book.get_clipping(clipping_id)
+        if clipping is None:
+            return CantFindEntityError(f"Can't find clipping with id: {clipping_id} in book with id: {book_id}")
         inline_note = InlineNote.create(
             content=content,
             added_at=datetime.now(),
@@ -93,6 +91,7 @@ class AddInlineNoteUseCase:
         )
         clipping.add_inline_note(inline_note)
         await self._book_storage.add(book)
+        return None
 
 
 class EditInlineNoteUseCase:
@@ -101,12 +100,19 @@ class EditInlineNoteUseCase:
 
     async def execute(
         self, book_id: str, clipping_id: str, inline_note_id: str, content: str
-    ) -> None:
+    ) -> None | DomainError:
         book = await self._book_storage.get(book_id)
+        if book is None:
+            return CantFindEntityError(f"Can't find book with id: {book_id}")
         clipping = book.get_clipping(clipping_id)
+        if clipping is None:
+            return CantFindEntityError(f"Can't find clipping with id: {clipping_id} in book with id: {book_id}")
         inline_note = clipping.get_inline_note(inline_note_id)
+        if inline_note is None:
+            return CantFindEntityError(f"Can't find inline note with id: {inline_note_id}")
         inline_note.content = content
         await self._book_storage.add(book)
+        return None
 
 
 class DeleteInlineNoteUseCase:
@@ -115,11 +121,16 @@ class DeleteInlineNoteUseCase:
 
     async def execute(
         self, book_id: str, clipping_id: str, inline_note_id: str
-    ) -> None:
+    ) -> None | DomainError:
         book = await self._book_storage.get(book_id)
+        if book is None:
+            return CantFindEntityError(f"Can't find book with id: {book_id}")
         clipping = book.get_clipping(clipping_id)
+        if clipping is None:
+            return CantFindEntityError(f"Can't find clipping with id: {clipping_id} in book with id: {book_id}")
         clipping.remove_inline_note(inline_note_id)
         await self._book_storage.add(book)
+        return None
 
 
 class UnlinkInlineNoteUseCase:
@@ -128,8 +139,11 @@ class UnlinkInlineNoteUseCase:
 
     async def execute(
         self, book_id: str, clipping_id: str, inline_note_id: str
-    ) -> None:
+    ) -> None | DomainError:
         book = await self._book_storage.get(book_id)
+        if book is None:
+            return CantFindEntityError(f"Can't find book with id: {book_id}")
 
         book.unlink_inline_note(clipping_id, inline_note_id)
         await self._book_storage.add(book)
+        return None

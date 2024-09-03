@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from clippings.books.dtos import ClippingImportCandidateDTO
+from clippings.books.dtos import BookDTO, ClippingImportCandidateDTO
 from clippings.books.entities import Book, Clipping, ClippingType, InlineNote
 
 
@@ -65,6 +65,7 @@ class ObjectMother:  # noqa: PIE798
     def clipping_import_candidate_dto(
         cls,
         book_title: str = "The Book",
+        book_author: str = "The Author",
         page: tuple[int, int] = (1, 1),
         location: tuple[int, int] = (10, 22),
         type: ClippingType = ClippingType.HIGHLIGHT,
@@ -72,7 +73,7 @@ class ObjectMother:  # noqa: PIE798
         added_at: datetime = datetime(2024, 8, 9),  # noqa: B008
     ) -> ClippingImportCandidateDTO:
         return ClippingImportCandidateDTO(
-            book_title=book_title,
+            book=BookDTO(title=book_title, author=book_author),
             page=page,
             location=location,
             type=type,

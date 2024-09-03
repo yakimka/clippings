@@ -29,7 +29,7 @@ class LanguageSettings:
     date_formats: list[tuple[DatePart, ...]]
     twelve_hour_mark: tuple[str, str] | None = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.month_names and len(self.month_names) != 12:
             raise ValueError(
                 f"{self.language_name}: `month_names` must be length of 12"
