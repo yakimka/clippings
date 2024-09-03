@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING, Any
 
 from jinja2 import Environment, PackageLoader, StrictUndefined
 from markupsafe import Markup
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from clippings.books.presenters.dtos import UrlDTO
 
 jinja_env = Environment(

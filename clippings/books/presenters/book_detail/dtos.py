@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from clippings.books.presenters.dtos import ActionDTO
+if TYPE_CHECKING:
+    from clippings.books.presenters.dtos import ActionDTO
 
 
 @dataclass(kw_only=True)

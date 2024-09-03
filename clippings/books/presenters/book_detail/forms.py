@@ -1,6 +1,8 @@
-from dataclasses import dataclass
+from __future__ import annotations
 
-from clippings.books.ports import BooksStorageABC
+from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
 from clippings.books.presenters.book_detail.dtos import ClippingDataDTO
 from clippings.books.presenters.book_detail.page import BookDetailBuilder
 from clippings.books.presenters.dtos import (
@@ -9,7 +11,10 @@ from clippings.books.presenters.dtos import (
     PresenterResult,
 )
 from clippings.books.presenters.html_renderers import make_html_renderer
-from clippings.books.presenters.urls import UrlsManager
+
+if TYPE_CHECKING:
+    from clippings.books.ports import BooksStorageABC
+    from clippings.books.presenters.urls import UrlsManager
 
 
 @dataclass(kw_only=True)

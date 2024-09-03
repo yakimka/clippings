@@ -136,7 +136,8 @@ def make_book_urls(base_url: str = "/books") -> list[UrlTemplateDTO]:
         UrlTemplateDTO(
             id="inline_note_unlink",
             template=make_template(
-                "/{book_id}/clippings/{clipping_id}/inline_notes/{inline_note_id}/unlink"
+                "/{book_id}/clippings/{clipping_id}/"
+                "inline_notes/{inline_note_id}/unlink"
             ),
             method="post",
         ),

@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Generic, Literal, TypeVar
+from typing import TYPE_CHECKING, Generic, Literal, TypeVar
 
 from clippings.books.presenters.html_renderers import not_found_page_renderer
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 
 T: TypeVar = TypeVar("T")
 

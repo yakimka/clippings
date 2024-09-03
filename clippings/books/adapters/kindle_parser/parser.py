@@ -3,7 +3,7 @@ from __future__ import annotations
 import itertools
 import logging
 from builtins import TypeError
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import TypeAlias, TypedDict
 
 from clippings.books.adapters.kindle_parser.language import (
@@ -341,7 +341,7 @@ class DatetimeParser:
                     return value
         return None
 
-    def _parse_datetime_parts(self) -> dict[str, int]:
+    def _parse_datetime_parts(self) -> dict[str, int]:  # noqa: C901
         numbers = self._cleaned.split(" ")
         langs = list(self.search_langs)
         if len(langs) > 1:
@@ -362,10 +362,9 @@ class DatetimeParser:
                     result["day"] = int(part_value)
                 elif type == DatePart.TIME:
                     hour, minute, second = (int(num) for num in part_value.split(":"))
-                    if mark := parsed_date.get(DatePart.TWElVE_HOUR_MARK):
-                        if mark == "PM":
-                            hour = (hour + 12) % 24
-                    result.update({"hour": hour, "minute": minute, "second": second})
+                    if parsed_date.get(DatePart.TWElVE_HOUR_MARK) == "PM":
+                        hour = (hour + 12) % 24
+                    result |= {"hour": hour, "minute": minute, "second": second}
             if self._check_datetime_parts(result):
                 return result
         return {}

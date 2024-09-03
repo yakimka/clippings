@@ -1,6 +1,3 @@
-from collections.abc import AsyncGenerator
-from pathlib import Path
-
 from fastapi import Depends, FastAPI, Form, UploadFile
 from fastapi.responses import HTMLResponse, Response
 from starlette.responses import RedirectResponse
@@ -13,7 +10,7 @@ from clippings.books.adapters.id_generators import (
 )
 from clippings.books.adapters.readers import KindleClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage
-from clippings.books.ports import BooksFinderABC, BooksStorageABC, ClippingsReaderABC
+from clippings.books.ports import BooksFinderABC, BooksStorageABC
 from clippings.books.presenters.book_detail.forms import (
     AddInlineNoteFormPresenter,
     EditBookInfoFormPresenter,
@@ -57,12 +54,6 @@ async def get_books_finder() -> BooksFinderABC:
 
 async def get_books_storage() -> BooksStorageABC:
     return MockBooksStorage(books_map)
-
-
-async def get_clippings_reader() -> AsyncGenerator[ClippingsReaderABC, None]:
-    this_dir = Path(__file__).parent
-    with open(this_dir / "My Clippings.txt", encoding="utf-8-sig") as file:
-        yield KindleClippingsReader(file)
 
 
 async def get_book_detail_presenter(
@@ -218,7 +209,7 @@ async def edit_clipping_form(
     "/books/{book_id}/clippings/{clipping_id}/inline_notes/add",
     response_class=HTMLResponse,
 )
-async def add_inline_note(
+async def add_inline_note_form(
     book_id: str,
     clipping_id: str,
     storage: BooksStorageABC = Depends(get_books_storage),
@@ -237,7 +228,7 @@ async def edit_inline_note_form(
     clipping_id: str,
     inline_note_id: str,
     storage: BooksStorageABC = Depends(get_books_storage),
-) -> Response:
+) -> str:
     presenter = EditInlineNoteFormPresenter(storage=storage, urls_manager=urls_manager)
     result = await presenter.present(
         book_id=book_id, clipping_id=clipping_id, inline_note_id=inline_note_id
@@ -304,7 +295,7 @@ async def save_clipping(
 
 
 @app.delete("/books/{book_id}/clippings/{clipping_id}", response_class=Response)
-def delete_clipping(book_id: str, clipping_id: str) -> Response:
+def delete_clipping(book_id: str, clipping_id: str) -> Response:  # noqa: U100
     return Response(status_code=200)
 
 

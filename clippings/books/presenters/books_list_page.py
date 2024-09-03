@@ -10,10 +10,10 @@ from clippings.books.presenters.dtos import (
     PresenterResult,
 )
 from clippings.books.presenters.html_renderers import make_html_renderer
-from clippings.books.presenters.urls import UrlsManager
 
 if TYPE_CHECKING:
     from clippings.books.presenters.pagination import PaginationPresenter
+    from clippings.books.presenters.urls import UrlsManager
 
 
 @dataclass

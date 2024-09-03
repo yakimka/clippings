@@ -1,7 +1,12 @@
-import uuid
+from __future__ import annotations
 
-from clippings.books.ports import BookForGenerateId, ClippingForGenerateId
+import uuid
+from typing import TYPE_CHECKING
+
 from clippings.utils.hash import hasher
+
+if TYPE_CHECKING:
+    from clippings.books.ports import BookForGenerateId, ClippingForGenerateId
 
 
 def book_id_generator(book: BookForGenerateId) -> str:

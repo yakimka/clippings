@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from clippings.books.presenters.dtos import ActionDTO, PresenterResult
 from clippings.books.presenters.html_renderers import make_html_renderer
-from clippings.books.presenters.urls import UrlsManager
+
+if TYPE_CHECKING:
+    from clippings.books.presenters.urls import UrlsManager
 
 
 @dataclass

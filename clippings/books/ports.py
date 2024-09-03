@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import abc
 from dataclasses import dataclass
-from datetime import datetime
 from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
+    from datetime import datetime
 
     from clippings.books.dtos import ClippingImportCandidateDTO
     from clippings.books.entities import Book, ClippingType

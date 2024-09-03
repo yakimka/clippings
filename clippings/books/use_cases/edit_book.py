@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from clippings.books.entities import InlineNote
-from clippings.books.ports import BooksStorageABC, InlineNoteIdGenerator
+
+if TYPE_CHECKING:
+    from clippings.books.ports import BooksStorageABC, InlineNoteIdGenerator
 
 
 @dataclass
