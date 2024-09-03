@@ -82,7 +82,9 @@ class Book:
             return CantFindEntityError(f"Clipping with id {clipping_id} not found")
         inline_note = clipping.get_inline_note(inline_note_id)
         if inline_note is None:
-            return CantFindEntityError(f"Inline note with id {inline_note_id} not found")
+            return CantFindEntityError(
+                f"Inline note with id {inline_note_id} not found"
+            )
 
         new_clipping = clipping.restore(inline_note)
         if isinstance(new_clipping, DomainError):

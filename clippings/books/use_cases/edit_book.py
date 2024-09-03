@@ -62,7 +62,9 @@ class EditClippingUseCase:
             return CantFindEntityError(f"Can't find book with id: {data.book_id}")
         clipping = book.get_clipping(data.id)
         if clipping is None:
-            return CantFindEntityError(f"Can't find clipping with id: {data.id} in book with id: {data.book_id}")
+            return CantFindEntityError(
+                f"Can't find clipping with id: {data.id}; Book id: {data.book_id}"
+            )
         clipping.content = data.content
         await self._book_storage.add(book)
         return None
@@ -77,13 +79,17 @@ class AddInlineNoteUseCase:
         self._book_storage = book_storage
         self._inline_note_id_generator = inline_note_id_generator
 
-    async def execute(self, book_id: str, clipping_id: str, content: str) -> None | DomainError:
+    async def execute(
+        self, book_id: str, clipping_id: str, content: str
+    ) -> None | DomainError:
         book = await self._book_storage.get(book_id)
         if book is None:
             return CantFindEntityError(f"Can't find book with id: {book_id}")
         clipping = book.get_clipping(clipping_id)
         if clipping is None:
-            return CantFindEntityError(f"Can't find clipping with id: {clipping_id} in book with id: {book_id}")
+            return CantFindEntityError(
+                f"Can't find clipping with id: {clipping_id} in book with id: {book_id}"
+            )
         inline_note = InlineNote.create(
             content=content,
             added_at=datetime.now(),
@@ -106,10 +112,14 @@ class EditInlineNoteUseCase:
             return CantFindEntityError(f"Can't find book with id: {book_id}")
         clipping = book.get_clipping(clipping_id)
         if clipping is None:
-            return CantFindEntityError(f"Can't find clipping with id: {clipping_id} in book with id: {book_id}")
+            return CantFindEntityError(
+                f"Can't find clipping with id: {clipping_id} in book with id: {book_id}"
+            )
         inline_note = clipping.get_inline_note(inline_note_id)
         if inline_note is None:
-            return CantFindEntityError(f"Can't find inline note with id: {inline_note_id}")
+            return CantFindEntityError(
+                f"Can't find inline note with id: {inline_note_id}"
+            )
         inline_note.content = content
         await self._book_storage.add(book)
         return None
@@ -127,7 +137,9 @@ class DeleteInlineNoteUseCase:
             return CantFindEntityError(f"Can't find book with id: {book_id}")
         clipping = book.get_clipping(clipping_id)
         if clipping is None:
-            return CantFindEntityError(f"Can't find clipping with id: {clipping_id} in book with id: {book_id}")
+            return CantFindEntityError(
+                f"Can't find clipping with id: {clipping_id} in book with id: {book_id}"
+            )
         clipping.remove_inline_note(inline_note_id)
         await self._book_storage.add(book)
         return None
