@@ -16,7 +16,7 @@ class UrlTemplateDTO:
 
 def make_book_urls(base_url: str = "/books") -> list[UrlTemplateDTO]:
     def make_template(template: str) -> str:
-        return f"{base_url.rstrip("/")}{template}"
+        return f"{base_url.rstrip('/')}{template}"
 
     templates = [
         UrlTemplateDTO(

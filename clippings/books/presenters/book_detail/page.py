@@ -152,8 +152,8 @@ class BookDetailBuilder:
         return ClippingDataDTO(
             content=clipping.content,
             type=clipping.type.value.capitalize(),
-            page=f"Page: {"-".join(map(str, clipping.page))}",
-            location=f"Loc: {"-".join(map(str, clipping.location))}",
+            page=f"Page: {'-'.join(map(str, clipping.page))}",
+            location=f"Loc: {'-'.join(map(str, clipping.location))}",
             added_at=f"Added: {clipping.added_at.date().isoformat()}",
             notes_label="Notes",
             inline_notes=[
