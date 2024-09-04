@@ -30,13 +30,18 @@ class KindleClippingsReader(ClippingsReaderABC):
         for raw_line in self._file_object:
             line = raw_line.decode(self._encoding)
             parser.add_line(line)
-            if (clipping := parser.get_clipping()) and clipping["type"] in ClippingType:
+            if clipping := parser.get_clipping():
+                try:
+                    clipping_type = ClippingType(clipping["type"])
+                except ValueError:
+                    continue
+
                 yield ClippingImportCandidateDTO(
                     book=BookDTO(
                         title=clipping["title"],
                         author="",
                     ),
-                    type=ClippingType(clipping["type"]),
+                    type=clipping_type,
                     content="\n".join(clipping["content"]).strip(),
                     page=clipping["page"],
                     location=clipping["location"],
