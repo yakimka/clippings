@@ -72,9 +72,7 @@ async def test_can_get_zero_results(start: int, limit: int, make_sut, make_books
 
 
 async def test_by_default_return_in_order_by_title(make_sut, mother):
-    books = [
-        mother.book(id=str(reversed(str(i))), title=f"Book {i}") for i in range(10, 20)
-    ]
+    books = [mother.book(id=str(i)[::-1], title=f"Book {i}") for i in range(10, 20)]
     shuffled_books = books.copy()
     shuffle(shuffled_books)
     sut = make_sut(books)
