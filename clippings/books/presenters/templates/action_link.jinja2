@@ -1,0 +1,8 @@
+<span
+    class="action-link"
+    {% if hx_target is defined %}
+    hx-target="{{ hx_target }}"
+    {% endif %}
+    {{ hx_link(action.url) }}>
+    <small>{{ action.label }}</small>
+</span>
