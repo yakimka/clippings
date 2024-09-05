@@ -10,9 +10,11 @@ from clippings.books.presenters.dtos import (
     PresenterResult,
 )
 from clippings.books.presenters.html_renderers import make_html_renderer
+from clippings.books.presenters.image import image_or_default
 
 if TYPE_CHECKING:
-    from clippings.books.presenters.pagination import PaginationPresenter
+    from clippings.books.entities import Clipping
+    from clippings.books.presenters.pagination import PaginationCalculator
     from clippings.books.presenters.urls import UrlsManager
 
 
@@ -22,7 +24,7 @@ class BookOnPageDTO:
     name: str
     clippings_count: int
     last_clipping_added_at: str
-    rating: int
+    rating: str
     review: str
     actions: list[ActionDTO]
 
@@ -48,30 +50,45 @@ class BooksListPagePresenter:
     def __init__(
         self,
         finder: BooksFinderABC,
-        pagination_presenter: PaginationPresenter,
+        pagination_calculator: PaginationCalculator,
         urls_manager: UrlsManager,
         html_template: str = "books_list_page.jinja2",
     ) -> None:
         self._finder = finder
-        self._pagination_presenter = pagination_presenter
+        self._pagination_calculator = pagination_calculator
         self._urls_manager = urls_manager
         self._renderer = make_html_renderer(html_template)
 
     async def present(self, page: int, on_page: int) -> PresenterResult[BooksPageDTO]:
-        query = FinderQuery(start=(page - 1) * on_page, limit=on_page)
-        books = await self._finder.find(query)
         books_count = await self._finder.count(FinderQuery(start=0, limit=None))
         books_url = self._urls_manager.build_url("book_list_page")
+        pagination = self._pagination_calculator(
+            current_page=page,
+            total_items=books_count,
+            on_page=on_page,
+            books_page_url=books_url.value,
+        )
+        page = pagination.current_page
+
+        query = FinderQuery(start=(page - 1) * on_page, limit=on_page)
+        books = await self._finder.find(query)
+
+        def last_clipping_date(clippings: list[Clipping]) -> str:
+            if not clippings:
+                return "-"
+            last_clipping = sorted(clippings, key=lambda c: c.added_at)[-1]
+            return last_clipping.added_at.strftime("%d %b %Y")
+
         data = BooksPageDTO(
             page_title="Books",
             books=[
                 BookOnPageDTO(
-                    cover_url="https://placehold.co/400x600",
+                    cover_url=image_or_default(book.cover_url),
                     name=f"{book.title} by {book.author}",
                     clippings_count=len(book.clippings),
-                    last_clipping_added_at="-",
-                    rating=10,
-                    review="",
+                    last_clipping_added_at=last_clipping_date(book.clippings),
+                    rating="-" if book.rating is None else str(book.rating),
+                    review=sub_by_words(book.review, 100),
                     actions=[
                         ActionDTO(
                             id="book_detail_page",
@@ -107,14 +124,20 @@ class BooksListPagePresenter:
                 "review": {"label": "Review"},
                 "actions": {"label": "Actions"},
             },
-            pagination=self._pagination_presenter(
-                current_page=page,
-                total_items=books_count,
-                on_page=on_page,
-                books_page_url=books_url.value,
-            ),
+            pagination=pagination.items,
         )
         return PresenterResult(
             data=data,
             renderer=self._renderer,
         )
+
+
+def sub_by_words(text: str, max_length: int) -> str:
+    words = text.split()
+    result: list[str] = []
+    for word in words:
+        if len(result) + len(word) > max_length:
+            result.append("...")
+            break
+        result.append(word)
+    return " ".join(result)

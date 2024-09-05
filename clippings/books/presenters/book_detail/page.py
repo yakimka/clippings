@@ -11,6 +11,7 @@ from clippings.books.presenters.dtos import (
     PresenterResult,
 )
 from clippings.books.presenters.html_renderers import make_html_renderer
+from clippings.books.presenters.image import image_or_default
 
 if TYPE_CHECKING:
     from clippings.books.entities import Book
@@ -145,7 +146,7 @@ class BookDetailBuilder:
         )
 
     def cover_url(self) -> str:
-        return self.book.cover_url or "https://placehold.co/400x600"
+        return image_or_default(self.book.cover_url)
 
     def clipping_data_dto(self, clipping_id: str) -> ClippingDataDTO:
         clipping = self.clippings_by_id[clipping_id]

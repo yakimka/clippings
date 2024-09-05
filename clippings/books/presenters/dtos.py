@@ -58,6 +58,13 @@ class ActionDTO:
 
 
 @dataclass
+class PaginationDTO:
+    current_page: int
+    total_pages: int
+    items: list[PaginationItemDTO]
+
+
+@dataclass
 class PaginationItemDTO:
     text: str
     url: str | None
