@@ -29,7 +29,7 @@ from clippings.books.presenters.books_list_page import BooksListPagePresenter
 from clippings.books.presenters.clippings_import_page import (
     ClippingsImportPagePresenter,
 )
-from clippings.books.presenters.pagination import classic_pagination_presenter
+from clippings.books.presenters.pagination import classic_pagination_calculator
 from clippings.books.presenters.urls import UrlsManager, make_book_urls
 from clippings.books.use_cases.edit_book import (
     AddInlineNoteUseCase,
@@ -102,7 +102,7 @@ async def book_list(
 ) -> str:
     presenter = BooksListPagePresenter(
         finder=books_finder,
-        pagination_presenter=classic_pagination_presenter,
+        pagination_calculator=classic_pagination_calculator,
         urls_manager=urls_manager,
     )
     result = await presenter.present(page=page, on_page=on_page)
