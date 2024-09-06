@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Literal
 
-from clippings.books.presenters.dtos import UrlDTO
+from clippings.web.presenters.dtos import UrlDTO
 
 
 @dataclass(kw_only=True)

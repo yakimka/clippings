@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from clippings.books.presenters.dtos import PaginationDTO, PaginationItemDTO
+from clippings.web.presenters.dtos import PaginationDTO, PaginationItemDTO
 
 
 class PaginationCalculator(Protocol):

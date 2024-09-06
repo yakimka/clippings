@@ -12,25 +12,25 @@ from clippings.books.adapters.readers import KindleClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage
 from clippings.books.entities import Book
 from clippings.books.ports import BooksFinderABC, BooksStorageABC
-from clippings.books.presenters.book_detail.forms import (
+from clippings.web.presenters.book_detail.forms import (
     AddInlineNoteFormPresenter,
     EditBookInfoFormPresenter,
     EditBookReviewFormPresenter,
     EditClippingFormPresenter,
     EditInlineNoteFormPresenter,
 )
-from clippings.books.presenters.book_detail.page import (
+from clippings.web.presenters.book_detail.page import (
     BookDetailPagePart,
     BookDetailPagePresenter,
     ClippingPart,
     ClippingPresenter,
 )
-from clippings.books.presenters.books_list_page import BooksListPagePresenter
-from clippings.books.presenters.clippings_import_page import (
+from clippings.web.presenters.books_list_page import BooksListPagePresenter
+from clippings.web.presenters.clippings_import_page import (
     ClippingsImportPagePresenter,
 )
-from clippings.books.presenters.pagination import classic_pagination_calculator
-from clippings.books.presenters.urls import UrlsManager, make_book_urls
+from clippings.web.presenters.pagination import classic_pagination_calculator
+from clippings.web.presenters.urls import UrlsManager, make_book_urls
 from clippings.books.use_cases.edit_book import (
     AddInlineNoteUseCase,
     BookFieldsDTO,

@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Generic, Literal, TypeAlias, TypeVar
 
-from clippings.books.presenters.html_renderers import not_found_page_renderer
+from clippings.web.presenters.html_renderers import not_found_page_renderer
 
 if TYPE_CHECKING:
     from collections.abc import Callable

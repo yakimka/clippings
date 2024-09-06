@@ -4,18 +4,18 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from clippings.books.ports import BooksFinderABC, FinderQuery
-from clippings.books.presenters.dtos import (
+from clippings.web.presenters.dtos import (
     ActionDTO,
     PaginationItemDTO,
     PresenterResult,
 )
-from clippings.books.presenters.html_renderers import make_html_renderer
-from clippings.books.presenters.image import image_or_default
+from clippings.web.presenters.html_renderers import make_html_renderer
+from clippings.web.presenters.image import image_or_default
 
 if TYPE_CHECKING:
     from clippings.books.entities import Clipping
-    from clippings.books.presenters.pagination import PaginationCalculator
-    from clippings.books.presenters.urls import UrlsManager
+    from clippings.web.presenters.pagination import PaginationCalculator
+    from clippings.web.presenters.urls import UrlsManager
 
 
 @dataclass

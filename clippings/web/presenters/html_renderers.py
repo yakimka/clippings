@@ -8,7 +8,7 @@ from markupsafe import Markup
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from clippings.books.presenters.dtos import UrlDTO
+    from clippings.web.presenters.dtos import UrlDTO
 
 jinja_env = Environment(
     loader=PackageLoader(__name__, "templates"),

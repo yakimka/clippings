@@ -4,19 +4,19 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from clippings.books.presenters.book_detail.dtos import ClippingDataDTO, InlineNoteDTO
-from clippings.books.presenters.dtos import (
+from clippings.web.presenters.book_detail.dtos import ClippingDataDTO, InlineNoteDTO
+from clippings.web.presenters.dtos import (
     ActionDTO,
     NotFoundPresenterResult,
     PresenterResult,
 )
-from clippings.books.presenters.html_renderers import make_html_renderer
-from clippings.books.presenters.image import image_or_default
+from clippings.web.presenters.html_renderers import make_html_renderer
+from clippings.web.presenters.image import image_or_default
 
 if TYPE_CHECKING:
     from clippings.books.entities import Book
     from clippings.books.ports import BooksStorageABC
-    from clippings.books.presenters.urls import UrlsManager
+    from clippings.web.presenters.urls import UrlsManager
 
 
 class BookDetailPagePart(Enum):
