@@ -22,14 +22,17 @@ def make_sut():
 def make_file_object():
     def _make_file_object(
         title: str = "Hexagonal Architecture Explained",
-        author: str = "Cockburn, Alistair",
+        authors: str = "Cockburn, Alistair",
         metadata: str = (
             "- Your Highlight on page 112"
             " | location 1300-1301 | Added on Thursday, 22 August 2024 18:10:53"
         ),
         content: str = "My highlight",
     ) -> io.BytesIO:
-        clipping = [f"{title} ({author})", metadata, "", content, "=========="]
+        title_line = title
+        if authors:
+            title_line += f" ({authors})"
+        clipping = [title_line, metadata, "", content, "=========="]
         return io.BytesIO("\n".join(clipping).encode("utf-8"))
 
     return _make_file_object
@@ -55,14 +58,53 @@ def multilanguage_clippings():
 async def test_parse_book_title(make_file_object, make_sut):
     file = make_file_object(
         title="Hexagonal Architecture Explained",
-        author="Cockburn, Alistair",
+        authors="Cockburn, Alistair",
     )
     sut = make_sut(file)
     clippings = [clipping async for clipping in sut.read()]
 
     assert len(clippings) == 1
     title = clippings[0].book.title
-    assert title == "Hexagonal Architecture Explained (Cockburn, Alistair)"
+    assert title == "Hexagonal Architecture Explained"
+
+
+async def test_parse_book_author(make_file_object, make_sut):
+    file = make_file_object(
+        title="Hexagonal Architecture Explained",
+        authors="Cockburn, Alistair",
+    )
+    sut = make_sut(file)
+    clippings = [clipping async for clipping in sut.read()]
+
+    assert len(clippings) == 1
+    authors = clippings[0].book.authors
+    assert authors == ["Cockburn, Alistair"]
+
+
+async def test_parse_multiple_book_authors(make_file_object, make_sut):
+    file = make_file_object(
+        authors="Smith, John; Doe, Jane",
+        title="Summary: The Subtle Art of Not Giving a F*ck",
+    )
+    sut = make_sut(file)
+    clippings = [clipping async for clipping in sut.read()]
+
+    assert len(clippings) == 1
+    authors = clippings[0].book.authors
+    assert authors == ["Smith, John", "Doe, Jane"]
+
+
+async def test_parse_title_without_authors(make_file_object, make_sut):
+    file = make_file_object(
+        title="Hexagonal Architecture Explained",
+        authors="",
+    )
+    sut = make_sut(file)
+    clippings = [clipping async for clipping in sut.read()]
+
+    assert len(clippings) == 1
+    authors = clippings[0].book.authors
+    assert authors == []
 
 
 @pytest.mark.parametrize(
@@ -215,7 +257,7 @@ async def test_parsing_languages(make_sut, multilanguage_clippings):
     assert unique_clippings == [
         ClippingImportCandidateDTO(
             BookDTO(
-                title="Hexagonal Architecture Explained (Cockburn, Alistair)", author=""
+                title="Hexagonal Architecture Explained", authors=["Cockburn, Alistair"]
             ),
             page=(112, 112),
             location=(1300, 1301),
@@ -225,7 +267,7 @@ async def test_parsing_languages(make_sut, multilanguage_clippings):
         ),
         ClippingImportCandidateDTO(
             BookDTO(
-                title="Hexagonal Architecture Explained (Cockburn, Alistair)", author=""
+                title="Hexagonal Architecture Explained", authors=["Cockburn, Alistair"]
             ),
             page=(112, 112),
             location=(1300, 1300),

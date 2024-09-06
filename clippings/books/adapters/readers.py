@@ -39,7 +39,11 @@ class KindleClippingsReader(ClippingsReaderABC):
                 yield ClippingImportCandidateDTO(
                     book=BookDTO(
                         title=clipping["title"],
-                        author="",
+                        authors=[
+                            item.strip()
+                            for item in clipping["authors"].split(";")
+                            if item.strip()
+                        ],
                     ),
                     type=clipping_type,
                     content="\n".join(clipping["content"]).strip(),

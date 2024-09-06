@@ -14,8 +14,8 @@ if TYPE_CHECKING:
 @dataclass
 class BookFieldsDTO:
     id: str
-    title: str | None = None
-    author: str | None = None
+    title: str
+    authors: list[str]
     cover_url: str | None = None
     rating: int | None = None
     review: str | None = None
@@ -32,8 +32,8 @@ class EditBookUseCase:
 
         if data.title is not None:
             book.title = data.title
-        if data.author is not None:
-            book.author = data.author
+        if data.authors is not None:
+            book.authors = data.authors
         if data.cover_url is not None:
             book.cover_url = data.cover_url
         if data.rating is not None:

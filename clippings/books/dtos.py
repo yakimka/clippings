@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 @dataclass
 class BookDTO:
     title: str
-    author: str
+    authors: list[str]
 
 
 @dataclass

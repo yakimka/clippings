@@ -12,6 +12,17 @@ from clippings.books.adapters.readers import KindleClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage
 from clippings.books.entities import Book
 from clippings.books.ports import BooksFinderABC, BooksStorageABC
+from clippings.books.use_cases.edit_book import (
+    AddInlineNoteUseCase,
+    BookFieldsDTO,
+    ClippingFieldsDTO,
+    DeleteInlineNoteUseCase,
+    EditBookUseCase,
+    EditClippingUseCase,
+    EditInlineNoteUseCase,
+    UnlinkInlineNoteUseCase,
+)
+from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
 from clippings.web.presenters.book_detail.forms import (
     AddInlineNoteFormPresenter,
     EditBookInfoFormPresenter,
@@ -26,22 +37,9 @@ from clippings.web.presenters.book_detail.page import (
     ClippingPresenter,
 )
 from clippings.web.presenters.books_list_page import BooksListPagePresenter
-from clippings.web.presenters.clippings_import_page import (
-    ClippingsImportPagePresenter,
-)
+from clippings.web.presenters.clippings_import_page import ClippingsImportPagePresenter
 from clippings.web.presenters.pagination import classic_pagination_calculator
 from clippings.web.presenters.urls import UrlsManager, make_book_urls
-from clippings.books.use_cases.edit_book import (
-    AddInlineNoteUseCase,
-    BookFieldsDTO,
-    ClippingFieldsDTO,
-    DeleteInlineNoteUseCase,
-    EditBookUseCase,
-    EditClippingUseCase,
-    EditInlineNoteUseCase,
-    UnlinkInlineNoteUseCase,
-)
-from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
 
 app = FastAPI()
 books_map: dict[str, Book] = {}
@@ -257,7 +255,7 @@ async def save_book_review(
 async def book_info_save(
     book_id: str,
     title: str = Form(),
-    author: str = Form(),
+    authors: str = Form(),
     rating: int = Form(),
     books_storage: BooksStorageABC = Depends(get_books_storage),
 ) -> str:
@@ -266,7 +264,7 @@ async def book_info_save(
         BookFieldsDTO(
             id=book_id,
             title=title,
-            author=author,
+            authors=authors.split(" & "),
             rating=rating,
         )
     )

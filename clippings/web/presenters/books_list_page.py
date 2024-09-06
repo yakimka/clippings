@@ -4,11 +4,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from clippings.books.ports import BooksFinderABC, FinderQuery
-from clippings.web.presenters.dtos import (
-    ActionDTO,
-    PaginationItemDTO,
-    PresenterResult,
-)
+from clippings.web.presenters.dtos import ActionDTO, PaginationItemDTO, PresenterResult
 from clippings.web.presenters.html_renderers import make_html_renderer
 from clippings.web.presenters.image import image_or_default
 
@@ -84,7 +80,7 @@ class BooksListPagePresenter:
             books=[
                 BookOnPageDTO(
                     cover_url=image_or_default(book.cover_url),
-                    name=f"{book.title} by {book.author}",
+                    name=f"{book.title} by {book.authors[0]}",
                     clippings_count=len(book.clippings),
                     last_clipping_added_at=last_clipping_date(book.clippings),
                     rating="-" if book.rating is None else str(book.rating),

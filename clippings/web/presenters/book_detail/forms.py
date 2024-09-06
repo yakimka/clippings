@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 class EditBookInfoDTO:
     cover_url: str
     title: str
-    author: str
+    authors: str
     rating: str
     actions: list[ActionDTO]
     fields_meta: dict[str, dict[str, str]]
@@ -51,11 +51,11 @@ class EditBookInfoFormPresenter:
         data = EditBookInfoDTO(
             cover_url=builder.cover_url(),
             title=book.title,
-            author=book.author or "",
+            authors=" & ".join(book.authors),
             rating=str(book.rating),
             fields_meta={
                 "title": {"label": "Book Title"},
-                "author": {"label": "Author"},
+                "authors": {"label": "Authors"},
                 "rating": {"label": "Rating", "min": "0", "max": "10"},
                 "cover": {"label": "Upload cover"},
             },

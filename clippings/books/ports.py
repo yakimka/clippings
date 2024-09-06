@@ -57,7 +57,7 @@ class ClippingsReaderABC(abc.ABC):
 
 class BookForGenerateId(Protocol):
     title: str
-    author: str
+    authors: list[str]
 
 
 class BookIdGenerator(Protocol):

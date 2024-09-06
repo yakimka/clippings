@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class Book:
     id: str
     title: str
-    author: str | None
+    authors: list[str]
     cover_url: str | None
     clippings: list[Clipping]
     review: str = ""

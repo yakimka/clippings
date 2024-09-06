@@ -30,6 +30,7 @@ class ClippingMetadata(TypedDict):
 
 class RawClipping(ClippingMetadata):
     title: str
+    authors: str
     metadata: str
     content: list[str]
 
@@ -49,7 +50,9 @@ class KindleClippingsParser:
             self._in_clipping = True
 
         if self._fsm.current_state == "title" and line:
-            self._clippings[-1]["title"] = line
+            title, authors = self._parse_title_and_authors(line)
+            self._clippings[-1]["title"] = title
+            self._clippings[-1]["authors"] = authors
             self._fsm.next_state()
         elif self._fsm.current_state == "metadata" and line:
             metadata = self._metadata_parser.parse(line)
@@ -72,6 +75,14 @@ class KindleClippingsParser:
             return self._clippings.pop()
         except IndexError:
             return None
+
+    def _parse_title_and_authors(self, title: str) -> tuple[str, str]:
+        title_parts = title.rsplit(" (", 1)
+        authors = ""
+        if len(title_parts) == 2:
+            authors = title_parts[1].strip(")")
+            title = title_parts[0]
+        return title.strip(), authors.strip()
 
 
 class KindleClippingsFSM:

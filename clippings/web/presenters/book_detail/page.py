@@ -32,7 +32,7 @@ class BookDetailDTO:
     actions: list[ActionDTO]
     cover_url: str
     title: str
-    author: str
+    authors: str
     rating: str
     review: str
     clippings: list[ClippingDTO]
@@ -117,7 +117,7 @@ class BookDetailBuilder:
             page_title=f"{self.book.title} Clippings",
             cover_url=self.cover_url(),
             title=self.book.title,
-            author=f"by {self.book.author}",
+            authors=f"by {' & '.join(self.book.authors)}",
             rating=(
                 "No rating"
                 if self.book.rating is None
