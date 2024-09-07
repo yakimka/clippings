@@ -75,7 +75,7 @@ class EditBookInfoFormPresenter:
             ],
         )
         return PresenterResult(
-            data=data, renderer=make_html_renderer("book_detail/forms/edit_info.jinja2")
+            data=data, renderer=make_html_renderer("book/detail/forms/edit_info.jinja2")
         )
 
 
@@ -123,7 +123,7 @@ class EditBookReviewFormPresenter:
         )
         return PresenterResult(
             data=data,
-            renderer=make_html_renderer("book_detail/forms/edit_review.jinja2"),
+            renderer=make_html_renderer("book/detail/forms/edit_review.jinja2"),
         )
 
 
@@ -186,7 +186,7 @@ class EditClippingFormPresenter:
         )
         return PresenterResult(
             data=data,
-            renderer=make_html_renderer("book_detail/forms/edit_clipping.jinja2"),
+            renderer=make_html_renderer("book/detail/forms/edit_clipping.jinja2"),
         )
 
 
@@ -245,7 +245,7 @@ class AddInlineNoteFormPresenter:
         )
         return PresenterResult(
             data=data,
-            renderer=make_html_renderer("book_detail/forms/add_inline_note.jinja2"),
+            renderer=make_html_renderer("book/detail/forms/add_inline_note.jinja2"),
         )
 
 
@@ -304,5 +304,5 @@ class EditInlineNoteFormPresenter:
         )
         return PresenterResult(
             data=data,
-            renderer=make_html_renderer("book_detail/forms/edit_inline_note.jinja2"),
+            renderer=make_html_renderer("book/detail/forms/edit_inline_note.jinja2"),
         )

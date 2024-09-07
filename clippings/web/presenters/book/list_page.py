@@ -10,8 +10,8 @@ from clippings.web.presenters.image import image_or_default
 
 if TYPE_CHECKING:
     from clippings.books.entities import Clipping
-    from clippings.web.presenters.pagination import PaginationCalculator
     from clippings.web.presenters.book.urls import UrlsManager
+    from clippings.web.presenters.pagination import PaginationCalculator
 
 
 @dataclass
@@ -47,12 +47,10 @@ class BooksListPagePresenter:
         finder: BooksFinderABC,
         pagination_calculator: PaginationCalculator,
         urls_manager: UrlsManager,
-        html_template: str = "books_list_page.jinja2",
     ) -> None:
         self._finder = finder
         self._pagination_calculator = pagination_calculator
         self._urls_manager = urls_manager
-        self._renderer = make_html_renderer(html_template)
 
     async def present(self, page: int, on_page: int) -> PresenterResult[BooksPageDTO]:
         books_count = await self._finder.count(FinderQuery(start=0, limit=None))
@@ -121,5 +119,5 @@ class BooksListPagePresenter:
         )
         return PresenterResult(
             data=data,
-            renderer=self._renderer,
+            renderer=make_html_renderer("book/list_page.jinja2"),
         )

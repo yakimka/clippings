@@ -14,15 +14,20 @@ from clippings.books.entities import Book
 from clippings.books.ports import BooksFinderABC, BooksStorageABC
 from clippings.books.use_cases.edit_book import (
     AddInlineNoteUseCase,
-    BookFieldsDTO,
     ClippingFieldsDTO,
     DeleteInlineNoteUseCase,
     EditBookUseCase,
     EditClippingUseCase,
     EditInlineNoteUseCase,
+    RatingDTO,
+    ReviewDTO,
+    TitleDTO,
     UnlinkInlineNoteUseCase,
 )
 from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
+from clippings.web.presenters.book.clippings_import_page import (
+    ClippingsImportPagePresenter,
+)
 from clippings.web.presenters.book.detail.forms import (
     AddInlineNoteFormPresenter,
     EditBookInfoFormPresenter,
@@ -37,9 +42,8 @@ from clippings.web.presenters.book.detail.page import (
     ClippingPresenter,
 )
 from clippings.web.presenters.book.list_page import BooksListPagePresenter
-from clippings.web.presenters.book.clippings_import_page import ClippingsImportPagePresenter
-from clippings.web.presenters.pagination import classic_pagination_calculator
 from clippings.web.presenters.book.urls import UrlsManager, make_book_urls
+from clippings.web.presenters.pagination import classic_pagination_calculator
 
 app = FastAPI()
 books_map: dict[str, Book] = {}
@@ -243,10 +247,8 @@ async def save_book_review(
 ) -> str:
     use_case = EditBookUseCase(book_storage=books_storage)
     await use_case.execute(
-        BookFieldsDTO(
-            id=book_id,
-            review=review,
-        )
+        book_id,
+        fields=[ReviewDTO(review=review)],
     )
     return f"/books/{book_id}/review"
 
@@ -261,12 +263,11 @@ async def book_info_save(
 ) -> str:
     use_case = EditBookUseCase(book_storage=books_storage)
     await use_case.execute(
-        BookFieldsDTO(
-            id=book_id,
-            title=title,
-            authors=authors.split(" & "),
-            rating=rating,
-        )
+        book_id,
+        fields=[
+            TitleDTO(title=title, authors=authors.split(" & ")),
+            RatingDTO(rating=rating),
+        ],
     )
     return f"/books/{book_id}/info"
 

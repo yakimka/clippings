@@ -20,10 +20,10 @@ if TYPE_CHECKING:
 
 
 class BookDetailPagePart(Enum):
-    ALL = "book_detail/page.jinja2"
-    INFO = "book_detail/info.jinja2"
-    REVIEW = "book_detail/review.jinja2"
-    CLIPPINGS = "book_detail/clippings.jinja2"
+    ALL = "book/detail/page.jinja2"
+    INFO = "book/detail/info.jinja2"
+    REVIEW = "book/detail/review.jinja2"
+    CLIPPINGS = "book/detail/clippings.jinja2"
 
 
 @dataclass
@@ -74,7 +74,7 @@ class BookDetailPagePresenter:
 
 
 class ClippingPart(Enum):
-    ALL = "book_detail/clipping.jinja2"
+    ALL = "book/detail/clipping.jinja2"
 
 
 class ClippingPresenter:

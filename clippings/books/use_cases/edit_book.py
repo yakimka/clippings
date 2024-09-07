@@ -4,44 +4,85 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from clippings.books.entities import InlineNote
+from clippings.books.entities import Book, InlineNote
 from clippings.books.exceptions import CantFindEntityError, DomainError
 
 if TYPE_CHECKING:
     from clippings.books.ports import BooksStorageABC, InlineNoteIdGenerator
 
 
-@dataclass
-class BookFieldsDTO:
-    id: str
+@dataclass(kw_only=True)
+class BookFieldDTO:
+    def apply(self, book: Book) -> bool:
+        raise NotImplementedError
+
+
+@dataclass(kw_only=True)
+class TitleDTO(BookFieldDTO):
     title: str
     authors: list[str]
-    cover_url: str | None = None
-    rating: int | None = None
-    review: str | None = None
+
+    def apply(self, book: Book) -> bool:
+        changed = False
+        if book.title != self.title:
+            book.title = self.title
+            changed = True
+        if book.authors != self.authors:
+            book.authors = self.authors
+            changed = True
+        return changed
+
+
+@dataclass(kw_only=True)
+class CoverUrlDTO(BookFieldDTO):
+    cover_url: str | None
+
+    def apply(self, book: Book) -> bool:
+        if book.cover_url != self.cover_url:
+            book.cover_url = self.cover_url
+            return True
+        return False
+
+
+@dataclass(kw_only=True)
+class RatingDTO(BookFieldDTO):
+    rating: int | None
+
+    def apply(self, book: Book) -> bool:
+        if book.rating != self.rating:
+            book.rating = self.rating
+            return True
+        return False
+
+
+@dataclass(kw_only=True)
+class ReviewDTO(BookFieldDTO):
+    review: str
+
+    def apply(self, book: Book) -> bool:
+        if book.review != self.review:
+            book.review = self.review
+            return True
+        return False
 
 
 class EditBookUseCase:
     def __init__(self, book_storage: BooksStorageABC):
         self._book_storage = book_storage
 
-    async def execute(self, data: BookFieldsDTO) -> None | DomainError:
-        book = await self._book_storage.get(data.id)
+    async def execute(
+        self, book_id: str, fields: list[BookFieldDTO]
+    ) -> None | DomainError:
+        book = await self._book_storage.get(book_id)
         if book is None:
-            return DomainError(f"Can't find book with id: {data.id}")
+            return DomainError(f"Can't find book with id: {book_id}")
 
-        if data.title is not None:
-            book.title = data.title
-        if data.authors is not None:
-            book.authors = data.authors
-        if data.cover_url is not None:
-            book.cover_url = data.cover_url
-        if data.rating is not None:
-            book.rating = data.rating
-        if data.review is not None:
-            book.review = data.review
-
-        await self._book_storage.add(book)
+        changed = False
+        for field in fields:
+            if field.apply(book):
+                changed = True
+        if changed:
+            await self._book_storage.add(book)
         return None
 
 

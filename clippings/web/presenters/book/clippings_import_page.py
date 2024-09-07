@@ -17,13 +17,8 @@ class ImportPageDTO:
 
 
 class ClippingsImportPagePresenter:
-    def __init__(
-        self,
-        urls_manager: UrlsManager,
-        html_template: str = "clippings_import_page.jinja2",
-    ) -> None:
+    def __init__(self, urls_manager: UrlsManager) -> None:
         self._urls_manager = urls_manager
-        self._renderer = make_html_renderer(html_template)
 
     async def present(self) -> PresenterResult[ImportPageDTO]:
         data = ImportPageDTO(
@@ -36,5 +31,5 @@ class ClippingsImportPagePresenter:
         )
         return PresenterResult(
             data=data,
-            renderer=self._renderer,
+            renderer=make_html_renderer("book/clippings_import_page.jinja2"),
         )
