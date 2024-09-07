@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from clippings.books.dtos import BookDTO, ClippingImportCandidateDTO
-from clippings.books.entities import Book, Clipping, ClippingType, InlineNote
+from clippings.books.entities import Book, Clipping, ClippingType, InlineNote, Position
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -36,8 +36,8 @@ class ObjectMother:  # noqa: PIE798
         cls,
         *,
         id: str = "clipping:id",
-        page: tuple[int, int] = (1, 1),
-        location: tuple[int, int] = (10, 22),
+        page: Position = (1, 1),
+        location: Position = (10, 22),
         type: ClippingType = ClippingType.HIGHLIGHT,
         content: str = "some highlighted text",
         added_at: datetime = datetime(2024, 8, 9),  # noqa: B008
@@ -76,8 +76,8 @@ class ObjectMother:  # noqa: PIE798
         cls,
         book_title: str = "The Book",
         book_authors: Iterable[str] = ("The Author",),
-        page: tuple[int, int] = (1, 1),
-        location: tuple[int, int] = (10, 22),
+        page: Position = (1, 1),
+        location: Position = (10, 22),
         type: ClippingType = ClippingType.HIGHLIGHT,
         content: str = "The Content",
         added_at: datetime = datetime(2024, 8, 9),  # noqa: B008

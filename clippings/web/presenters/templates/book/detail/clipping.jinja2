@@ -25,10 +25,9 @@
     {% endfor %}
     <footer style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <kbd>{{ data.type }}</kbd>
-            <kbd>{{ data.page }}</kbd>
-            <kbd>{{ data.location }}</kbd>
-            <kbd>{{ data.added_at }}</kbd>
+            {% for item in data.info %}
+            <kbd>{{ item.content }}</kbd>
+            {% endfor %}
         </div>
         <div>
             {% block clipping_actions %}

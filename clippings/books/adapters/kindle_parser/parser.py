@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import itertools
 import logging
-from builtins import TypeError
 from datetime import datetime
-from typing import TypeAlias, TypedDict
+from typing import TYPE_CHECKING, TypeAlias, TypedDict
 
 from clippings.books.adapters.kindle_parser.language import (
     DatePart,
@@ -13,12 +12,14 @@ from clippings.books.adapters.kindle_parser.language import (
 )
 from clippings.books.exceptions import DomainError
 
+if TYPE_CHECKING:
+    from clippings.books.entities import Position
+
 logger = logging.getLogger(__name__)
 
 
 Lang: TypeAlias = str
 Marker: TypeAlias = str
-Position: TypeAlias = tuple[int, int]
 
 
 class ClippingMetadata(TypedDict):

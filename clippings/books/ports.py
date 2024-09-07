@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from datetime import datetime
 
     from clippings.books.dtos import ClippingImportCandidateDTO
-    from clippings.books.entities import Book, ClippingType
+    from clippings.books.entities import Book, ClippingType, Position
 
 
 class BooksStorageABC(abc.ABC):
@@ -66,8 +66,8 @@ class BookIdGenerator(Protocol):
 
 
 class ClippingForGenerateId(Protocol):
-    page: tuple[int, int]
-    location: tuple[int, int]
+    page: Position
+    location: Position
     content: str
     type: ClippingType
     added_at: datetime

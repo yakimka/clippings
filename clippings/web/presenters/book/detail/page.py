@@ -4,7 +4,11 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from clippings.web.presenters.book.detail.dtos import ClippingDataDTO, InlineNoteDTO
+from clippings.web.presenters.book.detail.dtos import (
+    ClippingDataDTO,
+    ClippingInfoDTO,
+    InlineNoteDTO,
+)
 from clippings.web.presenters.dtos import (
     ActionDTO,
     NotFoundPresenterResult,
@@ -14,7 +18,7 @@ from clippings.web.presenters.html_renderers import make_html_renderer
 from clippings.web.presenters.image import image_or_default
 
 if TYPE_CHECKING:
-    from clippings.books.entities import Book
+    from clippings.books.entities import Book, Position
     from clippings.books.ports import BooksStorageABC
     from clippings.web.presenters.book.urls import UrlsManager
 
@@ -44,6 +48,7 @@ class BookDetailDTO:
 
 @dataclass(kw_only=True)
 class ClippingDTO(ClippingDataDTO):
+    info: list[ClippingInfoDTO]
     actions: list[ActionDTO]
 
     @property
@@ -150,12 +155,30 @@ class BookDetailBuilder:
 
     def clipping_data_dto(self, clipping_id: str) -> ClippingDataDTO:
         clipping = self.clippings_by_id[clipping_id]
+
+        def format_position(position: Position) -> str:
+            if position[0] == position[1]:
+                return str(position[0])
+            return f"{position[0]}-{position[1]}"
+
+        info = [
+            ClippingInfoDTO(content=clipping.type.value.capitalize()),
+        ]
+        if clipping.page != (-1, -1):
+            info.append(
+                ClippingInfoDTO(content=f"Page: {format_position(clipping.page)}")
+            )
+        if clipping.location != (-1, -1):
+            info.append(
+                ClippingInfoDTO(content=f"Loc: {format_position(clipping.location)}")
+            )
+        info.append(
+            ClippingInfoDTO(content=f"Added: {clipping.added_at.date().isoformat()}")
+        )
+
         return ClippingDataDTO(
             content=clipping.content,
-            type=clipping.type.value.capitalize(),
-            page=f"Page: {'-'.join(map(str, clipping.page))}",
-            location=f"Loc: {'-'.join(map(str, clipping.location))}",
-            added_at=f"Added: {clipping.added_at.date().isoformat()}",
+            info=info,
             notes_label="Notes",
             inline_notes=[
                 self._inline_note_dto(clipping_id, inline_note.id)
@@ -167,10 +190,7 @@ class BookDetailBuilder:
         clipping_data = self.clipping_data_dto(clipping_id)
         return ClippingDTO(
             content=clipping_data.content,
-            type=clipping_data.type,
-            page=clipping_data.page,
-            location=clipping_data.location,
-            added_at=clipping_data.added_at,
+            info=clipping_data.info,
             notes_label=clipping_data.notes_label,
             inline_notes=clipping_data.inline_notes,
             actions=[

@@ -177,10 +177,7 @@ class EditClippingFormPresenter:
                     ),
                 ),
             ],
-            type=clipping_data.type,
-            page=clipping_data.page,
-            location=clipping_data.location,
-            added_at=clipping_data.added_at,
+            info=clipping_data.info,
             notes_label=clipping_data.notes_label,
             inline_notes=clipping_data.inline_notes,
         )
@@ -236,10 +233,7 @@ class AddInlineNoteFormPresenter:
                 ),
             ],
             content=clipping_data.content,
-            type=clipping_data.type,
-            page=clipping_data.page,
-            location=clipping_data.location,
-            added_at=clipping_data.added_at,
+            info=clipping_data.info,
             notes_label=clipping_data.notes_label,
             inline_notes=clipping_data.inline_notes,
         )

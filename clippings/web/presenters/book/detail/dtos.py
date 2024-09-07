@@ -10,12 +10,14 @@ if TYPE_CHECKING:
 @dataclass(kw_only=True)
 class ClippingDataDTO:
     content: str
-    type: str
-    page: str
-    location: str
-    added_at: str
+    info: list[ClippingInfoDTO]
     notes_label: str
     inline_notes: list[InlineNoteDTO]
+
+
+@dataclass
+class ClippingInfoDTO:
+    content: str
 
 
 @dataclass

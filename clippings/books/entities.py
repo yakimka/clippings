@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeAlias
 
 from clippings.books.exceptions import CantFindEntityError, DomainError
 
@@ -46,8 +46,8 @@ class Book:
 
     def link_notes(self, *, inline_note_id_generator: InlineNoteIdGenerator) -> None:
         self.clippings.sort(key=lambda cl: cl.position_id)
-        position_to_highlight: dict[tuple[int, int], Clipping] = {}
-        position_to_note: dict[tuple[int, int], tuple[Clipping, int]] = {}
+        position_to_highlight: dict[Position, Clipping] = {}
+        position_to_note: dict[Position, tuple[Clipping, int]] = {}
         to_delete = []
         for i, clipping in enumerate(self.clippings):
             if clipping.type == ClippingType.HIGHLIGHT:
@@ -133,18 +133,21 @@ class InlineNote:
         )
 
 
+Position: TypeAlias = tuple[int, int]
+
+
 @dataclass
 class Clipping:
     id: str
-    page: tuple[int, int]
-    location: tuple[int, int]
+    page: Position
+    location: Position
     type: ClippingType
     content: str
     inline_notes: list[InlineNote]
     added_at: datetime
 
     @property
-    def position_id(self) -> tuple[int, int]:
+    def position_id(self) -> Position:
         return self.page[0], self.location[0]
 
     def get_inline_note(self, note_id: str) -> InlineNote | None:
