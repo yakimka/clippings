@@ -23,23 +23,23 @@ from clippings.books.use_cases.edit_book import (
     UnlinkInlineNoteUseCase,
 )
 from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
-from clippings.web.presenters.book_detail.forms import (
+from clippings.web.presenters.book.detail.forms import (
     AddInlineNoteFormPresenter,
     EditBookInfoFormPresenter,
     EditBookReviewFormPresenter,
     EditClippingFormPresenter,
     EditInlineNoteFormPresenter,
 )
-from clippings.web.presenters.book_detail.page import (
+from clippings.web.presenters.book.detail.page import (
     BookDetailPagePart,
     BookDetailPagePresenter,
     ClippingPart,
     ClippingPresenter,
 )
-from clippings.web.presenters.books_list_page import BooksListPagePresenter
-from clippings.web.presenters.clippings_import_page import ClippingsImportPagePresenter
+from clippings.web.presenters.book.list_page import BooksListPagePresenter
+from clippings.web.presenters.book.clippings_import_page import ClippingsImportPagePresenter
 from clippings.web.presenters.pagination import classic_pagination_calculator
-from clippings.web.presenters.urls import UrlsManager, make_book_urls
+from clippings.web.presenters.book.urls import UrlsManager, make_book_urls
 
 app = FastAPI()
 books_map: dict[str, Book] = {}

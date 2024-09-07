@@ -11,7 +11,7 @@ from clippings.web.presenters.image import image_or_default
 if TYPE_CHECKING:
     from clippings.books.entities import Clipping
     from clippings.web.presenters.pagination import PaginationCalculator
-    from clippings.web.presenters.urls import UrlsManager
+    from clippings.web.presenters.book.urls import UrlsManager
 
 
 @dataclass
@@ -21,7 +21,6 @@ class BookOnPageDTO:
     clippings_count: int
     last_clipping_added_at: str
     rating: str
-    review: str
     actions: list[ActionDTO]
 
     @property
@@ -84,7 +83,6 @@ class BooksListPagePresenter:
                     clippings_count=len(book.clippings),
                     last_clipping_added_at=last_clipping_date(book.clippings),
                     rating="-" if book.rating is None else str(book.rating),
-                    review=sub_by_words(book.review, 100),
                     actions=[
                         ActionDTO(
                             id="book_detail_page",
@@ -117,7 +115,6 @@ class BooksListPagePresenter:
                 "clippings_count": {"label": "Clippings count"},
                 "last_clipping_added_at": {"label": "Last added"},
                 "rating": {"label": "Rating"},
-                "review": {"label": "Review"},
                 "actions": {"label": "Actions"},
             },
             pagination=pagination.items,
@@ -126,14 +123,3 @@ class BooksListPagePresenter:
             data=data,
             renderer=self._renderer,
         )
-
-
-def sub_by_words(text: str, max_length: int) -> str:
-    words = text.split()
-    result: list[str] = []
-    for word in words:
-        if len(result) + len(word) > max_length:
-            result.append("...")
-            break
-        result.append(word)
-    return " ".join(result)

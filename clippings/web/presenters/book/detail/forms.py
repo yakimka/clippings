@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from clippings.web.presenters.book_detail.dtos import ClippingDataDTO
-from clippings.web.presenters.book_detail.page import BookDetailBuilder
+from clippings.web.presenters.book.detail.dtos import ClippingDataDTO
+from clippings.web.presenters.book.detail.page import BookDetailBuilder
 from clippings.web.presenters.dtos import (
     ActionDTO,
     NotFoundPresenterResult,
@@ -14,7 +14,7 @@ from clippings.web.presenters.html_renderers import make_html_renderer
 
 if TYPE_CHECKING:
     from clippings.books.ports import BooksStorageABC
-    from clippings.web.presenters.urls import UrlsManager
+    from clippings.web.presenters.book.urls import UrlsManager
 
 
 @dataclass(kw_only=True)
