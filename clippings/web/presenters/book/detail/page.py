@@ -20,7 +20,7 @@ from clippings.web.presenters.image import image_or_default
 if TYPE_CHECKING:
     from clippings.books.entities import Book, Position
     from clippings.books.ports import BooksStorageABC
-    from clippings.web.presenters.book.urls import UrlsManager
+    from clippings.web.presenters.urls import UrlsManager
 
 
 class BookDetailPagePart(Enum):

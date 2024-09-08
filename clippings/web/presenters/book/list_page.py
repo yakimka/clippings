@@ -10,8 +10,8 @@ from clippings.web.presenters.image import image_or_default
 
 if TYPE_CHECKING:
     from clippings.books.entities import Clipping
-    from clippings.web.presenters.book.urls import UrlsManager
     from clippings.web.presenters.pagination import PaginationCalculator
+    from clippings.web.presenters.urls import UrlsManager
 
 
 @dataclass

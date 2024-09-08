@@ -14,7 +14,7 @@ from clippings.web.presenters.html_renderers import make_html_renderer
 
 if TYPE_CHECKING:
     from clippings.books.ports import BooksStorageABC
-    from clippings.web.presenters.book.urls import UrlsManager
+    from clippings.web.presenters.urls import UrlsManager
 
 
 @dataclass(kw_only=True)

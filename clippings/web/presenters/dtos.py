@@ -16,6 +16,7 @@ T = TypeVar("T")
 class PresenterResult(Generic[T]):
     data: T
     renderer: Callable[[T], str]
+    status: int = 200
 
     def render(self) -> str:
         return self.renderer(self.data)
@@ -31,7 +32,7 @@ class PresenterResult(Generic[T]):
                 url=UrlDTO(value="/"),
             ),
         )
-        return PresenterResult(data, not_found_page_renderer)
+        return PresenterResult(data, not_found_page_renderer, status=404)
 
 
 @dataclass
@@ -68,3 +69,13 @@ class PaginationDTO:
 class PaginationItemDTO:
     text: str
     url: str | None
+
+
+@dataclass(kw_only=True)
+class UrlTemplateDTO:
+    id: str
+    template: str
+    method: Literal["get", "post", "put", "patch", "delete"]
+
+    def to_url_dto(self, **kwargs: str) -> UrlDTO:
+        return UrlDTO(value=self.template.format(**kwargs), method=self.method)
