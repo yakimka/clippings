@@ -18,7 +18,7 @@ async def book_list_page(request: Request) -> HTMLResponse:
     result = await controller.fire(
         page=_parse_int(page, default=1), on_page=_parse_int(on_page, default=10)
     )
-    return HTMLResponse(result.render(), status_code=result.status)
+    return HTMLResponse(result.payload, status_code=result.status_code)
 
 
 def _parse_int(value: str, *, default: int) -> int:

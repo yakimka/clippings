@@ -16,7 +16,6 @@ T = TypeVar("T")
 class PresenterResult(Generic[T]):
     data: T
     renderer: Callable[[T], str]
-    status: int = 200
 
     def render(self) -> str:
         return self.renderer(self.data)
@@ -32,7 +31,7 @@ class PresenterResult(Generic[T]):
                 url=UrlDTO(value="/"),
             ),
         )
-        return PresenterResult(data, not_found_page_renderer, status=404)
+        return PresenterResult(data, not_found_page_renderer)
 
 
 @dataclass

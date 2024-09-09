@@ -1,17 +1,9 @@
-from fastapi import Depends, FastAPI, Form, UploadFile
-from fastapi.responses import HTMLResponse, Response
+from fastapi import Depends, Form
+from fastapi.responses import Response
 from starlette.responses import RedirectResponse
 
-from clippings.books.adapters.finders import MockBooksFinder
-from clippings.books.adapters.id_generators import (
-    book_id_generator,
-    clipping_id_generator,
-    inline_note_id_generator,
-)
-from clippings.books.adapters.readers import KindleClippingsReader
-from clippings.books.adapters.storages import MockBooksStorage
-from clippings.books.entities import Book
-from clippings.books.ports import BooksFinderABC, BooksStorageABC
+from clippings.books.adapters.id_generators import inline_note_id_generator
+from clippings.books.ports import BooksStorageABC
 from clippings.books.use_cases.edit_book import (
     AddInlineNoteUseCase,
     ClippingFieldsDTO,
@@ -24,66 +16,11 @@ from clippings.books.use_cases.edit_book import (
     TitleDTO,
     UnlinkInlineNoteUseCase,
 )
-from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
-from clippings.web.presenters.book.clippings_import_page import (
-    ClippingsImportPagePresenter,
-)
-from clippings.web.presenters.book.detail.forms import (
-    AddInlineNoteFormPresenter,
-    EditBookInfoFormPresenter,
-    EditBookReviewFormPresenter,
-    EditClippingFormPresenter,
-    EditInlineNoteFormPresenter,
-)
-from clippings.web.presenters.book.detail.page import (
-    BookDetailPagePart,
-    BookDetailPagePresenter,
-    ClippingPart,
-    ClippingPresenter,
-)
-from clippings.web.presenters.book.list_page import BooksListPagePresenter
-from clippings.web.presenters.book.urls import make_book_urls
-from clippings.web.presenters.pagination import classic_pagination_calculator
-from clippings.web.presenters.urls import UrlsManager
-
-
-@app.get("/books/", response_class=HTMLResponse)
-async def book_list(
-    page: int = 1,
-    on_page: int = 10,
-    books_finder: BooksFinderABC = Depends(get_books_finder),
-) -> str:
-    presenter = BooksListPagePresenter(
-        finder=books_finder,
-        pagination_calculator=classic_pagination_calculator,
-        urls_manager=urls_manager,
-    )
-    result = await presenter.present(page=page, on_page=on_page)
-    return result.render()
-
-
-@app.get("/", response_class=RedirectResponse, status_code=302)
-async def redirect_to_books() -> str:
-    return "/books/"
 
 
 @app.delete("/books/{book_id}", response_class=Response)
 async def delete_book(book_id: str) -> Response:  # noqa: U100
     return Response(status_code=200)
-
-
-@app.put("/books/{book_id}/review", response_class=RedirectResponse, status_code=303)
-async def save_book_review(
-    book_id: str,
-    review: str = Form(""),
-    books_storage: BooksStorageABC = Depends(get_books_storage),
-) -> str:
-    use_case = EditBookUseCase(book_storage=books_storage)
-    await use_case.execute(
-        book_id,
-        fields=[ReviewDTO(review=review)],
-    )
-    return f"/books/{book_id}/review"
 
 
 @app.put("/books/{book_id}/info", response_class=RedirectResponse, status_code=303)

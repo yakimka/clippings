@@ -1,6 +1,7 @@
 from picodi import Provide, inject
 
 from clippings.books.ports import BooksStorageABC
+from clippings.web.controllers.responses import HTMLResponse
 from clippings.web.deps import get_books_storage
 from clippings.web.presenters.book.detail.page import (
     BookDetailPagePart,
@@ -20,11 +21,12 @@ class BaseBookDetailRenderController:
     ) -> None:
         self._books_storage = books_storage
 
-    async def fire(self, book_id: str) -> PresenterResult:
+    async def fire(self, book_id: str) -> HTMLResponse:
         presenter = BookDetailPagePresenter(
             storage=self._books_storage, urls_manager=urls_manager
         )
-        return await presenter.present(book_id=book_id, part=self.part)
+        result = await presenter.present(book_id=book_id, part=self.part)
+        return HTMLResponse.from_presenter_result(result)
 
 
 class RenderBookDetailPageController(BaseBookDetailRenderController):
@@ -50,8 +52,9 @@ class RenderBookClippingDetailController:
     ) -> None:
         self._books_storage = books_storage
 
-    async def fire(self, book_id: str, clipping_id: str) -> PresenterResult:
+    async def fire(self, book_id: str, clipping_id: str) -> HTMLResponse:
         presenter = ClippingPresenter(
             storage=self._books_storage, urls_manager=urls_manager
         )
-        return await presenter.present(book_id=book_id, clipping_id=clipping_id)
+        result = await presenter.present(book_id=book_id, clipping_id=clipping_id)
+        return HTMLResponse.from_presenter_result(result)

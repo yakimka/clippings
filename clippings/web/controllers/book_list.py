@@ -1,6 +1,7 @@
 from picodi import Provide, inject
 
 from clippings.books.ports import BooksFinderABC
+from clippings.web.controllers.responses import HTMLResponse
 from clippings.web.deps import get_books_finder
 from clippings.web.presenters.book.list_page import BooksListPagePresenter
 from clippings.web.presenters.dtos import PresenterResult
@@ -16,10 +17,11 @@ class RenderBookListController:
     ) -> None:
         self._book_finder = book_finder
 
-    async def fire(self, page: int, on_page: int) -> PresenterResult:
+    async def fire(self, page: int, on_page: int) -> HTMLResponse:
         presenter = BooksListPagePresenter(
             finder=self._book_finder,
             pagination_calculator=classic_pagination_calculator,
             urls_manager=urls_manager,
         )
-        return await presenter.present(page=page, on_page=on_page)
+        result = await presenter.present(page=page, on_page=on_page)
+        return HTMLResponse.from_presenter_result(result)
