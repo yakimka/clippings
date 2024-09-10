@@ -28,3 +28,6 @@ class MockBooksStorage(BooksStorageABC):
     async def extend(self, books: list[Book]) -> None:
         for book in books:
             await self.add(book)
+
+    async def remove(self, book: Book) -> None:
+        self.books.pop(book.id, None)

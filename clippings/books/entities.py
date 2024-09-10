@@ -22,11 +22,23 @@ class Book:
     review: str = ""
     rating: int | None = None
 
+    def authors_to_str(self) -> str:
+        return " & ".join(self.authors)
+
+    def authors_from_str(self, authors: str) -> None:
+        self.authors = authors.split(" & ")
+
     def get_clipping(self, clipping_id: str) -> Clipping | None:
         for clipping in self.clippings:
             if clipping.id == clipping_id:
                 return clipping
         return None
+
+    def remove_clipping(self, clipping: Clipping) -> None:
+        for i, item in enumerate(self.clippings):
+            if clipping.id == item.id:
+                del self.clippings[i]
+                break
 
     def add_clippings(self, clippings: list[Clipping]) -> bool:
         existed_ids = set()

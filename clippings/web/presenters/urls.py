@@ -1,9 +1,12 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
+from typing import TYPE_CHECKING
 
 from clippings.web.presenters.book.urls import make_book_urls
 from clippings.web.presenters.dtos import UrlDTO, UrlTemplateDTO
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 
 class UrlsManager:

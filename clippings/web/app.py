@@ -6,7 +6,7 @@ from clippings.web.presenters.urls import urls_manager
 from clippings.web.views import get_views_map
 
 
-async def startup():
+async def startup() -> None:
     await picodi.init_dependencies()
     print("Ready to go")
 
@@ -14,11 +14,16 @@ async def startup():
 def make_routes() -> list[Route]:
     views_map = get_views_map()
     result = []
+    not_found = set()
     for url_template in urls_manager:
         view = views_map.get(url_template.id)
         if view is None:
-            print(f"View not found for {url_template.id}")
+            not_found.add(url_template.id)
+            continue
         result.append(Route(url_template.template, view, methods=[url_template.method]))
+
+    if not_found:
+        raise RuntimeError(f"Views not found: {not_found}")
     return result
 
 

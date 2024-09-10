@@ -1,6 +1,9 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from picodi import Provide, inject
 
-from clippings.books.ports import BooksStorageABC
 from clippings.web.controllers.responses import HTMLResponse
 from clippings.web.deps import get_books_storage
 from clippings.web.presenters.book.detail.page import (
@@ -8,8 +11,10 @@ from clippings.web.presenters.book.detail.page import (
     BookDetailPagePresenter,
     ClippingPresenter,
 )
-from clippings.web.presenters.dtos import PresenterResult
 from clippings.web.presenters.urls import urls_manager
+
+if TYPE_CHECKING:
+    from clippings.books.ports import BooksStorageABC
 
 
 class BaseBookDetailRenderController:

@@ -20,15 +20,15 @@ class BookFieldDTO:
 @dataclass(kw_only=True)
 class TitleDTO(BookFieldDTO):
     title: str
-    authors: list[str]
+    authors: str
 
     def apply(self, book: Book) -> bool:
         changed = False
         if book.title != self.title:
             book.title = self.title
             changed = True
-        if book.authors != self.authors:
-            book.authors = self.authors
+        if book.authors_to_str() != self.authors:
+            book.authors_from_str(self.authors)
             changed = True
         return changed
 
@@ -163,6 +163,32 @@ class EditInlineNoteUseCase:
             )
         inline_note.content = content
         await self._book_storage.add(book)
+        return None
+
+
+class DeleteBookUseCase:
+    def __init__(self, book_storage: BooksStorageABC):
+        self._book_storage = book_storage
+
+    async def execute(self, book_id: str) -> None | DomainError:
+        book = await self._book_storage.get(book_id)
+        if book is None:
+            return CantFindEntityError(f"Can't find book with id: {book_id}")
+        await self._book_storage.remove(book)
+        return None
+
+
+class DeleteClippingUseCase:
+    def __init__(self, book_storage: BooksStorageABC):
+        self._book_storage = book_storage
+
+    async def execute(self, book_id: str, clipping_id: str) -> None | DomainError:
+        book = await self._book_storage.get(book_id)
+        if book is None:
+            return CantFindEntityError(f"Can't find book with id: {book_id}")
+        if clipping := book.get_clipping(clipping_id):
+            book.remove_clipping(clipping)
+            await self._book_storage.add(book)
         return None
 
 

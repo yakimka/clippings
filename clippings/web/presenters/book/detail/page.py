@@ -122,7 +122,7 @@ class BookDetailBuilder:
             page_title=f"{self.book.title} Clippings",
             cover_url=self.cover_url(),
             title=self.book.title,
-            authors=f"by {' & '.join(self.book.authors)}",
+            authors=f"by {self.book.authors_to_str()}",
             rating=(
                 "No rating"
                 if self.book.rating is None

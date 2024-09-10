@@ -5,7 +5,7 @@ def make_book_urls(base_url: str = "/books") -> list[UrlTemplateDTO]:
     def make_template(template: str) -> str:
         return f"{base_url.rstrip('/')}{template}"
 
-    templates = [
+    return [
         UrlTemplateDTO(
             id="clipping_import_page",
             template=make_template("/import"),
@@ -14,16 +14,6 @@ def make_book_urls(base_url: str = "/books") -> list[UrlTemplateDTO]:
         UrlTemplateDTO(
             id="clipping_upload",
             template=make_template("/import"),
-            method="post",
-        ),
-        UrlTemplateDTO(
-            id="book_add",
-            template=make_template(""),
-            method="post",
-        ),
-        UrlTemplateDTO(
-            id="book_add_form",
-            template=make_template("/add"),
             method="post",
         ),
         UrlTemplateDTO(
@@ -74,16 +64,6 @@ def make_book_urls(base_url: str = "/books") -> list[UrlTemplateDTO]:
         UrlTemplateDTO(
             id="clipping_list",
             template=make_template("/{book_id}/clippings"),
-            method="get",
-        ),
-        UrlTemplateDTO(
-            id="clipping_add",
-            template=make_template("/{book_id}/clippings"),
-            method="post",
-        ),
-        UrlTemplateDTO(
-            id="clipping_add_form",
-            template=make_template("/{book_id}/clippings/add"),
             method="get",
         ),
         UrlTemplateDTO(
@@ -148,4 +128,3 @@ def make_book_urls(base_url: str = "/books") -> list[UrlTemplateDTO]:
             method="get",
         ),
     ]
-    return templates

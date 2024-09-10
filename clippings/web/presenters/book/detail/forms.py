@@ -51,7 +51,7 @@ class EditBookInfoFormPresenter:
         data = EditBookInfoDTO(
             cover_url=builder.cover_url(),
             title=book.title,
-            authors=" & ".join(book.authors),
+            authors=book.authors_to_str(),
             rating=str(book.rating),
             fields_meta={
                 "title": {"label": "Book Title"},

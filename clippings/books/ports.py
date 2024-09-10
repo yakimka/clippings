@@ -29,6 +29,10 @@ class BooksStorageABC(abc.ABC):
     async def extend(self, books: list[Book]) -> None:
         pass
 
+    @abc.abstractmethod
+    async def remove(self, book: Book) -> None:
+        pass
+
 
 @dataclass(frozen=True)
 class FinderQuery:
