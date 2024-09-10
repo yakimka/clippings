@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 from clippings.web.presenters.dtos import NotFoundDTO, PresenterResult
 
 if TYPE_CHECKING:
-    from typing import Self
+    from typing_extensions import Self
 
 
 @dataclass(kw_only=True)
