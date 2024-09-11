@@ -34,7 +34,7 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(
-        "clippings.web.app:app",
+        "clippings.web.main:app",
         host="0.0.0.0",  # noqa: S104
         port=8000,
         reload=True,

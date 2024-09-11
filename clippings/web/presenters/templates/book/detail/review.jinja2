@@ -1,6 +1,8 @@
-<p hx-target="this">
-    {{ data.review }}
+<div hx-target="this">
+    {% for item in split_by_newline(data.review) %}
+    <p>{{ item }}</p>
+    {% endfor %}
     {% with action=data.actions_map.book_review_update_form %}
     {% include "action_link.jinja2" %}
     {% endwith %}
-</p>
+</div>

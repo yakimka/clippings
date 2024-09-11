@@ -40,7 +40,7 @@ class Book:
                 del self.clippings[i]
                 break
 
-    def add_clippings(self, clippings: list[Clipping]) -> bool:
+    def add_clippings(self, clippings: list[Clipping]) -> int:
         existed_ids = set()
         for clipping in self.clippings:
             existed_ids.add(clipping.id)
@@ -48,13 +48,13 @@ class Book:
                 if inline_note.original_id:
                     existed_ids.add(inline_note.original_id)
 
-        updated = False
+        added_count = 0
         for clipping in clippings:
             if clipping.id not in existed_ids:
                 self.clippings.append(clipping)
-                updated = True
+                added_count += 1
                 existed_ids.add(clipping.id)
-        return updated
+        return added_count
 
     def link_notes(self, *, inline_note_id_generator: InlineNoteIdGenerator) -> None:
         self.clippings.sort(key=lambda cl: cl.position_id)

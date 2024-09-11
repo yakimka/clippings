@@ -7,6 +7,7 @@ from clippings.web.presenters.dtos import ActionDTO, PresenterResult
 from clippings.web.presenters.html_renderers import make_html_renderer
 
 if TYPE_CHECKING:
+    from clippings.books.use_cases.import_clippings import ImportedBookDTO
     from clippings.web.presenters.urls import UrlsManager
 
 
@@ -32,4 +33,43 @@ class ClippingsImportPagePresenter:
         return PresenterResult(
             data=data,
             renderer=make_html_renderer("book/clippings_import_page.jinja2"),
+        )
+
+
+@dataclass
+class ImportResultDTO:
+    title: str
+    is_empty: bool
+    empty_message: str
+    items: list[ImportResultItemDTO]
+
+
+@dataclass
+class ImportResultItemDTO:
+    book_name: str
+    import_result: str
+    new_label: str | None
+
+
+class ImportClippingsResultPresenter:
+    async def present(
+        self, statistics: list[ImportedBookDTO]
+    ) -> PresenterResult[ImportResultDTO]:
+        return PresenterResult(
+            data=ImportResultDTO(
+                title="Import result",
+                is_empty=not bool(statistics),
+                empty_message="No clippings were imported",
+                items=[
+                    ImportResultItemDTO(
+                        book_name=f"{item.title} by {item.authors}",
+                        import_result=(
+                            f"Imported {item.imported_clippings_count} clippings"
+                        ),
+                        new_label="[NEW]" if item.is_new else None,
+                    )
+                    for item in statistics
+                ],
+            ),
+            renderer=make_html_renderer("book/clippings_import_result.jinja2"),
         )

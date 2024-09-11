@@ -11,6 +11,7 @@
                 {{ fields.title.label }}
                 <input
                         name="title"
+                        {% if fields.title.required %}required{% endif %}
                         placeholder="{{ fields.title.label }}"
                         value="{{ data.title }}"
                 />
@@ -19,6 +20,7 @@
                 {{ fields.authors.label }}
                 <input
                         name="authors"
+                        {% if fields.authors.required %}required{% endif %}
                         placeholder="{{ fields.authors.label }}"
                         value="{{ data.authors }}"
                 />
@@ -27,6 +29,7 @@
                 {{ fields.rating.label }}
                 <input
                         name="rating"
+                        {% if fields.rating.required %}required{% endif %}
                         placeholder="{{ fields.rating.label }}"
                         value="{{ data.rating }}"
                         type="number"
@@ -38,6 +41,7 @@
                 {{ fields.cover.label }}
                 <input
                         name="cover"
+                        {% if fields.cover.required %}required{% endif %}
                         placeholder="{{ fields.cover.label }}"
                         type="file"
                 />
