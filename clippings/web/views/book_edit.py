@@ -88,7 +88,7 @@ async def book_info_update(request: Request) -> RedirectResponse | HTMLResponse:
         return HTMLResponse("ERROR: Title must be a string")
     if not isinstance(form["authors"], str):
         return HTMLResponse("ERROR: Authors must be a string")
-    rating_raw = form.get("rating")
+    rating_raw = form.get("rating") or None
     if isinstance(rating_raw, UploadFile):
         return HTMLResponse("ERROR: Rating must be an integer")
 

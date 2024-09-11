@@ -24,7 +24,7 @@ class EditBookInfoDTO:
     authors: str
     rating: str
     actions: list[ActionDTO]
-    fields_meta: dict[str, dict[str, str]]
+    fields_meta: dict[str, dict[str, str | bool]]
 
     @property
     def actions_map(self) -> dict[str, ActionDTO]:
@@ -54,10 +54,15 @@ class EditBookInfoFormPresenter:
             authors=book.authors_to_str(),
             rating=str(book.rating),
             fields_meta={
-                "title": {"label": "Book Title"},
-                "authors": {"label": "Authors"},
-                "rating": {"label": "Rating", "min": "0", "max": "10"},
-                "cover": {"label": "Upload cover"},
+                "title": {"label": "Book Title", "required": True},
+                "authors": {"label": "Authors", "required": True},
+                "rating": {
+                    "label": "Rating",
+                    "min": "1",
+                    "max": "10",
+                    "required": False,
+                },
+                "cover": {"label": "Upload cover", "required": False},
             },
             actions=[
                 ActionDTO(

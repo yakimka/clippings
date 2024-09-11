@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from clippings.books.entities import Book, Clipping
@@ -13,6 +14,14 @@ if TYPE_CHECKING:
         ClippingsReaderABC,
         InlineNoteIdGenerator,
     )
+
+
+@dataclass
+class ImportedBookDTO:
+    title: str
+    authors: str
+    imported_clippings_count: int
+    is_new: bool
 
 
 class ImportClippingsUseCase:
@@ -30,7 +39,7 @@ class ImportClippingsUseCase:
         self._clipping_id_generator = clipping_id_generator
         self._inline_note_id_generator = inline_note_id_generator
 
-    async def execute(self) -> None:
+    async def execute(self) -> list[ImportedBookDTO]:
         book_id_to_book_map: dict[str, Book] = {}
         async for candidate in self._reader.read():
             book_id = self._book_id_generator(candidate.book)
@@ -60,14 +69,32 @@ class ImportClippingsUseCase:
         books_from_storage_by_id = {book.id: book for book in books_from_storage}
 
         to_update: list[Book] = []
+        statistics: list[ImportedBookDTO] = []
         for candidate_book_id, book in book_id_to_book_map.items():
             if existed_book := books_from_storage_by_id.get(candidate_book_id):
-                if existed_book.add_clippings(book.clippings):
+                if added := existed_book.add_clippings(book.clippings):
                     to_update.append(existed_book)
+                    statistics.append(
+                        ImportedBookDTO(
+                            title=existed_book.title,
+                            authors=existed_book.authors_to_str(),
+                            imported_clippings_count=added,
+                            is_new=False,
+                        )
+                    )
             else:
                 to_update.append(book)
+                statistics.append(
+                    ImportedBookDTO(
+                        title=book.title,
+                        authors=book.authors_to_str(),
+                        imported_clippings_count=len(book.clippings),
+                        is_new=True,
+                    )
+                )
 
         for book in to_update:
             book.link_notes(inline_note_id_generator=self._inline_note_id_generator)
 
         await self._storage.extend(to_update)
+        return statistics

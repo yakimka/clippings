@@ -1,0 +1,10 @@
+<section>
+    <h4>{{ data.title }}</h4>
+    {% if data.is_empty %}
+    <p>{{ data.empty_message }}</p>
+    {% else %}
+    {% for item in data.items %}
+    <p>{% if item.new_label %}{{ item.new_label }} {% endif %}{{ item.book_name }}: {{ item.import_result }}</p>
+    {% endfor %}
+    {% endif %}
+</section>

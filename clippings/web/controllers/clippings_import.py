@@ -15,6 +15,7 @@ from clippings.web.controllers.responses import HTMLResponse
 from clippings.web.deps import get_books_storage
 from clippings.web.presenters.book.clippings_import_page import (
     ClippingsImportPagePresenter,
+    ImportClippingsResultPresenter,
 )
 from clippings.web.presenters.urls import urls_manager
 
@@ -45,5 +46,8 @@ class ClippingsImportController:
             clipping_id_generator=clipping_id_generator,
             inline_note_id_generator=inline_note_id_generator,
         )
-        await import_use_case.execute()
-        return HTMLResponse(payload="Books imported successfully")
+        statistics = await import_use_case.execute()
+
+        presenter = ImportClippingsResultPresenter()
+        result = await presenter.present(statistics)
+        return HTMLResponse.from_presenter_result(result)
