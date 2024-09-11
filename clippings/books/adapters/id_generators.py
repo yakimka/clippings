@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 def book_id_generator(book: BookForGenerateId) -> str:
-    return hasher(f"{book.title}_{book.author}")
+    return hasher(f"{book.title}_{book.authors}")
 
 
 def clipping_id_generator(clipping: ClippingForGenerateId) -> str:

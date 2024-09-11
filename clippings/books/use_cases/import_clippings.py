@@ -38,7 +38,7 @@ class ImportClippingsUseCase:
                 book_id_to_book_map[book_id] = Book(
                     id=book_id,
                     title=candidate.book.title,
-                    author=candidate.book.author,
+                    authors=candidate.book.authors or ["Unknown Author"],
                     cover_url=None,
                     clippings=[],
                 )

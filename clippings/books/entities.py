@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeAlias
 
 from clippings.books.exceptions import CantFindEntityError, DomainError
 
@@ -16,17 +16,29 @@ if TYPE_CHECKING:
 class Book:
     id: str
     title: str
-    author: str | None
+    authors: list[str]
     cover_url: str | None
     clippings: list[Clipping]
     review: str = ""
     rating: int | None = None
+
+    def authors_to_str(self) -> str:
+        return " & ".join(self.authors)
+
+    def authors_from_str(self, authors: str) -> None:
+        self.authors = authors.split(" & ")
 
     def get_clipping(self, clipping_id: str) -> Clipping | None:
         for clipping in self.clippings:
             if clipping.id == clipping_id:
                 return clipping
         return None
+
+    def remove_clipping(self, clipping: Clipping) -> None:
+        for i, item in enumerate(self.clippings):
+            if clipping.id == item.id:
+                del self.clippings[i]
+                break
 
     def add_clippings(self, clippings: list[Clipping]) -> bool:
         existed_ids = set()
@@ -46,8 +58,8 @@ class Book:
 
     def link_notes(self, *, inline_note_id_generator: InlineNoteIdGenerator) -> None:
         self.clippings.sort(key=lambda cl: cl.position_id)
-        position_to_highlight: dict[tuple[int, int], Clipping] = {}
-        position_to_note: dict[tuple[int, int], tuple[Clipping, int]] = {}
+        position_to_highlight: dict[Position, Clipping] = {}
+        position_to_note: dict[Position, tuple[Clipping, int]] = {}
         to_delete = []
         for i, clipping in enumerate(self.clippings):
             if clipping.type == ClippingType.HIGHLIGHT:
@@ -133,18 +145,21 @@ class InlineNote:
         )
 
 
+Position: TypeAlias = tuple[int, int]
+
+
 @dataclass
 class Clipping:
     id: str
-    page: tuple[int, int]
-    location: tuple[int, int]
+    page: Position
+    location: Position
     type: ClippingType
     content: str
     inline_notes: list[InlineNote]
     added_at: datetime
 
     @property
-    def position_id(self) -> tuple[int, int]:
+    def position_id(self) -> Position:
         return self.page[0], self.location[0]
 
     def get_inline_note(self, note_id: str) -> InlineNote | None:

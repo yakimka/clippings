@@ -1,7 +1,13 @@
+from __future__ import annotations
+
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from clippings.books.dtos import BookDTO, ClippingImportCandidateDTO
-from clippings.books.entities import Book, Clipping, ClippingType, InlineNote
+from clippings.books.entities import Book, Clipping, ClippingType, InlineNote, Position
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 class ObjectMother:  # noqa: PIE798
@@ -11,14 +17,18 @@ class ObjectMother:  # noqa: PIE798
         *,
         id: str = "book:id",
         title: str = "The Book",
-        author: str | None = "The Author",
+        authors: Iterable[str] = ("The Author",),
         cover_url: str | None = "https://placehold.co/400x600",
         clippings: list[Clipping] | None = None,
     ) -> Book:
         if clippings is None:
             clippings = []
         return Book(
-            id=id, title=title, author=author, cover_url=cover_url, clippings=clippings
+            id=id,
+            title=title,
+            authors=list(authors),
+            cover_url=cover_url,
+            clippings=clippings,
         )
 
     @classmethod
@@ -26,8 +36,8 @@ class ObjectMother:  # noqa: PIE798
         cls,
         *,
         id: str = "clipping:id",
-        page: tuple[int, int] = (1, 1),
-        location: tuple[int, int] = (10, 22),
+        page: Position = (1, 1),
+        location: Position = (10, 22),
         type: ClippingType = ClippingType.HIGHLIGHT,
         content: str = "some highlighted text",
         added_at: datetime = datetime(2024, 8, 9),  # noqa: B008
@@ -65,15 +75,15 @@ class ObjectMother:  # noqa: PIE798
     def clipping_import_candidate_dto(
         cls,
         book_title: str = "The Book",
-        book_author: str = "The Author",
-        page: tuple[int, int] = (1, 1),
-        location: tuple[int, int] = (10, 22),
+        book_authors: Iterable[str] = ("The Author",),
+        page: Position = (1, 1),
+        location: Position = (10, 22),
         type: ClippingType = ClippingType.HIGHLIGHT,
         content: str = "The Content",
         added_at: datetime = datetime(2024, 8, 9),  # noqa: B008
     ) -> ClippingImportCandidateDTO:
         return ClippingImportCandidateDTO(
-            book=BookDTO(title=book_title, author=book_author),
+            book=BookDTO(title=book_title, authors=list(book_authors)),
             page=page,
             location=location,
             type=type,

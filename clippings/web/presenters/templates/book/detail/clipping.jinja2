@@ -1,0 +1,41 @@
+<article class="clipping-item" hx-target="this" hx-swap="outerHTML">
+    <section>{% block clipping_content %}{{ data.content }}{% endblock %}</section>
+    {% block after_clipping_content %}{% endblock %}
+    {% if data.inline_notes %}
+    <h6>{{ data.notes_label }}</h6>
+    <hr>
+    {% endif %}
+    {% for note in data.inline_notes %}
+    <section hx-target="this">
+        <small>{{ note.content }}</small>
+        {% for action in note.actions %}
+        {% if action.id == "delete" %}
+            {% with hx_target="closest .clipping-item" %}
+            {% include "action_link.jinja2" %}
+            {% endwith %}
+        {% elif action.id == "unlink" %}
+            {% with hx_target="closest .clipping-list" %}
+            {% include "action_link.jinja2" %}
+            {% endwith %}
+        {% else %}
+            {% include "action_link.jinja2" %}
+        {% endif %}
+        {% endfor %}
+    </section>
+    {% endfor %}
+    <footer style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            {% for item in data.info %}
+            <kbd>{{ item.content }}</kbd>
+            {% endfor %}
+        </div>
+        <div>
+            {% block clipping_actions %}
+            {% for action in data.actions %}
+            {% include "action_link.jinja2" %}
+            {% endfor %}
+            {% endblock %}
+        </div>
+    </footer>
+
+</article>

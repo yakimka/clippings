@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from datetime import datetime
 
     from clippings.books.dtos import ClippingImportCandidateDTO
-    from clippings.books.entities import Book, ClippingType
+    from clippings.books.entities import Book, ClippingType, Position
 
 
 class BooksStorageABC(abc.ABC):
@@ -27,6 +27,10 @@ class BooksStorageABC(abc.ABC):
 
     @abc.abstractmethod
     async def extend(self, books: list[Book]) -> None:
+        pass
+
+    @abc.abstractmethod
+    async def remove(self, book: Book) -> None:
         pass
 
 
@@ -57,7 +61,7 @@ class ClippingsReaderABC(abc.ABC):
 
 class BookForGenerateId(Protocol):
     title: str
-    author: str
+    authors: list[str]
 
 
 class BookIdGenerator(Protocol):
@@ -66,8 +70,8 @@ class BookIdGenerator(Protocol):
 
 
 class ClippingForGenerateId(Protocol):
-    page: tuple[int, int]
-    location: tuple[int, int]
+    page: Position
+    location: Position
     content: str
     type: ClippingType
     added_at: datetime
