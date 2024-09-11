@@ -21,7 +21,14 @@ def hx_link(url: UrlDTO) -> Markup:
     return Markup(f'hx-{url.method}="{url.value}"')
 
 
-jinja_env.globals.update(hx_link=hx_link)
+def split_by_newline(text: str) -> list[str]:
+    text = text.strip()
+    if not text:
+        return []
+    return text.split("\n")
+
+
+jinja_env.globals.update(hx_link=hx_link, split_by_newline=split_by_newline)
 
 
 def make_html_renderer(template_name: str) -> Callable[[Any], str]:

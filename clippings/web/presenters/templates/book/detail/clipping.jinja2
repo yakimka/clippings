@@ -1,5 +1,11 @@
 <article class="clipping-item" hx-target="this" hx-swap="outerHTML">
-    <section>{% block clipping_content %}{{ data.content }}{% endblock %}</section>
+    <section>
+    {% block clipping_content %}
+    {% for item in split_by_newline(data.content) %}
+    <p>{{ item }}</p>
+    {% endfor %}
+    {% endblock %}
+    </section>
     {% block after_clipping_content %}{% endblock %}
     {% if data.inline_notes %}
     <h6>{{ data.notes_label }}</h6>
