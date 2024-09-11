@@ -16,7 +16,9 @@ def get_views_map() -> dict[str, Callable]:
     for _, module_name, _ in pkgutil.iter_modules([str(views_path)]):
         if module_name.startswith("_"):
             continue
-        module = importlib.import_module(f"{views_path.name}.{module_name}")
+        module = importlib.import_module(
+            f"clippings.web.{views_path.name}.{module_name}"
+        )
         for name in dir(module):
             if name.startswith("_"):
                 continue
