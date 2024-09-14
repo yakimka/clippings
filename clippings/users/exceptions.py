@@ -1,5 +1,5 @@
 from clippings.seedwork.exceptions import DomainError
 
 
-class CantFindEntityError(DomainError):
+class AuthError(DomainError):
     pass

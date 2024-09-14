@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from starlette.authentication import requires
 from starlette.responses import HTMLResponse, RedirectResponse
 
 from clippings.web.controllers.book_list import RenderBookListController
@@ -16,6 +17,7 @@ async def home_page(request: Request) -> RedirectResponse:  # noqa: U100
     return RedirectResponse(book_list_url.value, status_code=302)
 
 
+@requires("authenticated", redirect="login")
 async def book_list_page(request: Request) -> HTMLResponse:
     page = request.query_params.get("page")
     on_page = request.query_params.get("on_page")

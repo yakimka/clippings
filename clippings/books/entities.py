@@ -4,7 +4,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING, TypeAlias
 
-from clippings.books.exceptions import CantFindEntityError, DomainError
+from clippings.books.exceptions import CantFindEntityError
+from clippings.seedwork.exceptions import DomainError
 
 if TYPE_CHECKING:
     from datetime import datetime

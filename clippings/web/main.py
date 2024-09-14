@@ -1,7 +1,11 @@
 import picodi
+from picodi.integrations.starlette import RequestScopeMiddleware
 from starlette.applications import Starlette
+from starlette.middleware import Middleware
+from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.routing import Route
 
+from clippings.web.auth import BasicAuthBackend
 from clippings.web.presenters.urls import urls_manager
 from clippings.web.views import get_views_map
 
@@ -27,7 +31,14 @@ def make_routes() -> list[Route]:
     return result
 
 
-app = Starlette(debug=True, routes=make_routes(), on_startup=[startup])
+middleware = [
+    Middleware(RequestScopeMiddleware),
+    Middleware(AuthenticationMiddleware, backend=BasicAuthBackend()),
+]
+
+app = Starlette(
+    debug=True, routes=make_routes(), middleware=middleware, on_startup=[startup]
+)
 
 
 if __name__ == "__main__":
