@@ -7,8 +7,8 @@ def make_user_urls(base_url: str = "/users") -> list[UrlTemplateDTO]:
 
     return [
         UrlTemplateDTO(
-            id="login",
-            template=make_template("/login"),
+            id="logout",
+            template=make_template("/logout"),
             method="get",
         ),
     ]

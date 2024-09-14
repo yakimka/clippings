@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from starlette.authentication import requires
 from starlette.responses import HTMLResponse
 
+from clippings.web.auth import basic_auth
 from clippings.web.controllers.book_detail import (
     RenderBookClippingDetailController,
     RenderBookClippingListController,
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from starlette.requests import Request
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def book_detail_page(request: Request) -> HTMLResponse:
     book_id = get_string_path_param(request, "book_id")
     controller = RenderBookDetailPageController()
@@ -26,7 +26,7 @@ async def book_detail_page(request: Request) -> HTMLResponse:
     return HTMLResponse(result.payload, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def book_info(request: Request) -> HTMLResponse:
     book_id = get_string_path_param(request, "book_id")
     controller = RenderBookInfoController()
@@ -34,7 +34,7 @@ async def book_info(request: Request) -> HTMLResponse:
     return HTMLResponse(result.payload, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def book_review(request: Request) -> HTMLResponse:
     book_id = get_string_path_param(request, "book_id")
     controller = RenderBookReviewController()
@@ -42,7 +42,7 @@ async def book_review(request: Request) -> HTMLResponse:
     return HTMLResponse(result.payload, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def clipping_list(request: Request) -> HTMLResponse:
     book_id = get_string_path_param(request, "book_id")
     controller = RenderBookClippingListController()
@@ -50,7 +50,7 @@ async def clipping_list(request: Request) -> HTMLResponse:
     return HTMLResponse(result.payload, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def clipping_detail(request: Request) -> HTMLResponse:
     book_id = get_string_path_param(request, "book_id")
     clipping_id = get_string_path_param(request, "clipping_id")
