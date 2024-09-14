@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from starlette.authentication import requires
 from starlette.datastructures import UploadFile
 from starlette.responses import HTMLResponse, RedirectResponse
 
+from clippings.web.auth import basic_auth
 from clippings.web.controllers.book_edit import (
     AddInlineNoteController,
     DeleteBookController,
@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from starlette.requests import Request
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def book_review_update_form(request: Request) -> HTMLResponse:
     book_id = get_string_path_param(request, "book_id")
     controller = RenderBookReviewEditFormController()
@@ -36,7 +36,7 @@ async def book_review_update_form(request: Request) -> HTMLResponse:
     return HTMLResponse(result.payload, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def book_info_update_form(request: Request) -> HTMLResponse:
     book_id = get_string_path_param(request, "book_id")
     controller = RenderBookInfoEditFormController()
@@ -44,7 +44,7 @@ async def book_info_update_form(request: Request) -> HTMLResponse:
     return HTMLResponse(result.payload, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def clipping_update_form(request: Request) -> HTMLResponse:
     book_id = get_string_path_param(request, "book_id")
     clipping_id = get_string_path_param(request, "clipping_id")
@@ -53,7 +53,7 @@ async def clipping_update_form(request: Request) -> HTMLResponse:
     return HTMLResponse(result.payload, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def inline_note_add_form(request: Request) -> HTMLResponse:
     book_id = get_string_path_param(request, "book_id")
     clipping_id = get_string_path_param(request, "clipping_id")
@@ -62,7 +62,7 @@ async def inline_note_add_form(request: Request) -> HTMLResponse:
     return HTMLResponse(result.payload, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def inline_note_update_form(request: Request) -> HTMLResponse:
     book_id = get_string_path_param(request, "book_id")
     clipping_id = get_string_path_param(request, "clipping_id")
@@ -72,7 +72,7 @@ async def inline_note_update_form(request: Request) -> HTMLResponse:
     return HTMLResponse(result.payload, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def book_review_update(request: Request) -> RedirectResponse | HTMLResponse:
     form = await request.form(max_files=10, max_fields=10)
     if "review" not in form:
@@ -86,7 +86,7 @@ async def book_review_update(request: Request) -> RedirectResponse | HTMLRespons
     return RedirectResponse(result.url, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def book_info_update(request: Request) -> RedirectResponse | HTMLResponse:
     form = await request.form(max_files=10, max_fields=10)
     for field in ["title", "authors"]:
@@ -118,7 +118,7 @@ async def book_info_update(request: Request) -> RedirectResponse | HTMLResponse:
     return RedirectResponse(result.url, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def clipping_update(request: Request) -> RedirectResponse | HTMLResponse:
     form = await request.form(max_files=10, max_fields=10)
     if form.get("content") is None:
@@ -137,7 +137,7 @@ async def clipping_update(request: Request) -> RedirectResponse | HTMLResponse:
     return RedirectResponse(result.url, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def inline_note_add(request: Request) -> RedirectResponse | HTMLResponse:
     form = await request.form(max_files=10, max_fields=10)
     if form.get("content") is None:
@@ -156,7 +156,7 @@ async def inline_note_add(request: Request) -> RedirectResponse | HTMLResponse:
     return RedirectResponse(result.url, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def inline_note_update(request: Request) -> RedirectResponse | HTMLResponse:
     form = await request.form(max_files=10, max_fields=10)
     if form.get("content") is None:
@@ -176,7 +176,7 @@ async def inline_note_update(request: Request) -> RedirectResponse | HTMLRespons
     return RedirectResponse(result.url, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def inline_note_unlink(request: Request) -> RedirectResponse:
     controller = UnlinkInlineNoteController()
     result = await controller.fire(
@@ -188,7 +188,7 @@ async def inline_note_unlink(request: Request) -> RedirectResponse:
     return RedirectResponse(result.url, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def book_delete(request: Request) -> HTMLResponse:
     controller = DeleteBookController()
     result = await controller.fire(book_id=get_string_path_param(request, "book_id"))
@@ -196,7 +196,7 @@ async def book_delete(request: Request) -> HTMLResponse:
     return HTMLResponse(result.payload, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def clipping_delete(request: Request) -> HTMLResponse:
     controller = DeleteClippingController()
     result = await controller.fire(
@@ -207,7 +207,7 @@ async def clipping_delete(request: Request) -> HTMLResponse:
     return HTMLResponse(result.payload, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def inline_note_delete(request: Request) -> RedirectResponse:
     controller = DeleteInlineNoteController()
     result = await controller.fire(

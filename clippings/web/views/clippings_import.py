@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from starlette.authentication import requires
 from starlette.datastructures import UploadFile
 from starlette.responses import HTMLResponse
 
+from clippings.web.auth import basic_auth
 from clippings.web.controllers.clippings_import import (
     ClippingsImportController,
     RenderClippingsImportPage,
@@ -15,14 +15,14 @@ if TYPE_CHECKING:
     from starlette.requests import Request
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def clipping_import_page(request: Request) -> HTMLResponse:  # noqa: U100
     controller = RenderClippingsImportPage()
     result = await controller.fire()
     return HTMLResponse(result.payload, status_code=result.status_code)
 
 
-@requires("authenticated", redirect="login")
+@basic_auth
 async def clipping_upload(request: Request) -> HTMLResponse:
     form = await request.form(max_files=1, max_fields=1)
     if not form.get("file"):
