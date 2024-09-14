@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from clippings.web.presenters.book.urls import make_book_urls
 from clippings.web.presenters.dtos import UrlDTO, UrlTemplateDTO
+from clippings.web.presenters.user.urls import make_user_urls
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -42,6 +43,7 @@ urls = [
         method="get",
     ),
     *make_book_urls(),
+    *make_user_urls(),
 ]
 check_url_templates(urls)
 

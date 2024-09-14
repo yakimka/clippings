@@ -10,7 +10,7 @@ from clippings.books.adapters.kindle_parser.language import (
     LanguageSettings,
     presets,
 )
-from clippings.books.exceptions import DomainError
+from clippings.seedwork.exceptions import DomainError
 
 if TYPE_CHECKING:
     from clippings.books.entities import Position

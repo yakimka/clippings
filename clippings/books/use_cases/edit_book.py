@@ -5,7 +5,8 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from clippings.books.entities import Book, InlineNote
-from clippings.books.exceptions import CantFindEntityError, DomainError
+from clippings.books.exceptions import CantFindEntityError
+from clippings.seedwork.exceptions import DomainError
 
 if TYPE_CHECKING:
     from clippings.books.ports import BooksStorageABC, InlineNoteIdGenerator
