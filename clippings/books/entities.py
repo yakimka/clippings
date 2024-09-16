@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING, TypeAlias
 
 from clippings.books.exceptions import CantFindEntityError
@@ -107,7 +107,7 @@ class Book:
         return None
 
 
-class ClippingType(Enum):
+class ClippingType(StrEnum):
     HIGHLIGHT = "highlight"
     NOTE = "note"
     UNLINKED_NOTE = "unlinked_note"

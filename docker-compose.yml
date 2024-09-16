@@ -22,3 +22,13 @@ services:
     restart: "no"
     ports:
       - "8000:8000"
+
+  mongo4:
+    image: mongo:4
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+    volumes:
+      - ./createUser.js:/docker-entrypoint-initdb.d/createUser.js
+      - ./volumes_data/mongo4:/data/db
