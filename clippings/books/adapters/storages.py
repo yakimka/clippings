@@ -42,6 +42,19 @@ class MockBooksStorage(BooksStorageABC):
     async def remove(self, book: Book) -> None:
         self.books.pop(book.id, None)
 
+    async def find(
+        self, query: BooksStorageABC.FindQuery = BooksStorageABC.DEFAULT_FIND_QUERY
+    ) -> list[Book]:
+        books = sorted(self.books.values(), key=lambda b: (b.title, b.id))
+        start = query.start
+        if query.limit is None:
+            return books[start:]
+        end = start + query.limit
+        return books[start:end]
+
+    async def count(self, query: BooksStorageABC.FindQuery) -> int:
+        return len(await self.find(query))
+
 
 def mongo_book_serializer(book: Book, user_id: str) -> dict:
     book_dict = asdict(book)
@@ -103,3 +116,34 @@ class MongoBooksStorage(BooksStorageABC):
 
     async def remove(self, book: Book) -> None:
         await self._collection.delete_one({"_id": book.id})
+
+    async def find(
+        self, query: BooksStorageABC.FindQuery = BooksStorageABC.DEFAULT_FIND_QUERY
+    ) -> list[Book]:
+        if query.limit == 0:
+            return []
+
+        cursor = (
+            self._collection.find({"user_id": self._user_id})
+            .sort([("title", 1), ("_id", 1)])
+            .skip(query.start)
+        )
+        if query.limit is not None:
+            cursor = cursor.limit(query.limit)
+        books = await cursor.to_list(None)
+        return [self._deserializer(dict(book)) for book in books]
+
+    async def count(self, query: BooksStorageABC.FindQuery) -> int:
+        pipeline: list[dict[str, Any]] = [
+            {"$match": {"user_id": self._user_id}},
+            {"$skip": query.start},
+        ]
+
+        if query.limit is not None:
+            pipeline.append({"$limit": query.limit})
+
+        pipeline.append({"$count": "total"})
+
+        result = await self._collection.aggregate(pipeline).to_list(None)
+
+        return result[0]["total"] if result else 0

@@ -57,7 +57,6 @@ jobs:
 
       - name: Prepare Docker
         run: |
-          cp .env.template .env
           docker login "$CACHE_REGISTRY" -u "$CACHE_REGISTRY_USERNAME" --password="${CACHE_REGISTRY_TOKEN}"
           docker buildx create --use --driver=docker-container
           docker --version && docker compose --version
@@ -79,6 +78,9 @@ jobs:
             docker push ${DEV_IMAGE}
           )
           docker tag ${DEV_IMAGE} ${PROJECT_NAME}:dev
+
+      - name: Spin DB containers
+        run: docker compose up -d mongo4
 
       - name: Run checks
         run: docker compose run -e CI=1 --user=$(id -u) --rm devtools ./ci.sh
@@ -159,7 +161,6 @@ jobs:
 
       - name: Prepare Docker
         run: |
-          cp .env.template .env
           docker login "$REGISTRY" -u "$REGISTRY_USERNAME" --password="${REGISTRY_TOKEN}"
           docker buildx create --use --driver=docker-container
           docker --version && docker compose --version
