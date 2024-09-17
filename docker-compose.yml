@@ -30,6 +30,3 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=me
       - MONGO_INITDB_ROOT_PASSWORD=root_password
       - MONGO_INITDB_DATABASE=clippings_db
-    volumes:
-      - ./createUser.js:/docker-entrypoint-initdb.d/createUser.js
-      - ./volumes_data/mongo4:/data/db

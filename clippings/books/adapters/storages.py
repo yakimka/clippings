@@ -134,6 +134,9 @@ class MongoBooksStorage(BooksStorageABC):
         return [self._deserializer(dict(book)) for book in books]
 
     async def count(self, query: BooksStorageABC.FindQuery) -> int:
+        if query.limit == 0:
+            return 0
+
         pipeline: list[dict[str, Any]] = [
             {"$match": {"user_id": self._user_id}},
             {"$skip": query.start},

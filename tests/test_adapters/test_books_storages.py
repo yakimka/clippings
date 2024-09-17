@@ -37,7 +37,7 @@ def make_books(mother):
 
 
 async def test_can_add_and_read_single_book_to_storage(make_sut, mother):
-    book = mother.book(id="book:1")
+    book = mother.book(id="book:1", clippings=[mother.clipping(id="clipping:1")])
     sut = await make_sut()
 
     await sut.add(book)
@@ -49,7 +49,7 @@ async def test_can_add_and_read_single_book_to_storage(make_sut, mother):
 
 async def test_can_add_multiple_books_to_storage(make_sut, mother):
     book1 = mother.book(id="book:1")
-    book2 = mother.book(id="book:2")
+    book2 = mother.book(id="book:2", clippings=[mother.clipping(id="clipping:2")])
     sut = await make_sut()
     await sut.extend([book1, book2])
 
@@ -104,10 +104,12 @@ async def test_can_get_fixed_number_of_items(
     sut = await make_sut(make_books(90))
 
     result = await sut.find(sut.FindQuery(start=start, limit=limit))
+    result_count = await sut.count(sut.FindQuery(start=start, limit=limit))
 
     assert len(result) == expected_count
     assert result[0].id == expected_start_id
     assert result[-1].id == expected_end_id
+    assert result_count == expected_count
 
 
 @pytest.mark.parametrize(
@@ -122,8 +124,10 @@ async def test_can_get_zero_results(start: int, limit: int, make_sut, make_books
     sut = await make_sut(make_books(3))
 
     result = await sut.find(sut.FindQuery(start=start, limit=limit))
+    result_count = await sut.count(sut.FindQuery(start=start, limit=limit))
 
     assert len(result) == 0
+    assert result_count == 0
 
 
 async def test_by_default_return_in_order_by_title(make_sut, mother):
