@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import StrEnum
 from typing import TYPE_CHECKING, TypeAlias
 
 from clippings.books.exceptions import CantFindEntityError
@@ -11,6 +10,15 @@ if TYPE_CHECKING:
     from datetime import datetime
 
     from clippings.books.ports import InlineNoteIdGenerator
+
+try:
+    from enum import StrEnum  # type: ignore[attr-defined,unused-ignore]
+except ImportError:
+    # TODO: remove when dropping support for Python 3.10
+    from enum import Enum
+
+    class StrEnum(str, Enum):  # type: ignore[no-redef]
+        pass
 
 
 @dataclass
