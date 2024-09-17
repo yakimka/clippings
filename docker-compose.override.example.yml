@@ -1,0 +1,7 @@
+---
+
+services:
+  mongo4:
+    volumes:
+      - ./createUser.js:/docker-entrypoint-initdb.d/createUser.js
+      - ./volumes_data/mongo4:/data/db

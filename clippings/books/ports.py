@@ -13,6 +13,13 @@ if TYPE_CHECKING:
 
 
 class BooksStorageABC(abc.ABC):
+    @dataclass(frozen=True)
+    class FindQuery:
+        start: int = 0
+        limit: int | None = 10
+
+    DEFAULT_FIND_QUERY = FindQuery()
+
     @abc.abstractmethod
     async def get(self, id: str) -> Book | None:
         pass
@@ -33,23 +40,12 @@ class BooksStorageABC(abc.ABC):
     async def remove(self, book: Book) -> None:
         pass
 
-
-@dataclass(frozen=True)
-class FinderQuery:
-    start: int = 0
-    limit: int | None = 10
-
-
-_default_query = FinderQuery()
-
-
-class BooksFinderABC(abc.ABC):
     @abc.abstractmethod
-    async def find(self, query: FinderQuery = _default_query) -> list[Book]:
+    async def find(self, query: FindQuery = DEFAULT_FIND_QUERY) -> list[Book]:
         pass
 
     @abc.abstractmethod
-    async def count(self, query: FinderQuery) -> int:
+    async def count(self, query: FindQuery) -> int:
         pass
 
 

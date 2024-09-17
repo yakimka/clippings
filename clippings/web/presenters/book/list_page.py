@@ -3,13 +3,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from clippings.books.ports import BooksFinderABC, FinderQuery
 from clippings.web.presenters.dtos import ActionDTO, PaginationItemDTO, PresenterResult
 from clippings.web.presenters.html_renderers import make_html_renderer
 from clippings.web.presenters.image import image_or_default
 
 if TYPE_CHECKING:
     from clippings.books.entities import Clipping
+    from clippings.books.ports import BooksStorageABC
     from clippings.web.presenters.pagination import PaginationCalculator
     from clippings.web.presenters.urls import UrlsManager
 
@@ -44,16 +44,18 @@ class BooksPageDTO:
 class BooksListPagePresenter:
     def __init__(
         self,
-        finder: BooksFinderABC,
+        storage: BooksStorageABC,
         pagination_calculator: PaginationCalculator,
         urls_manager: UrlsManager,
     ) -> None:
-        self._finder = finder
+        self._storage = storage
         self._pagination_calculator = pagination_calculator
         self._urls_manager = urls_manager
 
     async def present(self, page: int, on_page: int) -> PresenterResult[BooksPageDTO]:
-        books_count = await self._finder.count(FinderQuery(start=0, limit=None))
+        books_count = await self._storage.count(
+            self._storage.FindQuery(start=0, limit=None)
+        )
         books_url = self._urls_manager.build_url("book_list_page")
         pagination = self._pagination_calculator(
             current_page=page,
@@ -63,8 +65,8 @@ class BooksListPagePresenter:
         )
         page = pagination.current_page
 
-        query = FinderQuery(start=(page - 1) * on_page, limit=on_page)
-        books = await self._finder.find(query)
+        query = self._storage.FindQuery(start=(page - 1) * on_page, limit=on_page)
+        books = await self._storage.find(query)
 
         def last_clipping_date(clippings: list[Clipping]) -> str:
             if not clippings:

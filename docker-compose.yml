@@ -5,8 +5,9 @@ x-common: &common
     target: development
     context: .
     dockerfile: Dockerfile-dev
+  environment:
+    - TEST_MONGO_URI=mongodb://me:root_password@mongo4:27017
   image: "clippings:dev"
-#  env_file: .env
   volumes:
     - .:/opt/code
 
@@ -26,9 +27,6 @@ services:
   mongo4:
     image: mongo:4
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
-      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
-    volumes:
-      - ./createUser.js:/docker-entrypoint-initdb.d/createUser.js
-      - ./volumes_data/mongo4:/data/db
+      - MONGO_INITDB_ROOT_USERNAME=me
+      - MONGO_INITDB_ROOT_PASSWORD=root_password
+      - MONGO_INITDB_DATABASE=clippings_db

@@ -6,7 +6,6 @@ from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from picodi import Provide, SingletonScope, dependency, inject
 from picodi.integrations.starlette import RequestScope
 
-from clippings.books.adapters.finders import MockBooksFinder, MongoBooksFinder
 from clippings.books.adapters.storages import MockBooksStorage, MongoBooksStorage
 from clippings.users.adapters.password_hashers import PBKDF2PasswordHasher
 from clippings.users.adapters.storages import MockUsersStorage
@@ -16,7 +15,7 @@ from clippings.web.settings import InfrastructureSettings
 
 if TYPE_CHECKING:
     from clippings.books.entities import Book
-    from clippings.books.ports import BooksFinderABC, BooksStorageABC
+    from clippings.books.ports import BooksStorageABC
     from clippings.users.ports import PasswordHasherABC, UsersStorageABC
 
 
@@ -80,28 +79,6 @@ def get_books_storage(
     mongo_books_storage: MongoBooksStorage = Provide(get_mongo_books_storage),
 ) -> BooksStorageABC:
     return mongo_books_storage
-
-
-@inject
-def get_mock_books_finder(
-    books_map: dict[str, Book] = Provide(get_user_books_map),
-) -> MockBooksFinder:
-    return MockBooksFinder(books_map)
-
-
-@inject
-def get_mongo_books_finder(
-    db: AsyncIOMotorDatabase = Provide(get_mongo_database),
-    user_id: str = Provide(get_user_id),
-) -> MongoBooksFinder:
-    return MongoBooksFinder(db, user_id=user_id)
-
-
-@inject
-def get_books_finder(
-    mongo_books_finder: MongoBooksFinder = Provide(get_mongo_books_finder),
-) -> BooksFinderABC:
-    return mongo_books_finder
 
 
 @inject
