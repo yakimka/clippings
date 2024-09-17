@@ -9,3 +9,4 @@ docs/_build
 docker-compose.override.yml
 createUser.js
 settings.yaml
+volumes_data
