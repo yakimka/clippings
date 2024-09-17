@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum
 from typing import TYPE_CHECKING, TypeAlias
 
 from clippings.books.exceptions import CantFindEntityError
@@ -10,15 +11,6 @@ if TYPE_CHECKING:
     from datetime import datetime
 
     from clippings.books.ports import InlineNoteIdGenerator
-
-try:
-    from enum import StrEnum  # type: ignore[attr-defined,unused-ignore]
-except ImportError:
-    # TODO: remove when dropping support for Python 3.10
-    from enum import Enum
-
-    class StrEnum(str, Enum):  # type: ignore[no-redef]
-        pass
 
 
 @dataclass
@@ -115,7 +107,7 @@ class Book:
         return None
 
 
-class ClippingType(StrEnum):
+class ClippingType(Enum):
     HIGHLIGHT = "highlight"
     NOTE = "note"
     UNLINKED_NOTE = "unlinked_note"

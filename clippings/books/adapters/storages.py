@@ -47,6 +47,8 @@ def mongo_book_serializer(book: Book, user_id: str) -> dict:
     book_dict = asdict(book)
     book_dict["_id"] = book_dict.pop("id")
     book_dict["user_id"] = user_id
+    for clipping in book_dict["clippings"]:
+        clipping["type"] = clipping["type"].value
     return book_dict
 
 
