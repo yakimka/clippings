@@ -8,7 +8,7 @@ from picodi.integrations.starlette import RequestScope
 
 from clippings.books.adapters.finders import MockBooksFinder, MongoBooksFinder
 from clippings.books.adapters.storages import MockBooksStorage, MongoBooksStorage
-from clippings.users.adapters.password_hashers import BcryptPasswordHasher
+from clippings.users.adapters.password_hashers import PBKDF2PasswordHasher
 from clippings.users.adapters.storages import MockUsersStorage
 from clippings.users.entities import User
 from clippings.users.use_cases.auth import AuthenticateUserUseCase
@@ -106,7 +106,7 @@ def get_books_finder(
 
 @inject
 def get_password_hasher() -> PasswordHasherABC:
-    return BcryptPasswordHasher()
+    return PBKDF2PasswordHasher()
 
 
 @dependency(scope_class=SingletonScope)
@@ -115,7 +115,9 @@ async def get_users_map(
     password_hasher: PasswordHasherABC = Provide(get_password_hasher),
 ) -> dict[str, User]:
     return {
-        "1": User(id="1", nickname="test", hashed_password=password_hasher.hash("test"))
+        "1": User(
+            id="1", nickname="admin", hashed_password=password_hasher.hash("test1234Q")
+        )
     }
 
 
