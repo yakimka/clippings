@@ -5,15 +5,20 @@ from typing import TYPE_CHECKING
 
 from clippings.books.dtos import BookDTO, ClippingImportCandidateDTO
 from clippings.books.entities import Book, Clipping, ClippingType, InlineNote, Position
+from clippings.users.entities import User
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+    from clippings.users.ports import PasswordHasherABC
 
-class ObjectMother:  # noqa: PIE798
-    @classmethod
+
+class ObjectMother:
+    def __init__(self, user_password_hasher: PasswordHasherABC) -> None:
+        self.user_password_hasher = user_password_hasher
+
     def book(
-        cls,
+        self,
         *,
         id: str = "book:id",
         title: str = "The Book",
@@ -31,9 +36,8 @@ class ObjectMother:  # noqa: PIE798
             clippings=clippings,
         )
 
-    @classmethod
     def clipping(
-        cls,
+        self,
         *,
         id: str = "clipping:id",
         page: Position = (1, 1),
@@ -53,9 +57,8 @@ class ObjectMother:  # noqa: PIE798
             inline_notes=inline_notes or [],
         )
 
-    @classmethod
     def inline_note(
-        cls,
+        self,
         *,
         id: str = "inline_note:id",
         content: str = "some note",
@@ -71,9 +74,8 @@ class ObjectMother:  # noqa: PIE798
             added_at=added_at,
         )
 
-    @classmethod
     def clipping_import_candidate_dto(
-        cls,
+        self,
         book_title: str = "The Book",
         book_authors: Iterable[str] = ("The Author",),
         page: Position = (1, 1),
@@ -90,3 +92,14 @@ class ObjectMother:  # noqa: PIE798
             content=content,
             added_at=added_at,
         )
+
+    def user(
+        self,
+        *,
+        id: str = "user:42",
+        nickname: str = "my_nickname",
+        password: str = "my_password",
+    ) -> User:
+        user = User(id=id, nickname=nickname)
+        user.set_password(password, self.user_password_hasher)
+        return user

@@ -13,5 +13,5 @@ async def mongo_db() -> AsyncIOMotorDatabase:
         raise ValueError("TEST_MONGO_URI is not set")
 
     client = AsyncIOMotorClient(uri)
-    yield client.test_db
     await client.drop_database("test_db")
+    return client.test_db
