@@ -28,6 +28,6 @@ class AuthenticateUserUseCase:
         if not user:
             return AuthError("User not found")
         if not user.check_password(password, self._password_hasher):
-            raise AuthError("Invalid password")
+            return AuthError("Invalid password")
 
         return AuthUserDTO(id=user.id, nickname=user.nickname)
