@@ -98,8 +98,6 @@ class ObjectMother:
         *,
         id: str = "user:42",
         nickname: str = "my_nickname",
-        password: str = "my_password",
+        hashed_password: str | None = None,
     ) -> User:
-        user = User(id=id, nickname=nickname)
-        user.set_password(password, self.user_password_hasher)
-        return user
+        return User(id=id, nickname=nickname, hashed_password=hashed_password)

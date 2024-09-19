@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 class User:
     id: str
     nickname: str
-    hashed_password: str | None = None
+    hashed_password: str | None
 
     def set_password(self, password: str, hasher: PasswordHasherABC) -> None:
         self.hashed_password = hasher.hash(password)

@@ -13,7 +13,7 @@ def make_sut():
 
 def test_hash_generates_valid_format(make_sut):
     sut = make_sut()
-    password = "password123"  # noqa: S105
+    password = "password123"
 
     hashed_password = sut.hash(password)
 
@@ -22,7 +22,7 @@ def test_hash_generates_valid_format(make_sut):
 
 def test_verify_returns_true_for_correct_password(make_sut):
     sut = make_sut()
-    password = "password123"  # noqa: S105
+    password = "password123"
     hashed_password = sut.hash(password)
 
     result = sut.verify(password, hashed_password)
