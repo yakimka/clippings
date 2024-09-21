@@ -186,6 +186,30 @@ class TestUnlinkInlineNote:
         assert unlinked_note.type == ClippingType.UNLINKED_NOTE
         assert [cl.id for cl in book.clippings] == ["1", "42", "2"]
 
+    def test_unlinked_note_must_stay_unlinked(self, mother):
+        # Arrange
+        inline_note = mother.inline_note(
+            id="in:1", original_id="42", automatically_linked=True
+        )
+        clipping = mother.clipping(
+            id="1",
+            page=(-1, -1),
+            location=(42, 52),
+            type=ClippingType.HIGHLIGHT,
+            inline_notes=[inline_note],
+        )
+        book = mother.book(clippings=[clipping])
+        result = book.unlink_inline_note(clipping_id="1", inline_note_id="in:1")
+        assert result is None
+
+        # Act
+        # Manually unlinked notes must stay unlinked
+        book.link_notes(inline_note_id_generator=inline_note_id_generator)
+
+        # Assert
+        assert len(book.clippings) == 2
+        assert {item.id for item in book.clippings} == {"1", "42"}
+
 
 class TestRemoveClipping:
     def test_remove_clipping(self, mother):

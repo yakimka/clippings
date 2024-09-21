@@ -32,7 +32,7 @@ class ImportClippingsUseCase:
         book_id_generator: BookIdGenerator,
         clipping_id_generator: ClippingIdGenerator,
         inline_note_id_generator: InlineNoteIdGenerator,
-    ):
+    ) -> None:
         self._storage = storage
         self._reader = reader
         self._book_id_generator = book_id_generator
