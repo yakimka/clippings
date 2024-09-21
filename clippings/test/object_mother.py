@@ -24,6 +24,8 @@ class ObjectMother:
         title: str = "The Book",
         authors: Iterable[str] = ("The Author",),
         cover_url: str | None = "https://placehold.co/400x600",
+        review: str = "",
+        rating: int | None = None,
         clippings: list[Clipping] | None = None,
     ) -> Book:
         if clippings is None:
@@ -34,6 +36,8 @@ class ObjectMother:
             authors=list(authors),
             cover_url=cover_url,
             clippings=clippings,
+            review=review,
+            rating=rating,
         )
 
     def clipping(
