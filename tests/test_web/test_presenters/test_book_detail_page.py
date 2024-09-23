@@ -9,7 +9,7 @@ from clippings.web.presenters.urls import urls_manager
 
 
 @pytest.fixture()
-def make_sut(mother, mock_book_storage):
+def make_sut(mock_book_storage):
     def _make_sut(book_storage=mock_book_storage):
         return BookDetailPagePresenter(storage=book_storage, urls_manager=urls_manager)
 
@@ -28,6 +28,7 @@ async def test_present_should_return_book_detail_dto_when_book_is_found(
     assert isinstance(result.data, BookDetailDTO)
     assert result.data.title == "Sample Book"
     assert len(result.data.clippings) == 1
+    assert isinstance(result.render(), str)
 
 
 async def test_present_should_replace_none_with_text_representation(
@@ -42,6 +43,7 @@ async def test_present_should_replace_none_with_text_representation(
     assert isinstance(result.data, BookDetailDTO)
     assert "no rating" in result.data.rating.lower()
     assert result.data.cover_url.startswith("https://")
+    assert isinstance(result.render(), str)
 
 
 async def test_present_should_return_not_found_when_book_is_not_found(
@@ -53,3 +55,4 @@ async def test_present_should_return_not_found_when_book_is_not_found(
     result = await sut.present(book_id="book_1")
 
     assert isinstance(result.data, NotFoundDTO)
+    assert isinstance(result.render(), str)

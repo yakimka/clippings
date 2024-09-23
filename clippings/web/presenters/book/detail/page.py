@@ -78,10 +78,6 @@ class BookDetailPagePresenter:
         )
 
 
-class ClippingPart(Enum):
-    ALL = "book/detail/clipping.jinja2"
-
-
 class ClippingPresenter:
     def __init__(
         self,
@@ -92,7 +88,7 @@ class ClippingPresenter:
         self._urls_manager = urls_manager
 
     async def present(
-        self, book_id: str, clipping_id: str, part: ClippingPart = ClippingPart.ALL
+        self, book_id: str, clipping_id: str
     ) -> PresenterResult[ClippingDTO] | NotFoundPresenterResult:
         book = await self._storage.get(book_id)
         if book is None:
@@ -104,7 +100,7 @@ class ClippingPresenter:
 
         return PresenterResult(
             data=builder.clipping_dto(clipping_id),
-            renderer=make_html_renderer(part.value),
+            renderer=make_html_renderer("book/detail/clipping.jinja2"),
         )
 
 
