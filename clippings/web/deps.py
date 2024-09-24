@@ -57,13 +57,19 @@ def get_mock_books_storage(
 
 
 @inject
-def get_mongo_database(
+def get_mongo_client(
     infrastructure_settings: InfrastructureSettings = Provide(
         get_infrastructure_settings
     ),
+) -> AsyncIOMotorClient:
+    return AsyncIOMotorClient(infrastructure_settings.mongo.uri)
+
+
+@inject
+def get_mongo_database(
+    mongo_client: AsyncIOMotorClient = Provide(get_mongo_client),
 ) -> AsyncIOMotorDatabase:
-    client = AsyncIOMotorClient(infrastructure_settings.mongo.uri)
-    return client.clippings_db
+    return mongo_client.clippings_db
 
 
 @inject
@@ -99,8 +105,17 @@ async def get_users_map(
 
 
 @inject
-def get_users_storage(users_map: dict = Provide(get_users_map)) -> UsersStorageABC:
+def get_mock_users_storage(
+    users_map: dict = Provide(get_users_map),
+) -> MockUsersStorage:
     return MockUsersStorage(users_map)
+
+
+@inject
+def get_users_storage(
+    mock_users_storage: MockUsersStorage = Provide(get_mock_users_storage),
+) -> UsersStorageABC:
+    return mock_users_storage
 
 
 @inject

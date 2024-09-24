@@ -82,6 +82,9 @@ jobs:
       - name: Spin DB containers
         run: docker compose up -d mongo4
 
+      - name: Prepare configs
+        run: cp settings.example.yaml settings.yaml
+
       - name: Run checks
         run: docker compose run -e CI=1 --user=$(id -u) --rm devtools ./ci.sh
 
