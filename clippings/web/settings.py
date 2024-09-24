@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 settings = Dynaconf(
     envvar_prefix="CLP",
     settings_files=[BASE_DIR.parent / "settings.yaml"],
-    environments=False,
+    environments=True,
     load_dotenv=True,
 )
 

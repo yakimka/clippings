@@ -1,2 +1,7 @@
-mongo:
-  uri: mongodb://mongo4:27017
+default:
+  mongo:
+    uri: mongodb://mongo4:27017
+
+testing:
+  mongo:
+    uri: mongodb://me:root_password@mongo4:27017

@@ -55,34 +55,34 @@ class Book:
                 self.clippings.append(clipping)
                 added_count += 1
                 existed_ids.add(clipping.id)
+        self._sort_clippings_in_reading_order()
         return added_count
 
+    def _sort_clippings_in_reading_order(self) -> None:
+        clipping_type_order = {
+            ClippingType.HIGHLIGHT: 0,
+            ClippingType.NOTE: 1,
+            ClippingType.UNLINKED_NOTE: 1,
+        }
+        self.clippings.sort(
+            key=lambda cl: (cl.position_id, clipping_type_order[cl.type])
+        )
+
     def link_notes(self, *, inline_note_id_generator: InlineNoteIdGenerator) -> None:
-        self.clippings.sort(key=lambda cl: cl.position_id)
-        position_to_highlight: dict[Position, Clipping] = {}
-        position_to_note: dict[Position, tuple[Clipping, int]] = {}
+        self._sort_clippings_in_reading_order()
+        pos_to_highlight: dict[Position, Clipping] = {}
         to_delete = []
-        for i, clipping in enumerate(self.clippings):
-            if clipping.type == ClippingType.HIGHLIGHT:
-                position_to_highlight[clipping.position_id] = clipping
-                if prev := position_to_note.pop(clipping.position_id, None):
-                    prev_note, note_i = prev
-                    clipping.inline_notes.append(
-                        InlineNote.create_from_clipping(
-                            prev_note, id_generator=inline_note_id_generator
-                        )
+        for i, cl in enumerate(self.clippings):
+            if cl.type == ClippingType.HIGHLIGHT:
+                pos_to_highlight[cl.position_id] = cl
+            elif cl.type == ClippingType.NOTE and cl.position_id in pos_to_highlight:
+                prev_hl = pos_to_highlight[cl.position_id]
+                prev_hl.inline_notes.append(
+                    InlineNote.create_from_clipping(
+                        cl, id_generator=inline_note_id_generator
                     )
-                    to_delete.append(note_i)
-            elif clipping.type == ClippingType.NOTE:
-                if prev_hl := position_to_highlight.get(clipping.position_id):
-                    prev_hl.inline_notes.append(
-                        InlineNote.create_from_clipping(
-                            clipping, id_generator=inline_note_id_generator
-                        )
-                    )
-                    to_delete.append(i)
-                else:
-                    position_to_note[clipping.position_id] = (clipping, i)
+                )
+                to_delete.append(i)
 
         for i in reversed(to_delete):
             del self.clippings[i]

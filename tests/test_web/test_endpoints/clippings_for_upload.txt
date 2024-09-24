@@ -1,0 +1,15 @@
+﻿Some test book (John Doe)
+- Your Highlight on page 112 | Location 1300-1351 | Added on Thursday, August 22, 2024 6:10:53 PM
+
+My highlight in English (US)
+==========
+Some test book (John Doe)
+- Your Note on page 112 | Location 1300 | Added on Thursday, August 22, 2024 6:10:53 PM
+
+My note in English (US)
+==========
+Some test book (John Doe)
+- Your Bookmark on page 112 | Location 1300 | Added on Thursday, August 22, 2024 6:10:53 PM
+
+
+==========

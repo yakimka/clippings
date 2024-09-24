@@ -190,7 +190,10 @@ class DeleteClippingUseCase:
         if clipping := book.get_clipping(clipping_id):
             book.remove_clipping(clipping)
             await self._book_storage.add(book)
-        return None
+            return None
+        return CantFindEntityError(
+            f"Can't find clipping with id: {clipping_id} in book with id: {book_id}"
+        )
 
 
 class DeleteInlineNoteUseCase:
@@ -224,6 +227,8 @@ class UnlinkInlineNoteUseCase:
         if book is None:
             return CantFindEntityError(f"Can't find book with id: {book_id}")
 
-        book.unlink_inline_note(clipping_id, inline_note_id)
+        result = book.unlink_inline_note(clipping_id, inline_note_id)
+        if isinstance(result, DomainError):
+            return result
         await self._book_storage.add(book)
         return None

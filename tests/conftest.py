@@ -3,11 +3,12 @@ import pytest
 from clippings.books.adapters.readers import MockClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage
 from clippings.test.object_mother import ObjectMother
+from clippings.users.adapters.password_hashers import PBKDF2PasswordHasher
 
 
 @pytest.fixture()
 def mother():
-    return ObjectMother()
+    return ObjectMother(user_password_hasher=PBKDF2PasswordHasher())
 
 
 @pytest.fixture()
