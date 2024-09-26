@@ -11,8 +11,8 @@ from clippings.books.adapters.id_generators import (
 )
 from clippings.books.adapters.readers import KindleClippingsReader
 from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
+from clippings.deps import get_books_storage
 from clippings.web.controllers.responses import HTMLResponse
-from clippings.web.deps import get_books_storage
 from clippings.web.presenters.book.clippings_import_page import (
     ClippingsImportPagePresenter,
     ImportClippingsResultPresenter,

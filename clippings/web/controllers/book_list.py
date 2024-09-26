@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 
 from picodi import Provide, inject
 
+from clippings.deps import get_books_storage
 from clippings.web.controllers.responses import HTMLResponse
-from clippings.web.deps import get_books_storage
 from clippings.web.presenters.book.list_page import BooksListPagePresenter
 from clippings.web.presenters.pagination import classic_pagination_calculator
 from clippings.web.presenters.urls import urls_manager

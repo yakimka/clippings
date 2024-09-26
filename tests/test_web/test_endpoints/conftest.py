@@ -3,15 +3,15 @@ from httpx import AsyncClient
 from picodi import registry
 from picodi.helpers import enter, lifespan
 
-from clippings.web.deps import (
+from clippings.deps import (
     get_books_storage,
     get_mock_books_storage,
     get_mock_users_storage,
     get_password_hasher,
-    get_user_id,
     get_users_map,
     get_users_storage,
 )
+from clippings.web.deps import get_user_id
 from clippings.web.main import app
 
 

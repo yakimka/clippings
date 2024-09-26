@@ -1,6 +1,6 @@
 import pytest
 
-from clippings.web.settings import settings
+from clippings.settings import settings
 
 
 @pytest.fixture(scope="session", autouse=True)
