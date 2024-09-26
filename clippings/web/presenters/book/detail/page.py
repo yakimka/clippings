@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING
 
+from clippings.books.entities import Book, ClippingType, Position
 from clippings.web.presenters.book.detail.dtos import (
     ClippingDataDTO,
     ClippingInfoDTO,
@@ -18,7 +19,6 @@ from clippings.web.presenters.html_renderers import make_html_renderer
 from clippings.web.presenters.image import image_or_default
 
 if TYPE_CHECKING:
-    from clippings.books.entities import Book, Position
     from clippings.books.ports import BooksStorageABC
     from clippings.web.presenters.urls import UrlsManager
 
@@ -157,8 +157,14 @@ class BookDetailBuilder:
                 return str(position[0])
             return f"{position[0]}-{position[1]}"
 
+        clipping_type_map = {
+            ClippingType.HIGHLIGHT: "Highlight",
+            ClippingType.NOTE: "Note",
+            ClippingType.UNLINKED_NOTE: "Note",
+        }
+
         info = [
-            ClippingInfoDTO(content=clipping.type.value.capitalize()),
+            ClippingInfoDTO(content=clipping_type_map[clipping.type]),
         ]
         if clipping.page != (-1, -1):
             info.append(
