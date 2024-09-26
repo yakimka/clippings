@@ -8,7 +8,7 @@ from picodi import Provide, SingletonScope, dependency, inject
 from clippings.books.adapters.storages import MockBooksStorage, MongoBooksStorage
 from clippings.settings import InfrastructureSettings
 from clippings.users.adapters.password_hashers import PBKDF2PasswordHasher
-from clippings.users.adapters.storages import MockUsersStorage
+from clippings.users.adapters.storages import MockUsersStorage, MongoUsersStorage
 
 if TYPE_CHECKING:
     from clippings.books.entities import Book
@@ -90,10 +90,17 @@ def get_mock_users_storage(
 
 
 @inject
+def get_mongo_users_storage(
+    db: AsyncIOMotorDatabase = Provide(get_mongo_database),
+) -> MongoUsersStorage:
+    return MongoUsersStorage(db)
+
+
+@inject
 def get_users_storage(
-    mock_users_storage: MockUsersStorage = Provide(get_mock_users_storage),
+    mongo_users_storage: MongoUsersStorage = Provide(get_mongo_users_storage),
 ) -> UsersStorageABC:
-    return mock_users_storage
+    return mongo_users_storage
 
 
 @inject
