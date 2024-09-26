@@ -4,18 +4,20 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from clippings.users.adapters.storages import MockUsersStorage
+from clippings.users.adapters.storages import MockUsersStorage, MongoUsersStorage
 
 if TYPE_CHECKING:
     from clippings.users.entities import User
     from clippings.users.ports import UsersStorageABC
 
 
-@pytest.fixture(params=["mock"])
-def make_sut(request):
+@pytest.fixture(params=["mock", "mongo"])
+def make_sut(request, mongo_db):
     async def _make_sut(users: list[User] | None = None) -> UsersStorageABC:
         if request.param == "mock":
             storage = MockUsersStorage()
+        elif request.param == "mongo":
+            storage = MongoUsersStorage(mongo_db)
         else:
             raise ValueError(f"Unknown storage type: {request.param}")
         if users is not None:
