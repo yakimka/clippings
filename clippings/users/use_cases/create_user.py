@@ -32,6 +32,9 @@ class CreateUserUseCase:
         self._password_hasher = password_hasher
 
     async def execute(self, user: UserToCreateDTO) -> str | DomainError:
+        if len(user.password) < 8:
+            return DomainError("Password must be at least 8 characters long")
+
         user_id = self._user_id_generator(user)
         if await self._users_storage.get_by_nickname(user.nickname):
             return DomainError(f"User with nickname '{user.nickname}' already exists")

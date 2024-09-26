@@ -44,3 +44,13 @@ async def test_cant_add_user_with_same_nickname(make_sut, users_storage, mother)
 
     assert isinstance(result, DomainError)
     assert str(result) == "User with nickname 'mario' already exists"
+
+
+async def test_user_password_must_be_at_least_8_characters_long(make_sut):
+    sut = make_sut()
+    user_to_create = UserToCreateDTO(nickname="mario", password="short")
+
+    result = await sut.execute(user_to_create)
+
+    assert isinstance(result, DomainError)
+    assert str(result) == "Password must be at least 8 characters long"
