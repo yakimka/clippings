@@ -19,8 +19,8 @@ from clippings.books.use_cases.edit_book import (
     TitleDTO,
     UnlinkInlineNoteUseCase,
 )
+from clippings.deps import get_books_storage
 from clippings.web.controllers.responses import HTMLResponse, RedirectResponse
-from clippings.web.deps import get_books_storage
 from clippings.web.presenters.book.detail.forms import (
     AddInlineNoteFormPresenter,
     EditBookInfoFormPresenter,
