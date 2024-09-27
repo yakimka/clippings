@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from starlette.datastructures import UploadFile
-from starlette.responses import HTMLResponse, RedirectResponse
+from starlette.responses import HTMLResponse, Response
 
 from clippings.web.auth import basic_auth
 from clippings.web.controllers.book_edit import (
@@ -22,58 +22,58 @@ from clippings.web.controllers.book_edit import (
     UpdateBookReviewController,
     UpdateClippingController,
 )
-from clippings.web.views._utils import get_string_path_param
+from clippings.web.views._utils import convert_response, get_string_path_param
 
 if TYPE_CHECKING:
     from starlette.requests import Request
 
 
 @basic_auth
-async def book_review_update_form(request: Request) -> HTMLResponse:
+async def book_review_update_form(request: Request) -> Response:
     book_id = get_string_path_param(request, "book_id")
     controller = RenderBookReviewEditFormController()
     result = await controller.fire(book_id)
-    return HTMLResponse(result.payload, status_code=result.status_code)
+    return convert_response(result)
 
 
 @basic_auth
-async def book_info_update_form(request: Request) -> HTMLResponse:
+async def book_info_update_form(request: Request) -> Response:
     book_id = get_string_path_param(request, "book_id")
     controller = RenderBookInfoEditFormController()
     result = await controller.fire(book_id)
-    return HTMLResponse(result.payload, status_code=result.status_code)
+    return convert_response(result)
 
 
 @basic_auth
-async def clipping_update_form(request: Request) -> HTMLResponse:
+async def clipping_update_form(request: Request) -> Response:
     book_id = get_string_path_param(request, "book_id")
     clipping_id = get_string_path_param(request, "clipping_id")
     controller = RenderBookClippingEditFormController()
     result = await controller.fire(book_id, clipping_id)
-    return HTMLResponse(result.payload, status_code=result.status_code)
+    return convert_response(result)
 
 
 @basic_auth
-async def inline_note_add_form(request: Request) -> HTMLResponse:
+async def inline_note_add_form(request: Request) -> Response:
     book_id = get_string_path_param(request, "book_id")
     clipping_id = get_string_path_param(request, "clipping_id")
     controller = RenderInlineNoteAddFromController()
     result = await controller.fire(book_id, clipping_id)
-    return HTMLResponse(result.payload, status_code=result.status_code)
+    return convert_response(result)
 
 
 @basic_auth
-async def inline_note_update_form(request: Request) -> HTMLResponse:
+async def inline_note_update_form(request: Request) -> Response:
     book_id = get_string_path_param(request, "book_id")
     clipping_id = get_string_path_param(request, "clipping_id")
     inline_note_id = get_string_path_param(request, "inline_note_id")
     controller = RenderInlineNoteEditFormController()
     result = await controller.fire(book_id, clipping_id, inline_note_id)
-    return HTMLResponse(result.payload, status_code=result.status_code)
+    return convert_response(result)
 
 
 @basic_auth
-async def book_review_update(request: Request) -> RedirectResponse | HTMLResponse:
+async def book_review_update(request: Request) -> Response:
     form = await request.form(max_files=10, max_fields=10)
     if "review" not in form:
         return HTMLResponse("ERROR: No review provided")
@@ -83,11 +83,11 @@ async def book_review_update(request: Request) -> RedirectResponse | HTMLRespons
     book_id = get_string_path_param(request, "book_id")
     controller = UpdateBookReviewController()
     result = await controller.fire(book_id, form["review"] or "")
-    return RedirectResponse(result.url, status_code=result.status_code)
+    return convert_response(result)
 
 
 @basic_auth
-async def book_info_update(request: Request) -> RedirectResponse | HTMLResponse:
+async def book_info_update(request: Request) -> Response:
     form = await request.form(max_files=10, max_fields=10)
     for field in ["title", "authors"]:
         if not form.get(field):
@@ -115,11 +115,11 @@ async def book_info_update(request: Request) -> RedirectResponse | HTMLResponse:
         rating=rating,
     )
 
-    return RedirectResponse(result.url, status_code=result.status_code)
+    return convert_response(result)
 
 
 @basic_auth
-async def clipping_update(request: Request) -> RedirectResponse | HTMLResponse:
+async def clipping_update(request: Request) -> Response:
     form = await request.form(max_files=10, max_fields=10)
     if form.get("content") is None:
         return HTMLResponse("ERROR: No content provided")
@@ -134,11 +134,11 @@ async def clipping_update(request: Request) -> RedirectResponse | HTMLResponse:
         content=form["content"],
     )
 
-    return RedirectResponse(result.url, status_code=result.status_code)
+    return convert_response(result)
 
 
 @basic_auth
-async def inline_note_add(request: Request) -> RedirectResponse | HTMLResponse:
+async def inline_note_add(request: Request) -> Response:
     form = await request.form(max_files=10, max_fields=10)
     if form.get("content") is None:
         return HTMLResponse("ERROR: No content provided")
@@ -153,11 +153,11 @@ async def inline_note_add(request: Request) -> RedirectResponse | HTMLResponse:
         content=form["content"],
     )
 
-    return RedirectResponse(result.url, status_code=result.status_code)
+    return convert_response(result)
 
 
 @basic_auth
-async def inline_note_update(request: Request) -> RedirectResponse | HTMLResponse:
+async def inline_note_update(request: Request) -> Response:
     form = await request.form(max_files=10, max_fields=10)
     if form.get("content") is None:
         return HTMLResponse("ERROR: No content provided")
@@ -173,47 +173,43 @@ async def inline_note_update(request: Request) -> RedirectResponse | HTMLRespons
         content=form["content"],
     )
 
-    return RedirectResponse(result.url, status_code=result.status_code)
+    return convert_response(result)
 
 
 @basic_auth
-async def inline_note_unlink(request: Request) -> RedirectResponse:
+async def inline_note_unlink(request: Request) -> Response:
     controller = UnlinkInlineNoteController()
     result = await controller.fire(
         book_id=get_string_path_param(request, "book_id"),
         clipping_id=get_string_path_param(request, "clipping_id"),
         inline_note_id=get_string_path_param(request, "inline_note_id"),
     )
-
-    return RedirectResponse(result.url, status_code=result.status_code)
+    return convert_response(result)
 
 
 @basic_auth
-async def book_delete(request: Request) -> HTMLResponse:
+async def book_delete(request: Request) -> Response:
     controller = DeleteBookController()
     result = await controller.fire(book_id=get_string_path_param(request, "book_id"))
-
-    return HTMLResponse(result.payload, status_code=result.status_code)
+    return convert_response(result)
 
 
 @basic_auth
-async def clipping_delete(request: Request) -> HTMLResponse:
+async def clipping_delete(request: Request) -> Response:
     controller = DeleteClippingController()
     result = await controller.fire(
         book_id=get_string_path_param(request, "book_id"),
         clipping_id=get_string_path_param(request, "clipping_id"),
     )
-
-    return HTMLResponse(result.payload, status_code=result.status_code)
+    return convert_response(result)
 
 
 @basic_auth
-async def inline_note_delete(request: Request) -> RedirectResponse:
+async def inline_note_delete(request: Request) -> Response:
     controller = DeleteInlineNoteController()
     result = await controller.fire(
         book_id=get_string_path_param(request, "book_id"),
         clipping_id=get_string_path_param(request, "clipping_id"),
         inline_note_id=get_string_path_param(request, "inline_note_id"),
     )
-
-    return RedirectResponse(result.url, status_code=result.status_code)
+    return convert_response(result)
