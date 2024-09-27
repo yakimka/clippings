@@ -187,3 +187,8 @@ class Clipping:
 
     def remove_inline_note(self, note_id: str) -> None:
         self.inline_notes = [note for note in self.inline_notes if note.id != note_id]
+
+
+@dataclass
+class DeletedHash:
+    id: str

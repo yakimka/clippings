@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from datetime import datetime
 
     from clippings.books.dtos import ClippingImportCandidateDTO
-    from clippings.books.entities import Book, ClippingType, Position
+    from clippings.books.entities import Book, ClippingType, DeletedHash, Position
 
 
 class BooksStorageABC(abc.ABC):
@@ -46,6 +46,16 @@ class BooksStorageABC(abc.ABC):
 
     @abc.abstractmethod
     async def count(self, query: FindQuery) -> int:
+        pass
+
+
+class DeletedHashStorageABC(abc.ABC):
+    @abc.abstractmethod
+    async def get_all(self) -> list[DeletedHash]:
+        pass
+
+    @abc.abstractmethod
+    async def add(self, deleted_hash: DeletedHash) -> None:
         pass
 
 

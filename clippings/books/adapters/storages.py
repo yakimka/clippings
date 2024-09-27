@@ -9,8 +9,8 @@ from typing import TYPE_CHECKING, Any
 from dacite import Config, from_dict
 from pymongo import ReplaceOne
 
-from clippings.books.entities import Book
-from clippings.books.ports import BooksStorageABC
+from clippings.books.entities import Book, DeletedHash
+from clippings.books.ports import BooksStorageABC, DeletedHashStorageABC
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -150,3 +150,28 @@ class MongoBooksStorage(BooksStorageABC):
         result = await self._collection.aggregate(pipeline).to_list(None)
 
         return result[0]["total"] if result else 0
+
+
+class MockDeletedHashStorage(DeletedHashStorageABC):
+    def __init__(self, hashes_map: dict[str, DeletedHash] | None = None) -> None:
+        self.hashes: dict[str, DeletedHash] = {} if hashes_map is None else hashes_map
+
+    async def get_all(self) -> list[DeletedHash]:
+        return list(self.hashes.values())
+
+    async def add(self, deleted_hash: DeletedHash) -> None:
+        self.hashes[deleted_hash.id] = deleted_hash
+
+
+class MongoDeletedHashStorage(DeletedHashStorageABC):
+    def __init__(self, db: AsyncIOMotorDatabase, user_id: str) -> None:
+        self._collection = db["deleted_hashes"]
+        self._user_id = user_id
+
+    async def get_all(self) -> list[DeletedHash]:
+        docs = await self._collection.find({"user_id": self._user_id}).to_list(None)
+        return [DeletedHash(doc["_id"]) for doc in docs]
+
+    async def add(self, hash: DeletedHash) -> None:
+        doc = {"_id": hash.id, "user_id": self._user_id}
+        await self._collection.replace_one({"_id": hash.id}, doc, upsert=True)
