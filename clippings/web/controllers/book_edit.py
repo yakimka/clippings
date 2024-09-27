@@ -20,7 +20,8 @@ from clippings.books.use_cases.edit_book import (
     UnlinkInlineNoteUseCase,
 )
 from clippings.deps import get_books_storage
-from clippings.web.controllers.responses import HTMLResponse, RedirectResponse
+from clippings.seedwork.exceptions import DomainError
+from clippings.web.controllers.responses import HTMLResponse, RedirectResponse, Response
 from clippings.web.presenters.book.detail.forms import (
     AddInlineNoteFormPresenter,
     EditBookInfoFormPresenter,
@@ -120,9 +121,13 @@ class UpdateBookReviewController:
     ) -> None:
         self._books_storage = books_storage
 
-    async def fire(self, book_id: str, review: str) -> RedirectResponse:
+    async def fire(self, book_id: str, review: str) -> Response:
         use_case = EditBookUseCase(book_storage=self._books_storage)
-        await use_case.execute(book_id=book_id, fields=[ReviewDTO(review=review)])
+        result = await use_case.execute(
+            book_id=book_id, fields=[ReviewDTO(review=review)]
+        )
+        if isinstance(result, DomainError):
+            return HTMLResponse(payload=str(result))
 
         redirect = urls_manager.build_url("book_review", book_id=book_id)
         return RedirectResponse(url=redirect.value, status_code=303)
@@ -137,15 +142,17 @@ class UpdateBookInfoController:
 
     async def fire(
         self, book_id: str, title: str, authors: str, rating: int | None
-    ) -> RedirectResponse:
+    ) -> Response:
         use_case = EditBookUseCase(book_storage=self._books_storage)
-        await use_case.execute(
+        result = await use_case.execute(
             book_id=book_id,
             fields=[
                 TitleDTO(title=title, authors=authors),
                 RatingDTO(rating=rating),
             ],
         )
+        if isinstance(result, DomainError):
+            return HTMLResponse(payload=str(result))
 
         redirect = urls_manager.build_url("book_info", book_id=book_id)
         return RedirectResponse(url=redirect.value, status_code=303)
@@ -158,17 +165,17 @@ class UpdateClippingController:
     ) -> None:
         self._books_storage = books_storage
 
-    async def fire(
-        self, book_id: str, clipping_id: str, content: str
-    ) -> RedirectResponse:
+    async def fire(self, book_id: str, clipping_id: str, content: str) -> Response:
         use_case = EditClippingUseCase(book_storage=self._books_storage)
-        await use_case.execute(
+        result = await use_case.execute(
             ClippingFieldsDTO(
                 id=clipping_id,
                 book_id=book_id,
                 content=content,
             )
         )
+        if isinstance(result, DomainError):
+            return HTMLResponse(payload=str(result))
 
         redirect = urls_manager.build_url(
             "clipping_detail", book_id=book_id, clipping_id=clipping_id
@@ -183,16 +190,16 @@ class AddInlineNoteController:
     ) -> None:
         self._books_storage = books_storage
 
-    async def fire(
-        self, book_id: str, clipping_id: str, content: str
-    ) -> RedirectResponse:
+    async def fire(self, book_id: str, clipping_id: str, content: str) -> Response:
         use_case = AddInlineNoteUseCase(
             book_storage=self._books_storage,
             inline_note_id_generator=inline_note_id_generator,
         )
-        await use_case.execute(
+        result = await use_case.execute(
             book_id=book_id, clipping_id=clipping_id, content=content
         )
+        if isinstance(result, DomainError):
+            return HTMLResponse(payload=str(result))
 
         redirect = urls_manager.build_url(
             "clipping_detail", book_id=book_id, clipping_id=clipping_id
@@ -209,14 +216,16 @@ class EditInlineNoteController:
 
     async def fire(
         self, book_id: str, clipping_id: str, inline_note_id: str, content: str
-    ) -> RedirectResponse:
+    ) -> Response:
         use_case = EditInlineNoteUseCase(book_storage=self._books_storage)
-        await use_case.execute(
+        result = await use_case.execute(
             book_id=book_id,
             clipping_id=clipping_id,
             inline_note_id=inline_note_id,
             content=content,
         )
+        if isinstance(result, DomainError):
+            return HTMLResponse(payload=str(result))
 
         redirect = urls_manager.build_url(
             "clipping_detail",
@@ -236,13 +245,15 @@ class UnlinkInlineNoteController:
 
     async def fire(
         self, book_id: str, clipping_id: str, inline_note_id: str
-    ) -> RedirectResponse:
+    ) -> Response:
         use_case = UnlinkInlineNoteUseCase(book_storage=self._books_storage)
-        await use_case.execute(
+        result = await use_case.execute(
             book_id=book_id,
             clipping_id=clipping_id,
             inline_note_id=inline_note_id,
         )
+        if isinstance(result, DomainError):
+            return HTMLResponse(payload=str(result))
 
         redirect = urls_manager.build_url(
             "clipping_list",
@@ -262,7 +273,9 @@ class DeleteBookController:
 
     async def fire(self, book_id: str) -> HTMLResponse:
         use_case = DeleteBookUseCase(book_storage=self._books_storage)
-        await use_case.execute(book_id)
+        result = await use_case.execute(book_id)
+        if isinstance(result, DomainError):
+            return HTMLResponse(payload=str(result))
         return HTMLResponse(payload="", status_code=200)
 
 
@@ -275,7 +288,9 @@ class DeleteClippingController:
 
     async def fire(self, book_id: str, clipping_id: str) -> HTMLResponse:
         use_case = DeleteClippingUseCase(book_storage=self._books_storage)
-        await use_case.execute(book_id, clipping_id)
+        result = await use_case.execute(book_id, clipping_id)
+        if isinstance(result, DomainError):
+            return HTMLResponse(payload=str(result))
         return HTMLResponse(payload="", status_code=200)
 
 
@@ -288,13 +303,15 @@ class DeleteInlineNoteController:
 
     async def fire(
         self, book_id: str, clipping_id: str, inline_note_id: str
-    ) -> RedirectResponse:
+    ) -> Response:
         use_case = DeleteInlineNoteUseCase(book_storage=self._books_storage)
-        await use_case.execute(
+        result = await use_case.execute(
             book_id=book_id,
             clipping_id=clipping_id,
             inline_note_id=inline_note_id,
         )
+        if isinstance(result, DomainError):
+            return HTMLResponse(payload=str(result))
 
         redirect = urls_manager.build_url(
             "clipping_detail",
