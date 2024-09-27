@@ -11,7 +11,7 @@ from clippings.books.adapters.id_generators import (
 )
 from clippings.books.adapters.readers import KindleClippingsReader
 from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
-from clippings.deps import get_books_storage
+from clippings.deps import get_books_storage, get_deleted_hash_storage
 from clippings.web.controllers.responses import HTMLResponse
 from clippings.web.presenters.book.clippings_import_page import (
     ClippingsImportPagePresenter,
@@ -20,7 +20,7 @@ from clippings.web.presenters.book.clippings_import_page import (
 from clippings.web.presenters.urls import urls_manager
 
 if TYPE_CHECKING:
-    from clippings.books.ports import BooksStorageABC
+    from clippings.books.ports import BooksStorageABC, DeletedHashStorageABC
 
 
 class RenderClippingsImportPage:
@@ -33,15 +33,19 @@ class RenderClippingsImportPage:
 class ClippingsImportController:
     @inject
     def __init__(
-        self, books_storage: BooksStorageABC = Provide(get_books_storage)
+        self,
+        books_storage: BooksStorageABC = Provide(get_books_storage),
+        deleted_hash_storage: DeletedHashStorageABC = Provide(get_deleted_hash_storage),
     ) -> None:
         self._books_storage = books_storage
+        self._deleted_hash_storage = deleted_hash_storage
 
     async def fire(self, file: BinaryIO) -> HTMLResponse:
         clippings_reader = KindleClippingsReader(file)
         import_use_case = ImportClippingsUseCase(
             storage=self._books_storage,
             reader=clippings_reader,
+            deleted_hash_storage=self._deleted_hash_storage,
             book_id_generator=book_id_generator,
             clipping_id_generator=clipping_id_generator,
             inline_note_id_generator=inline_note_id_generator,

@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from clippings.books.entities import Book, Clipping
+from clippings.books.entities import Book, Clipping, DeletedHash
 
 if TYPE_CHECKING:
 
@@ -12,6 +12,7 @@ if TYPE_CHECKING:
         BooksStorageABC,
         ClippingIdGenerator,
         ClippingsReaderABC,
+        DeletedHashStorageABC,
         InlineNoteIdGenerator,
     )
 
@@ -29,12 +30,14 @@ class ImportClippingsUseCase:
         self,
         storage: BooksStorageABC,
         reader: ClippingsReaderABC,
+        deleted_hash_storage: DeletedHashStorageABC,
         book_id_generator: BookIdGenerator,
         clipping_id_generator: ClippingIdGenerator,
         inline_note_id_generator: InlineNoteIdGenerator,
     ) -> None:
         self._storage = storage
         self._reader = reader
+        self._deleted_hash_storage = deleted_hash_storage
         self._book_id_generator = book_id_generator
         self._clipping_id_generator = clipping_id_generator
         self._inline_note_id_generator = inline_note_id_generator
@@ -67,6 +70,7 @@ class ImportClippingsUseCase:
 
         books_from_storage = await self._storage.get_many(list(book_id_to_book_map))
         books_from_storage_by_id = {book.id: book for book in books_from_storage}
+        deleted_hashes = await self._deleted_hash_storage.get_all()
 
         to_update: list[Book] = []
         statistics: list[ImportedBookDTO] = []
@@ -83,6 +87,9 @@ class ImportClippingsUseCase:
                         )
                     )
             else:
+                book_deleted_hash = DeletedHash.from_ids(book.id)
+                if book_deleted_hash in deleted_hashes:
+                    continue
                 to_update.append(book)
                 statistics.append(
                     ImportedBookDTO(
@@ -96,5 +103,6 @@ class ImportClippingsUseCase:
         for book in to_update:
             book.link_notes(inline_note_id_generator=self._inline_note_id_generator)
 
-        await self._storage.extend(to_update)
+        if to_update:
+            await self._storage.extend(to_update)
         return statistics

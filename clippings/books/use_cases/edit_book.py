@@ -4,12 +4,16 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from clippings.books.entities import Book, InlineNote
+from clippings.books.entities import Book, DeletedHash, InlineNote
 from clippings.books.exceptions import CantFindEntityError
 from clippings.seedwork.exceptions import DomainError
 
 if TYPE_CHECKING:
-    from clippings.books.ports import BooksStorageABC, InlineNoteIdGenerator
+    from clippings.books.ports import (
+        BooksStorageABC,
+        DeletedHashStorageABC,
+        InlineNoteIdGenerator,
+    )
 
 
 @dataclass(kw_only=True)
@@ -168,14 +172,18 @@ class EditInlineNoteUseCase:
 
 
 class DeleteBookUseCase:
-    def __init__(self, book_storage: BooksStorageABC):
+    def __init__(
+        self, book_storage: BooksStorageABC, deleted_hash_storage: DeletedHashStorageABC
+    ):
         self._book_storage = book_storage
+        self._deleted_hash_storage = deleted_hash_storage
 
     async def execute(self, book_id: str) -> None | DomainError:
         book = await self._book_storage.get(book_id)
         if book is None:
             return CantFindEntityError(f"Can't find book with id: {book_id}")
         await self._book_storage.remove(book)
+        await self._deleted_hash_storage.add(DeletedHash.from_ids(book_id))
         return None
 
 

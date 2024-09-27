@@ -194,5 +194,7 @@ class DeletedHash:
     id: str
 
     @classmethod
-    def from_ids(cls, book_id: str, clipping_id: str) -> DeletedHash:
+    def from_ids(cls, book_id: str, clipping_id: str | None = None) -> DeletedHash:
+        if not clipping_id:
+            return cls(id=book_id)
         return cls(id=f"{book_id}:{clipping_id}")

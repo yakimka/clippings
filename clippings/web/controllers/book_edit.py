@@ -19,7 +19,7 @@ from clippings.books.use_cases.edit_book import (
     TitleDTO,
     UnlinkInlineNoteUseCase,
 )
-from clippings.deps import get_books_storage
+from clippings.deps import get_books_storage, get_deleted_hash_storage
 from clippings.seedwork.exceptions import DomainError
 from clippings.web.controllers.responses import HTMLResponse, RedirectResponse, Response
 from clippings.web.presenters.book.detail.forms import (
@@ -32,7 +32,7 @@ from clippings.web.presenters.book.detail.forms import (
 from clippings.web.presenters.urls import urls_manager
 
 if TYPE_CHECKING:
-    from clippings.books.ports import BooksStorageABC
+    from clippings.books.ports import BooksStorageABC, DeletedHashStorageABC
 
 
 class RenderBookReviewEditFormController:
@@ -267,12 +267,18 @@ class UnlinkInlineNoteController:
 class DeleteBookController:
     @inject
     def __init__(
-        self, books_storage: BooksStorageABC = Provide(get_books_storage)
+        self,
+        books_storage: BooksStorageABC = Provide(get_books_storage),
+        deleted_hash_storage: DeletedHashStorageABC = Provide(get_deleted_hash_storage),
     ) -> None:
         self._books_storage = books_storage
+        self._deleted_hash_storage = deleted_hash_storage
 
     async def fire(self, book_id: str) -> HTMLResponse:
-        use_case = DeleteBookUseCase(book_storage=self._books_storage)
+        use_case = DeleteBookUseCase(
+            book_storage=self._books_storage,
+            deleted_hash_storage=self._deleted_hash_storage,
+        )
         result = await use_case.execute(book_id)
         if isinstance(result, DomainError):
             return HTMLResponse(payload=str(result))

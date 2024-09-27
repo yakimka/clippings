@@ -1,6 +1,7 @@
 import pytest
 
 from clippings.books.adapters.id_generators import (
+    book_id_generator,
     clipping_id_generator,
     inline_note_id_generator,
 )
@@ -14,20 +15,23 @@ from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
 
 @pytest.fixture()
 def import_clippings_use_case(
-    mock_book_storage, mock_clipping_reader, autoincrement_id_generator
+    mock_book_storage, mock_clipping_reader, mock_deleted_hash_storage
 ) -> ImportClippingsUseCase:
     return ImportClippingsUseCase(
         storage=mock_book_storage,
         reader=mock_clipping_reader,
-        book_id_generator=autoincrement_id_generator,
+        deleted_hash_storage=mock_deleted_hash_storage,
+        book_id_generator=book_id_generator,
         clipping_id_generator=clipping_id_generator,
         inline_note_id_generator=inline_note_id_generator,
     )
 
 
 @pytest.fixture()
-def delete_book_use_case(mock_book_storage):
-    return DeleteBookUseCase(book_storage=mock_book_storage)
+def delete_book_use_case(mock_book_storage, mock_deleted_hash_storage):
+    return DeleteBookUseCase(
+        book_storage=mock_book_storage, deleted_hash_storage=mock_deleted_hash_storage
+    )
 
 
 @pytest.fixture()
@@ -52,13 +56,15 @@ async def test_reimporting_deleted_book_does_nothing(
         mother.clipping_import_candidate_dto(
             book_title="The Book",
             book_authors=["The Author"],
+            content="The content",
         )
     ]
     await import_clippings_use_case.execute()
-    delete_result = await delete_book_use_case.execute("1")
-    assert delete_result is None
+    imported_books = await mock_book_storage.find()
+    assert len(imported_books) == 1
 
     # Act
+    await delete_book_use_case.execute(imported_books[0].id)
     await import_clippings_use_case.execute()
 
     # Assert
