@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING
 from unittest.mock import ANY
 
 import pytest
@@ -15,15 +14,6 @@ from clippings.books.use_cases.import_clippings import (
     ImportClippingsUseCase,
     ImportedBookDTO,
 )
-
-if TYPE_CHECKING:
-    from clippings.books.ports import BookIdGenerator
-
-
-@pytest.fixture()
-def autoincrement_id_generator() -> BookIdGenerator:
-    ids = (str(i) for i in range(1, 1000))
-    return lambda _: str(next(ids))
 
 
 @pytest.fixture()

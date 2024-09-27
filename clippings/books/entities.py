@@ -192,3 +192,7 @@ class Clipping:
 @dataclass
 class DeletedHash:
     id: str
+
+    @classmethod
+    def from_ids(cls, book_id: str, clipping_id: str) -> DeletedHash:
+        return cls(id=f"{book_id}:{clipping_id}")
