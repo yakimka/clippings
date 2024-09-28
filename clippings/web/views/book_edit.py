@@ -8,6 +8,7 @@ from starlette.responses import HTMLResponse, Response
 from clippings.web.auth import basic_auth
 from clippings.web.controllers.book_edit import (
     AddInlineNoteController,
+    ClearDeletedHashesController,
     DeleteBookController,
     DeleteClippingController,
     DeleteInlineNoteController,
@@ -212,4 +213,11 @@ async def inline_note_delete(request: Request) -> Response:
         clipping_id=get_string_path_param(request, "clipping_id"),
         inline_note_id=get_string_path_param(request, "inline_note_id"),
     )
+    return convert_response(result)
+
+
+@basic_auth
+async def deleted_hash_clear(request: Request) -> Response:  # noqa: U100
+    controller = ClearDeletedHashesController()
+    result = await controller.fire()
     return convert_response(result)

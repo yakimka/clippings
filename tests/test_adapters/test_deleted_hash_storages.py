@@ -44,3 +44,15 @@ async def test_add_and_get_hash(make_sut, mother):
     result = await sut.get_all()
 
     assert result == [deleted_hash]
+
+
+async def test_clear(make_sut, mother):
+    sut = await make_sut()
+    deleted_hash = mother.deleted_hash(id="deleted_hash:id")
+    await sut.add(deleted_hash)
+
+    await sut.clear()
+
+    result = await sut.get_all()
+
+    assert result == []

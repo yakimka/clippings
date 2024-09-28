@@ -7,6 +7,7 @@ from picodi import Provide, inject
 from clippings.books.adapters.id_generators import inline_note_id_generator
 from clippings.books.use_cases.edit_book import (
     AddInlineNoteUseCase,
+    ClearDeletedHashesUseCase,
     ClippingFieldsDTO,
     DeleteBookUseCase,
     DeleteClippingUseCase,
@@ -338,3 +339,19 @@ class DeleteInlineNoteController:
             inline_note_id=inline_note_id,
         )
         return RedirectResponse(url=redirect.value, status_code=303)
+
+
+class ClearDeletedHashesController:
+    @inject
+    def __init__(
+        self,
+        deleted_hash_storage: DeletedHashStorageABC = Provide(get_deleted_hash_storage),
+    ) -> None:
+        self._deleted_hash_storage = deleted_hash_storage
+
+    async def fire(self) -> Response:
+        use_case = ClearDeletedHashesUseCase(
+            deleted_hash_storage=self._deleted_hash_storage
+        )
+        await use_case.execute()
+        return HTMLResponse(payload="", status_code=200)

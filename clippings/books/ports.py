@@ -58,6 +58,10 @@ class DeletedHashStorageABC(abc.ABC):
     async def add(self, deleted_hash: DeletedHash) -> None:
         pass
 
+    @abc.abstractmethod
+    async def clear(self) -> None:
+        pass
+
 
 class ClippingsReaderABC(abc.ABC):
     @abc.abstractmethod

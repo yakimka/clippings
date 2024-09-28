@@ -265,3 +265,12 @@ class UnlinkInlineNoteUseCase:
             return result
         await self._book_storage.add(book)
         return None
+
+
+class ClearDeletedHashesUseCase:
+    def __init__(self, deleted_hash_storage: DeletedHashStorageABC):
+        self._deleted_hash_storage = deleted_hash_storage
+
+    async def execute(self) -> None:
+        await self._deleted_hash_storage.clear()
+        return None
