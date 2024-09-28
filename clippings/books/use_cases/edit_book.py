@@ -204,6 +204,13 @@ class DeleteClippingUseCase:
             await self._deleted_hash_storage.add(
                 DeletedHash.from_ids(book.id, clipping_id=clipping_id)
             )
+            for inline_note in clipping.inline_notes:
+                if inline_note.automatically_linked:
+                    await self._deleted_hash_storage.add(
+                        DeletedHash.from_ids(
+                            book.id, clipping_id=inline_note.original_id
+                        )
+                    )
             return None
         return CantFindEntityError(
             f"Can't find clipping with id: {clipping_id} in book with id: {book_id}"
@@ -211,8 +218,11 @@ class DeleteClippingUseCase:
 
 
 class DeleteInlineNoteUseCase:
-    def __init__(self, book_storage: BooksStorageABC):
+    def __init__(
+        self, book_storage: BooksStorageABC, deleted_hash_storage: DeletedHashStorageABC
+    ):
         self._book_storage = book_storage
+        self._deleted_hash_storage = deleted_hash_storage
 
     async def execute(
         self, book_id: str, clipping_id: str, inline_note_id: str
@@ -225,8 +235,17 @@ class DeleteInlineNoteUseCase:
             return CantFindEntityError(
                 f"Can't find clipping with id: {clipping_id} in book with id: {book_id}"
             )
-        clipping.remove_inline_note(inline_note_id)
+        inline_note = clipping.get_inline_note(inline_note_id)
+        if inline_note is None:
+            return CantFindEntityError(
+                f"Can't find inline note with id: {inline_note_id}"
+            )
+        clipping.remove_inline_note(inline_note)
         await self._book_storage.add(book)
+        if inline_note.automatically_linked:
+            await self._deleted_hash_storage.add(
+                DeletedHash.from_ids(book_id, clipping_id=inline_note.original_id)
+            )
         return None
 
 
