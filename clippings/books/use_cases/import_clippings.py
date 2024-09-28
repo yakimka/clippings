@@ -44,6 +44,8 @@ class ImportClippingsUseCase:
 
     async def execute(self) -> list[ImportedBookDTO]:
         book_id_to_book_map: dict[str, Book] = {}
+        book_id_to_clippings_map: dict[str, list[Clipping]] = {}
+        deleted_hashes = await self._deleted_hash_storage.get_all()
         async for candidate in self._reader.read():
             book_id = self._book_id_generator(candidate.book)
             if book_id not in book_id_to_book_map:
@@ -54,29 +56,31 @@ class ImportClippingsUseCase:
                     cover_url=None,
                     clippings=[],
                 )
-            book_id_to_book_map[book_id].add_clippings(
-                [
-                    Clipping(
-                        id=self._clipping_id_generator(candidate),
-                        page=candidate.page,
-                        location=candidate.location,
-                        type=candidate.type,
-                        content=candidate.content,
-                        added_at=candidate.added_at,
-                        inline_notes=[],
-                    )
-                ]
+            clipping = Clipping(
+                id=self._clipping_id_generator(candidate),
+                page=candidate.page,
+                location=candidate.location,
+                type=candidate.type,
+                content=candidate.content,
+                added_at=candidate.added_at,
+                inline_notes=[],
             )
+            clipping_deleted_hash = DeletedHash.from_ids(
+                book_id, clipping_id=clipping.id
+            )
+            if clipping_deleted_hash in deleted_hashes:
+                continue
+            book_id_to_clippings_map.setdefault(book_id, []).append(clipping)
 
         books_from_storage = await self._storage.get_many(list(book_id_to_book_map))
         books_from_storage_by_id = {book.id: book for book in books_from_storage}
-        deleted_hashes = await self._deleted_hash_storage.get_all()
 
         to_update: list[Book] = []
         statistics: list[ImportedBookDTO] = []
         for candidate_book_id, book in book_id_to_book_map.items():
+            new_clippings = book_id_to_clippings_map.get(candidate_book_id, [])
             if existed_book := books_from_storage_by_id.get(candidate_book_id):
-                if added := existed_book.add_clippings(book.clippings):
+                if added := existed_book.add_clippings(new_clippings):
                     to_update.append(existed_book)
                     statistics.append(
                         ImportedBookDTO(
@@ -90,6 +94,7 @@ class ImportClippingsUseCase:
                 book_deleted_hash = DeletedHash.from_ids(book.id)
                 if book_deleted_hash in deleted_hashes:
                     continue
+                book.add_clippings(new_clippings)
                 to_update.append(book)
                 statistics.append(
                     ImportedBookDTO(

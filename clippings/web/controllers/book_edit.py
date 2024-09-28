@@ -288,12 +288,18 @@ class DeleteBookController:
 class DeleteClippingController:
     @inject
     def __init__(
-        self, books_storage: BooksStorageABC = Provide(get_books_storage)
+        self,
+        books_storage: BooksStorageABC = Provide(get_books_storage),
+        deleted_hash_storage: DeletedHashStorageABC = Provide(get_deleted_hash_storage),
     ) -> None:
         self._books_storage = books_storage
+        self._deleted_hash_storage = deleted_hash_storage
 
     async def fire(self, book_id: str, clipping_id: str) -> HTMLResponse:
-        use_case = DeleteClippingUseCase(book_storage=self._books_storage)
+        use_case = DeleteClippingUseCase(
+            book_storage=self._books_storage,
+            deleted_hash_storage=self._deleted_hash_storage,
+        )
         result = await use_case.execute(book_id, clipping_id)
         if isinstance(result, DomainError):
             return HTMLResponse(payload=str(result))

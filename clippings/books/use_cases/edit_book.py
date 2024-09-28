@@ -188,8 +188,11 @@ class DeleteBookUseCase:
 
 
 class DeleteClippingUseCase:
-    def __init__(self, book_storage: BooksStorageABC):
+    def __init__(
+        self, book_storage: BooksStorageABC, deleted_hash_storage: DeletedHashStorageABC
+    ):
         self._book_storage = book_storage
+        self._deleted_hash_storage = deleted_hash_storage
 
     async def execute(self, book_id: str, clipping_id: str) -> None | DomainError:
         book = await self._book_storage.get(book_id)
@@ -198,6 +201,9 @@ class DeleteClippingUseCase:
         if clipping := book.get_clipping(clipping_id):
             book.remove_clipping(clipping)
             await self._book_storage.add(book)
+            await self._deleted_hash_storage.add(
+                DeletedHash.from_ids(book.id, clipping_id=clipping_id)
+            )
             return None
         return CantFindEntityError(
             f"Can't find clipping with id: {clipping_id} in book with id: {book_id}"

@@ -5,9 +5,11 @@ from clippings.books.use_cases.edit_book import DeleteBookUseCase
 
 
 @pytest.fixture()
-def make_sut(mock_book_storage):
+def make_sut(mock_book_storage, mock_deleted_hash_storage):
     def _make_sut(books_storage=mock_book_storage):
-        return DeleteBookUseCase(book_storage=books_storage)
+        return DeleteBookUseCase(
+            book_storage=books_storage, deleted_hash_storage=mock_deleted_hash_storage
+        )
 
     return _make_sut
 
