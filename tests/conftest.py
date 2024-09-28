@@ -1,7 +1,7 @@
 import pytest
 
 from clippings.books.adapters.readers import MockClippingsReader
-from clippings.books.adapters.storages import MockBooksStorage
+from clippings.books.adapters.storages import MockBooksStorage, MockDeletedHashStorage
 from clippings.test.object_mother import ObjectMother
 from clippings.users.adapters.password_hashers import PBKDF2PasswordHasher
 from clippings.users.adapters.storages import MockUsersStorage
@@ -21,6 +21,11 @@ def mock_storage_books_map():
 @pytest.fixture()
 def mock_book_storage(mock_storage_books_map) -> MockBooksStorage:
     return MockBooksStorage(books_map=mock_storage_books_map)
+
+
+@pytest.fixture()
+def mock_deleted_hash_storage() -> MockDeletedHashStorage:
+    return MockDeletedHashStorage()
 
 
 @pytest.fixture()

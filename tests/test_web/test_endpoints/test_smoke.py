@@ -159,3 +159,10 @@ async def test_update_inline_note(client, book_storage, mother):
     assert response.status_code == 303
     updated_clipping = (await book_storage.get("book1")).get_clipping("clipping1")
     assert updated_clipping.inline_notes[0].content == "new content"
+
+
+async def test_clear_deleted_hashes(client):
+    url = urls_manager.build_url("deleted_hash_clear").value
+    response = await client.post(url)
+
+    assert response.status_code == 200

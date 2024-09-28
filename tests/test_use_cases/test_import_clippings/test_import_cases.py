@@ -28,11 +28,15 @@ def autoincrement_id_generator() -> BookIdGenerator:
 
 @pytest.fixture()
 def sut(
-    mock_book_storage, mock_clipping_reader, autoincrement_id_generator
+    mock_book_storage,
+    mock_clipping_reader,
+    autoincrement_id_generator,
+    mock_deleted_hash_storage,
 ) -> ImportClippingsUseCase:
     return ImportClippingsUseCase(
         storage=mock_book_storage,
         reader=mock_clipping_reader,
+        deleted_hash_storage=mock_deleted_hash_storage,
         book_id_generator=autoincrement_id_generator,
         clipping_id_generator=clipping_id_generator,
         inline_note_id_generator=inline_note_id_generator,

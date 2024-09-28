@@ -127,4 +127,9 @@ def make_book_urls(base_url: str = "/books") -> list[UrlTemplateDTO]:
             ),
             method="get",
         ),
+        UrlTemplateDTO(
+            id="deleted_hash_clear",
+            template=make_template("/deleted_hashes/clear"),
+            method="post",
+        ),
     ]

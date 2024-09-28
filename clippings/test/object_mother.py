@@ -4,7 +4,14 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from clippings.books.dtos import BookDTO, ClippingImportCandidateDTO
-from clippings.books.entities import Book, Clipping, ClippingType, InlineNote, Position
+from clippings.books.entities import (
+    Book,
+    Clipping,
+    ClippingType,
+    DeletedHash,
+    InlineNote,
+    Position,
+)
 from clippings.users.entities import User
 
 if TYPE_CHECKING:
@@ -96,6 +103,9 @@ class ObjectMother:
             content=content,
             added_at=added_at,
         )
+
+    def deleted_hash(self, *, id: str = "hash") -> DeletedHash:
+        return DeletedHash(id=id)
 
     def user(
         self,

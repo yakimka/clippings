@@ -7,6 +7,7 @@ from picodi import Provide, inject
 from clippings.books.adapters.id_generators import inline_note_id_generator
 from clippings.books.use_cases.edit_book import (
     AddInlineNoteUseCase,
+    ClearDeletedHashesUseCase,
     ClippingFieldsDTO,
     DeleteBookUseCase,
     DeleteClippingUseCase,
@@ -19,7 +20,7 @@ from clippings.books.use_cases.edit_book import (
     TitleDTO,
     UnlinkInlineNoteUseCase,
 )
-from clippings.deps import get_books_storage
+from clippings.deps import get_books_storage, get_deleted_hash_storage
 from clippings.seedwork.exceptions import DomainError
 from clippings.web.controllers.responses import HTMLResponse, RedirectResponse, Response
 from clippings.web.presenters.book.detail.forms import (
@@ -32,7 +33,7 @@ from clippings.web.presenters.book.detail.forms import (
 from clippings.web.presenters.urls import urls_manager
 
 if TYPE_CHECKING:
-    from clippings.books.ports import BooksStorageABC
+    from clippings.books.ports import BooksStorageABC, DeletedHashStorageABC
 
 
 class RenderBookReviewEditFormController:
@@ -267,12 +268,18 @@ class UnlinkInlineNoteController:
 class DeleteBookController:
     @inject
     def __init__(
-        self, books_storage: BooksStorageABC = Provide(get_books_storage)
+        self,
+        books_storage: BooksStorageABC = Provide(get_books_storage),
+        deleted_hash_storage: DeletedHashStorageABC = Provide(get_deleted_hash_storage),
     ) -> None:
         self._books_storage = books_storage
+        self._deleted_hash_storage = deleted_hash_storage
 
     async def fire(self, book_id: str) -> HTMLResponse:
-        use_case = DeleteBookUseCase(book_storage=self._books_storage)
+        use_case = DeleteBookUseCase(
+            book_storage=self._books_storage,
+            deleted_hash_storage=self._deleted_hash_storage,
+        )
         result = await use_case.execute(book_id)
         if isinstance(result, DomainError):
             return HTMLResponse(payload=str(result))
@@ -282,12 +289,18 @@ class DeleteBookController:
 class DeleteClippingController:
     @inject
     def __init__(
-        self, books_storage: BooksStorageABC = Provide(get_books_storage)
+        self,
+        books_storage: BooksStorageABC = Provide(get_books_storage),
+        deleted_hash_storage: DeletedHashStorageABC = Provide(get_deleted_hash_storage),
     ) -> None:
         self._books_storage = books_storage
+        self._deleted_hash_storage = deleted_hash_storage
 
     async def fire(self, book_id: str, clipping_id: str) -> HTMLResponse:
-        use_case = DeleteClippingUseCase(book_storage=self._books_storage)
+        use_case = DeleteClippingUseCase(
+            book_storage=self._books_storage,
+            deleted_hash_storage=self._deleted_hash_storage,
+        )
         result = await use_case.execute(book_id, clipping_id)
         if isinstance(result, DomainError):
             return HTMLResponse(payload=str(result))
@@ -297,14 +310,20 @@ class DeleteClippingController:
 class DeleteInlineNoteController:
     @inject
     def __init__(
-        self, books_storage: BooksStorageABC = Provide(get_books_storage)
+        self,
+        books_storage: BooksStorageABC = Provide(get_books_storage),
+        deleted_hash_storage: DeletedHashStorageABC = Provide(get_deleted_hash_storage),
     ) -> None:
         self._books_storage = books_storage
+        self._deleted_hash_storage = deleted_hash_storage
 
     async def fire(
         self, book_id: str, clipping_id: str, inline_note_id: str
     ) -> Response:
-        use_case = DeleteInlineNoteUseCase(book_storage=self._books_storage)
+        use_case = DeleteInlineNoteUseCase(
+            book_storage=self._books_storage,
+            deleted_hash_storage=self._deleted_hash_storage,
+        )
         result = await use_case.execute(
             book_id=book_id,
             clipping_id=clipping_id,
@@ -320,3 +339,19 @@ class DeleteInlineNoteController:
             inline_note_id=inline_note_id,
         )
         return RedirectResponse(url=redirect.value, status_code=303)
+
+
+class ClearDeletedHashesController:
+    @inject
+    def __init__(
+        self,
+        deleted_hash_storage: DeletedHashStorageABC = Provide(get_deleted_hash_storage),
+    ) -> None:
+        self._deleted_hash_storage = deleted_hash_storage
+
+    async def fire(self) -> Response:
+        use_case = ClearDeletedHashesUseCase(
+            deleted_hash_storage=self._deleted_hash_storage
+        )
+        await use_case.execute()
+        return HTMLResponse(payload="", status_code=200)

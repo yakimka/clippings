@@ -102,7 +102,7 @@ class Book:
         new_clipping = clipping.restore(inline_note)
         if isinstance(new_clipping, DomainError):
             return new_clipping
-        clipping.remove_inline_note(inline_note_id)
+        clipping.remove_inline_note(inline_note)
         self.add_clippings([new_clipping])
         return None
 
@@ -169,6 +169,12 @@ class Clipping:
                 return note
         return None
 
+    def remove_inline_note(self, inline_note: InlineNote) -> None:
+        for i, item in enumerate(self.inline_notes):
+            if inline_note.id == item.id:
+                del self.inline_notes[i]
+                break
+
     def add_inline_note(self, inline_note: InlineNote) -> None:
         self.inline_notes.append(inline_note)
 
@@ -185,5 +191,13 @@ class Clipping:
             added_at=inline_note.added_at,
         )
 
-    def remove_inline_note(self, note_id: str) -> None:
-        self.inline_notes = [note for note in self.inline_notes if note.id != note_id]
+
+@dataclass
+class DeletedHash:
+    id: str
+
+    @classmethod
+    def from_ids(cls, book_id: str, clipping_id: str | None = None) -> DeletedHash:
+        if not clipping_id:
+            return cls(id=book_id)
+        return cls(id=f"{book_id}:{clipping_id}")
