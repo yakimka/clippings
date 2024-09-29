@@ -49,7 +49,7 @@ class EditBookInfoFormPresenter:
         builder = BookDetailBuilder(book, self._urls_manager)
 
         data = EditBookInfoDTO(
-            cover_url=builder.cover_url(),
+            cover_url=builder.cover_url_big(),
             title=book.title,
             authors=book.authors_to_str(),
             rating=str(book.rating),

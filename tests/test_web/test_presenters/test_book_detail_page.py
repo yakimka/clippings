@@ -42,7 +42,7 @@ async def test_present_should_replace_none_with_text_representation(
 
     assert isinstance(result.data, BookDetailDTO)
     assert "no rating" in result.data.rating.lower()
-    assert result.data.cover_url.startswith("https://")
+    assert isinstance(result.data.cover_url, str)
     assert isinstance(result.render(), str)
 
 

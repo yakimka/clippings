@@ -116,7 +116,7 @@ class BookDetailBuilder:
     def detail_dto(self) -> BookDetailDTO:
         return BookDetailDTO(
             page_title=f"{self.book.title} Clippings",
-            cover_url=self.cover_url(),
+            cover_url=self.cover_url_small(),
             title=self.book.title,
             authors=f"by {self.book.authors_to_str()}",
             rating=(
@@ -146,8 +146,11 @@ class BookDetailBuilder:
             ],
         )
 
-    def cover_url(self) -> str:
-        return image_or_default(self.book.cover_url)
+    def cover_url_small(self) -> str:
+        return image_or_default(self.book.cover_url, size="small")
+
+    def cover_url_big(self) -> str:
+        return image_or_default(self.book.cover_url, size="big")
 
     def clipping_data_dto(self, clipping_id: str) -> ClippingDataDTO:
         clipping = self.clippings_by_id[clipping_id]
