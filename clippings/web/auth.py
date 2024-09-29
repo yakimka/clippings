@@ -33,6 +33,8 @@ class BasicAuthBackend(AuthenticationBackend):
         request_context: dict = Provide(get_request_context),
         auth_use_case: AuthenticateUserUseCase = Provide(get_auth_use_case),
     ) -> tuple[AuthCredentials, SimpleUser] | None:
+        request_context["base_url"] = str(conn.base_url)
+
         if "Authorization" not in conn.headers:
             return None
 
@@ -51,6 +53,7 @@ class BasicAuthBackend(AuthenticationBackend):
             return None
 
         request_context["user_id"] = result.id
+        request_context["user_nickname"] = result.nickname
         return AuthCredentials(["authenticated"]), SimpleUser(result.nickname)
 
 

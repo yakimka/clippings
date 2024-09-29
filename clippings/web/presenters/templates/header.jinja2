@@ -1,4 +1,22 @@
 <header class="container" style="padding-bottom: 0;">
-    <h6><a href="/">Clippings</a></h6>
+    <nav>
+      <ul>
+        <li><a href="/" class="contrast">{{ global_data.home_link_text }}</a></li>
+      </ul>
+      <ul>
+        <li>
+          <details class="dropdown">
+            <summary role="button" class="outline contrast">
+              {{ global_data.nav_menu.title }}
+            </summary>
+            <ul dir="rtl">
+              {% for item in global_data.nav_menu.items %}
+              <li hx-target="this"><a href="#" {{ hx_link(item.url) }} hx-swap="delete">{{ item.text }}</a></li>
+              {% endfor %}
+            </ul>
+          </details>
+        </li>
+      </ul>
+    </nav>
     <hr>
 </header>

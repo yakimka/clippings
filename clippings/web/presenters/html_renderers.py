@@ -4,6 +4,11 @@ from typing import TYPE_CHECKING, Any
 
 from jinja2 import Environment, PackageLoader, StrictUndefined
 from markupsafe import Markup
+from picodi import Provide, inject
+
+from clippings.web.deps import get_request_context
+from clippings.web.presenters.global_data import create_global_data
+from clippings.web.presenters.urls import urls_manager
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -32,8 +37,12 @@ jinja_env.globals.update(hx_link=hx_link, split_by_newline=split_by_newline)
 
 
 def make_html_renderer(template_name: str) -> Callable[[Any], str]:
-    def render(data: Any) -> str:
-        return jinja_env.get_template(template_name).render(data=data)
+    @inject
+    def render(data: Any, request_context: dict = Provide(get_request_context)) -> str:
+        global_data = create_global_data(request_context, urls_manager=urls_manager)
+        return jinja_env.get_template(template_name).render(
+            data=data, global_data=global_data
+        )
 
     return render
 
