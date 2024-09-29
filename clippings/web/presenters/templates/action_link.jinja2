@@ -3,6 +3,6 @@
     {% if hx_target is defined %}
     hx-target="{{ hx_target }}"
     {% endif %}
-    {{ hx_link(action.url) }}>
+    {{ hx_action(action) }}>
     <small>{{ action.label }}</small>
 </span>

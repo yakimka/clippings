@@ -1,5 +1,5 @@
 <form
-        {{ hx_link(data.actions_map.save.url) }}
+        {{ hx_action(data.actions_map.save) }}
         hx-target="this"
         hx-swap="outerHTML">
   <textarea
@@ -15,7 +15,7 @@
         />
         <button
                 class="secondary"
-                {{ hx_link(data.actions_map.cancel.url) }}
+                {{ hx_action(data.actions_map.cancel) }}
         >
             {{ data.actions_map.cancel.label }}
         </button>

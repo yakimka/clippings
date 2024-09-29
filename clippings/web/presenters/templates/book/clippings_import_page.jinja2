@@ -7,7 +7,7 @@
         <section>
             <form
                     hx-encoding="multipart/form-data"
-                    {{ hx_link(data.import_action.url) }}>
+                    {{ hx_action(data.import_action) }}>
                 <input
                         name="file"
                         type="file"

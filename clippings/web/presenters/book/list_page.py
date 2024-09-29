@@ -32,13 +32,8 @@ class BookOnPageDTO:
 class BooksPageDTO:
     page_title: str
     books: list[BookOnPageDTO]
-    actions: list[ActionDTO]
     fields_meta: dict[str, dict[str, str]]
     pagination: list[PaginationItemDTO]
-
-    @property
-    def actions_map(self) -> dict[str, ActionDTO]:
-        return {action.id: action for action in self.actions}
 
 
 class BooksListPagePresenter:
@@ -94,6 +89,9 @@ class BooksListPagePresenter:
                         ActionDTO(
                             id="book_delete",
                             label="Delete",
+                            confirm_message=(
+                                f"Are you sure you want to delete {book.title}?"
+                            ),
                             url=self._urls_manager.build_url(
                                 "book_delete", book_id=book.id
                             ),
@@ -101,13 +99,6 @@ class BooksListPagePresenter:
                     ],
                 )
                 for book in books
-            ],
-            actions=[
-                ActionDTO(
-                    id="import_clippings",
-                    label="Import",
-                    url=self._urls_manager.build_url("clipping_import_page"),
-                )
             ],
             fields_meta={
                 "cover_url": {"label": "Cover"},
