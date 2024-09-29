@@ -6,6 +6,7 @@ from jinja2 import Environment, PackageLoader, StrictUndefined
 from markupsafe import Markup
 from picodi import Provide, inject
 
+from clippings.web import markdown
 from clippings.web.deps import get_request_context
 from clippings.web.presenters.global_data import create_global_data
 from clippings.web.presenters.urls import urls_manager
@@ -34,15 +35,12 @@ def hx_action(action: ActionDTO) -> Markup:
     return Markup(" ".join(filter(None, [hx_url, hx_confirm])))
 
 
-def split_by_newline(text: str) -> list[str]:
-    text = text.strip()
-    if not text:
-        return []
-    return text.split("\n")
+def render_md_safe(text: str) -> Markup:
+    return Markup(markdown.render_safe(text))
 
 
 jinja_env.globals.update(
-    hx_link=hx_link, hx_action=hx_action, split_by_newline=split_by_newline
+    hx_link=hx_link, hx_action=hx_action, render_md_safe=render_md_safe
 )
 
 
