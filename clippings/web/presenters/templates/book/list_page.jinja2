@@ -7,12 +7,6 @@
 <main class="container">
     <h1>{{ data.page_title }}</h1>
 
-    <div role="group">
-        <a role="button" href="{{ data.actions_map.import_clippings.url.value }}">
-            {{ data.actions_map.import_clippings.label }}
-        </a>
-    </div>
-
     <table>
         <thead>
         <tr>
@@ -41,7 +35,7 @@
                 <div role="group">
                     <button
                         class="secondary"
-                        {{ hx_link(book.actions_map.book_delete.url) }}
+                        {{ hx_action(book.actions_map.book_delete) }}
                         hx-target="closest tr">{{ book.actions_map.book_delete.label }}
                     </button>
                 </div>

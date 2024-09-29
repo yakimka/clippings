@@ -10,8 +10,12 @@
               {{ global_data.nav_menu.title }}
             </summary>
             <ul dir="rtl">
-              {% for item in global_data.nav_menu.items %}
-              <li hx-target="this"><a href="#" {{ hx_link(item.url) }} hx-swap="delete">{{ item.text }}</a></li>
+              {% for action in global_data.nav_menu.actions %}
+              {% if action.id.startswith("goto_") %}
+              <li><a href="{{ action.url.value }}">{{ action.label }}</a></li>
+              {% else %}
+              <li hx-target="this"><a href="#" {{ hx_action(action) }} hx-swap="delete">{{ action.label }}</a></li>
+              {% endif %}
               {% endfor %}
             </ul>
           </details>

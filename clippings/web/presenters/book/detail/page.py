@@ -217,6 +217,7 @@ class BookDetailBuilder:
                 ActionDTO(
                     id="clipping_delete",
                     label="delete",
+                    confirm_message="Are you sure you want to delete this clipping?",
                     url=self.urls_manager.build_url(
                         "clipping_delete",
                         book_id=self.book.id,
@@ -246,6 +247,7 @@ class BookDetailBuilder:
                 ActionDTO(
                     id="delete",
                     label="delete",
+                    confirm_message="Are you sure you want to delete this note?",
                     url=self.urls_manager.build_url(
                         "inline_note_delete",
                         book_id=self.book.id,
@@ -260,6 +262,9 @@ class BookDetailBuilder:
                 ActionDTO(
                     id="unlink",
                     label="unlink",
+                    confirm_message=(
+                        "Are you sure you want to unlink this note from the highlight?"
+                    ),
                     url=self.urls_manager.build_url(
                         "inline_note_unlink",
                         book_id=self.book.id,

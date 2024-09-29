@@ -3,8 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from clippings.web.presenters.dtos import ActionDTO, UrlDTO
+
 if TYPE_CHECKING:
-    from clippings.web.presenters.dtos import UrlDTO
     from clippings.web.presenters.urls import UrlsManager
 
 
@@ -17,7 +18,7 @@ class MenuItem:
 @dataclass
 class NavMenu:
     title: str
-    items: list[MenuItem]
+    actions: list[ActionDTO]
 
 
 @dataclass
@@ -33,12 +34,27 @@ def create_global_data(request_context: dict, urls_manager: UrlsManager) -> Glob
         home_link_url="/",
         nav_menu=NavMenu(
             title=request_context.get("user_nickname", "Username"),
-            items=[
-                MenuItem(
-                    text="Reset deleted memory",
-                    url=urls_manager.build_url("deleted_hash_clear"),
+            actions=[
+                ActionDTO(
+                    id="goto_import_page",
+                    label="Import clippings",
+                    url=urls_manager.build_url("clipping_import_page"),
                 ),
-                MenuItem(text="Logout", url=urls_manager.build_url("logout")),
+                ActionDTO(
+                    id="reset_deleted_memory",
+                    label="Reset deleted memory",
+                    url=urls_manager.build_url("deleted_hash_clear"),
+                    confirm_message=(
+                        "When you delete your clippings, we save a hash for each "
+                        "removed item. This helps us prevent reimporting clippings "
+                        "that you've already deleted. Resetting this memory will allow "
+                        "those clippings to be imported again, even if they were "
+                        "previously deleted. This action cannot be undone."
+                    ),
+                ),
+                ActionDTO(
+                    id="logout", label="Logout", url=urls_manager.build_url("logout")
+                ),
             ],
         ),
     )

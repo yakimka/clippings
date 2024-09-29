@@ -55,6 +55,7 @@ class ActionDTO:
     id: str
     label: str
     url: UrlDTO | None
+    confirm_message: str = ""
 
 
 @dataclass
