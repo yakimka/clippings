@@ -65,7 +65,11 @@
             return themes[(currentThemeIndex + 1) % themes.length]
         }
         const setTheme = (theme) => {
-            html.setAttribute('data-theme', theme)
+            if (theme === 'auto') {
+                html.removeAttribute('data-theme')
+            } else {
+                html.setAttribute('data-theme', theme)
+            }
             switchTheme.innerHTML = icons[themes.indexOf(theme)]
             switchTheme.setAttribute('title', theme)
             localStorage.setItem('theme', theme)
