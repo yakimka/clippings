@@ -1,13 +1,18 @@
+from pathlib import Path
+
 import picodi
 from picodi.integrations.starlette import RequestScopeMiddleware
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.authentication import AuthenticationMiddleware
-from starlette.routing import Route
+from starlette.routing import Mount, Route
+from starlette.staticfiles import StaticFiles
 
 from clippings.web.auth import BasicAuthBackend
 from clippings.web.presenters.urls import urls_manager
 from clippings.web.views import get_views_map
+
+CURRENT_DIR = Path(__file__).parent
 
 
 async def startup() -> None:
@@ -37,7 +42,17 @@ middleware = [
 ]
 
 app = Starlette(
-    debug=True, routes=make_routes(), middleware=middleware, on_startup=[startup]
+    debug=True,
+    routes=[
+        *make_routes(),
+        Mount(
+            "/static",
+            app=StaticFiles(directory=CURRENT_DIR / "presenters" / "static"),
+            name="static",
+        ),
+    ],
+    middleware=middleware,
+    on_startup=[startup],
 )
 
 
