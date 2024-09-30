@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic, Literal, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Generic, Literal, TypeVar
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -17,31 +17,6 @@ class PresenterResult(Generic[T]):
 
     def render(self) -> str:
         return self.renderer(self.data)
-
-    @classmethod
-    def not_found(cls) -> NotFoundPresenterResult:
-        from clippings.web.presenters.html_renderers import not_found_page_renderer
-
-        data = NotFoundDTO(
-            page_title="Not Found",
-            message="Sorry, the page you are looking for does not exist.",
-            go_to_home_action=ActionDTO(
-                id="go_to_home",
-                label="Go to the home page",
-                url=UrlDTO(value="/"),
-            ),
-        )
-        return PresenterResult(data, not_found_page_renderer)
-
-
-@dataclass
-class NotFoundDTO:
-    page_title: str
-    message: str
-    go_to_home_action: ActionDTO
-
-
-NotFoundPresenterResult: TypeAlias = PresenterResult[NotFoundDTO]
 
 
 @dataclass

@@ -3,10 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from clippings.web.presenters.dtos import NotFoundDTO, PresenterResult
+from clippings.web.presenters.book.system_pages import NotFoundDTO
 
 if TYPE_CHECKING:
     from typing_extensions import Self
+
+    from clippings.web.presenters.dtos import PresenterResult
 
 
 @dataclass(kw_only=True)

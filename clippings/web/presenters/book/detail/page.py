@@ -10,11 +10,11 @@ from clippings.web.presenters.book.detail.dtos import (
     ClippingInfoDTO,
     InlineNoteDTO,
 )
-from clippings.web.presenters.dtos import (
-    ActionDTO,
-    NotFoundPresenterResult,
-    PresenterResult,
+from clippings.web.presenters.book.system_pages import (
+    NotFoundDTO,
+    not_found_page_presenter,
 )
+from clippings.web.presenters.dtos import ActionDTO, PresenterResult
 from clippings.web.presenters.html_renderers import make_html_renderer
 from clippings.web.presenters.image import image_or_default
 
@@ -67,10 +67,10 @@ class BookDetailPagePresenter:
 
     async def present(
         self, book_id: str, part: BookDetailPagePart = BookDetailPagePart.ALL
-    ) -> PresenterResult[BookDetailDTO] | NotFoundPresenterResult:
+    ) -> PresenterResult[BookDetailDTO] | PresenterResult[NotFoundDTO]:
         book = await self._storage.get(book_id)
         if book is None:
-            return PresenterResult.not_found()
+            return not_found_page_presenter()
         builder = BookDetailBuilder(book, self._urls_manager)
 
         return PresenterResult(
@@ -89,13 +89,13 @@ class ClippingPresenter:
 
     async def present(
         self, book_id: str, clipping_id: str
-    ) -> PresenterResult[ClippingDTO] | NotFoundPresenterResult:
+    ) -> PresenterResult[ClippingDTO] | PresenterResult[NotFoundDTO]:
         book = await self._storage.get(book_id)
         if book is None:
-            return PresenterResult.not_found()
+            return not_found_page_presenter()
         clipping = book.get_clipping(clipping_id)
         if clipping is None:
-            return PresenterResult.not_found()
+            return not_found_page_presenter()
         builder = BookDetailBuilder(book, self._urls_manager)
 
         return PresenterResult(
