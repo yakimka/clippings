@@ -53,6 +53,3 @@ def make_html_renderer(template_name: str) -> Callable[[Any], str]:
         )
 
     return render
-
-
-not_found_page_renderer = make_html_renderer("404_not_found.jinja2")

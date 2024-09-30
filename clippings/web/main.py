@@ -11,13 +11,13 @@ from starlette.staticfiles import StaticFiles
 from clippings.web.auth import BasicAuthBackend
 from clippings.web.presenters.urls import urls_manager
 from clippings.web.views import get_views_map
+from clippings.web.views.system import not_found_view, server_error_view
 
 CURRENT_DIR = Path(__file__).parent
 
 
 async def startup() -> None:
     await picodi.init_dependencies()
-    print("Ready to go")
 
 
 def make_routes() -> list[Route]:
@@ -36,23 +36,28 @@ def make_routes() -> list[Route]:
     return result
 
 
+exception_handlers = {
+    404: not_found_view,
+    500: server_error_view,
+}
+
 middleware = [
     Middleware(RequestScopeMiddleware),
     Middleware(AuthenticationMiddleware, backend=BasicAuthBackend()),
 ]
 
 app = Starlette(
-    debug=True,
     routes=[
         *make_routes(),
         Mount(
-            "/static",
-            app=StaticFiles(directory=CURRENT_DIR / "presenters" / "static"),
+            "/",
+            app=StaticFiles(directory=CURRENT_DIR / "presenters" / "public"),
             name="static",
         ),
     ],
     middleware=middleware,
     on_startup=[startup],
+    exception_handlers=exception_handlers,
 )
 
 

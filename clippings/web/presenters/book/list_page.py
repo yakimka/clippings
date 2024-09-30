@@ -32,6 +32,8 @@ class BookOnPageDTO:
 class BooksPageDTO:
     page_title: str
     books: list[BookOnPageDTO]
+    empty_message: str
+    empty_action: ActionDTO
     fields_meta: dict[str, dict[str, str]]
     pagination: list[PaginationItemDTO]
 
@@ -100,6 +102,12 @@ class BooksListPagePresenter:
                 )
                 for book in books
             ],
+            empty_message="There are no books yet. But don't worry, you can add some.",
+            empty_action=ActionDTO(
+                id="goto_import_page",
+                label="Go to the import page",
+                url=self._urls_manager.build_url("clipping_import_page"),
+            ),
             fields_meta={
                 "cover_url": {"label": "Cover"},
                 "name": {"label": "Book"},

@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING
 
 from clippings.web.presenters.book.detail.dtos import ClippingDataDTO
 from clippings.web.presenters.book.detail.page import BookDetailBuilder
-from clippings.web.presenters.dtos import (
-    ActionDTO,
-    NotFoundPresenterResult,
-    PresenterResult,
+from clippings.web.presenters.book.system_pages import (
+    NotFoundDTO,
+    not_found_page_presenter,
 )
+from clippings.web.presenters.dtos import ActionDTO, PresenterResult
 from clippings.web.presenters.html_renderers import make_html_renderer
 
 if TYPE_CHECKING:
@@ -42,10 +42,10 @@ class EditBookInfoFormPresenter:
 
     async def present(
         self, book_id: str
-    ) -> PresenterResult[EditBookInfoDTO] | NotFoundPresenterResult:
+    ) -> PresenterResult[EditBookInfoDTO] | PresenterResult[NotFoundDTO]:
         book = await self._storage.get(book_id)
         if book is None:
-            return PresenterResult.not_found()
+            return not_found_page_presenter()
         builder = BookDetailBuilder(book, self._urls_manager)
 
         data = EditBookInfoDTO(
@@ -105,10 +105,10 @@ class EditBookReviewFormPresenter:
 
     async def present(
         self, book_id: str
-    ) -> PresenterResult[EditBookReviewDTO] | NotFoundPresenterResult:
+    ) -> PresenterResult[EditBookReviewDTO] | PresenterResult[NotFoundDTO]:
         book = await self._storage.get(book_id)
         if book is None:
-            return PresenterResult.not_found()
+            return not_found_page_presenter()
         data = EditBookReviewDTO(
             review=book.review,
             actions=[
@@ -153,14 +153,14 @@ class EditClippingFormPresenter:
 
     async def present(
         self, book_id: str, clipping_id: str
-    ) -> PresenterResult[EditClippingDTO] | NotFoundPresenterResult:
+    ) -> PresenterResult[EditClippingDTO] | PresenterResult[NotFoundDTO]:
         book = await self._storage.get(book_id)
         if book is None:
-            return PresenterResult.not_found()
+            return not_found_page_presenter()
 
         clipping = book.get_clipping(clipping_id)
         if clipping is None:
-            return PresenterResult.not_found()
+            return not_found_page_presenter()
         builder = BookDetailBuilder(book, self._urls_manager)
         clipping_data = builder.clipping_data_dto(clipping_id)
 
@@ -212,10 +212,10 @@ class AddInlineNoteFormPresenter:
 
     async def present(
         self, book_id: str, clipping_id: str
-    ) -> PresenterResult[AddInlineNoteDTO] | NotFoundPresenterResult:
+    ) -> PresenterResult[AddInlineNoteDTO] | PresenterResult[NotFoundDTO]:
         book = await self._storage.get(book_id)
         if book is None or book.get_clipping(clipping_id) is None:
-            return PresenterResult.not_found()
+            return not_found_page_presenter()
 
         builder = BookDetailBuilder(book, self._urls_manager)
         clipping_data = builder.clipping_data_dto(clipping_id)
@@ -269,16 +269,16 @@ class EditInlineNoteFormPresenter:
 
     async def present(
         self, book_id: str, clipping_id: str, inline_note_id: str
-    ) -> PresenterResult[EditInlineNoteDTO] | NotFoundPresenterResult:
+    ) -> PresenterResult[EditInlineNoteDTO] | PresenterResult[NotFoundDTO]:
         book = await self._storage.get(book_id)
         if book is None:
-            return PresenterResult.not_found()
+            return not_found_page_presenter()
         clipping = book.get_clipping(clipping_id)
         if clipping is None:
-            return PresenterResult.not_found()
+            return not_found_page_presenter()
         inline_note = clipping.get_inline_note(inline_note_id)
         if inline_note is None:
-            return PresenterResult.not_found()
+            return not_found_page_presenter()
         data = EditInlineNoteDTO(
             content=inline_note.content,
             actions=[

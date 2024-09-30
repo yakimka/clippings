@@ -6,7 +6,7 @@ from clippings.web.presenters.book.detail.forms import (
     EditBookReviewDTO,
     EditBookReviewFormPresenter,
 )
-from clippings.web.presenters.dtos import NotFoundDTO
+from clippings.web.presenters.book.system_pages import NotFoundDTO
 from clippings.web.presenters.urls import urls_manager
 
 
