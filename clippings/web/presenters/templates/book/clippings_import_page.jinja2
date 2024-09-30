@@ -4,26 +4,24 @@
     <main class="container">
         <h1>{{ data.page_title }}</h1>
 
-        <section>
+        <section hx-target="this" hx-swap="outerHTML" class="grid">
             <form
                     hx-encoding="multipart/form-data"
+                    hx-disabled-elt="find #submit"
                     {{ hx_action(data.import_action) }}>
                 <input
                         name="file"
                         type="file"
                         placeholder="{{ data.import_action.label }}"
                 />
-                <progress id="progress" value="0" max="100"></progress>
                 <input
+                        id="submit"
                         type="submit"
                         value="{{ data.import_action.label }}"
                 />
             </form>
-            <script>
-                htmx.on('#form', 'htmx:xhr:progress', function (evt) {
-                    htmx.find('#progress').setAttribute('value', evt.detail.loaded / evt.detail.total * 100)
-                });
-            </script>
+            <div></div>
+            <div></div>
         </section>
     </main>
 {% endblock %}

@@ -15,12 +15,30 @@
         .action-link:hover {
           color: var(--pico-secondary-dark);
         }
+        .htmx-indicator{
+            display:none;
+        }
+        .htmx-request .htmx-indicator{
+            display:inline;
+        }
+        .htmx-request.htmx-indicator{
+            display:inline;
+        }
+        header {
+          background-color: var(--pico-background-color);
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+        }
+        header hr {
+            margin: 0;
+        }
     </style>
     <link rel="stylesheet" href="/static/pico.min.css">
     <script src="/static/htmx.min.js"></script>
     <title>{% block title %}{% endblock %}</title>
 </head>
-<body>
+<body hx-indicator="#head-indicator">
 {%  include "header.jinja2" %}
 {% block body %}{% endblock %}
 </body>
