@@ -38,6 +38,7 @@ motor = "^3.5.1"
 dacite = "^1.8.1"
 dynaconf = "^3.2.6"
 markdown-it-py = "^3.0.0"
+mmh3 = "^5.0.1"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.11.2"

@@ -14,9 +14,7 @@ def book_id_generator(book: BookForGenerateId) -> str:
 
 
 def clipping_id_generator(clipping: ClippingForGenerateId) -> str:
-    return hasher(
-        f"{clipping.page}_{clipping.location}_{clipping.content}_{clipping.added_at}"
-    )
+    return hasher(f"{clipping.page}_{clipping.location}_{clipping.content}")
 
 
 def inline_note_id_generator() -> str:
