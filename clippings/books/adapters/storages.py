@@ -58,7 +58,7 @@ class MockBooksStorage(BooksStorageABC):
 
 def mongo_book_serializer(book: Book, user_id: str) -> dict:
     book_dict = asdict(book)
-    book_dict["_id"] = book_dict.pop("id")
+    book_dict["_id"] = f"{user_id}|{book_dict['id']}"
     book_dict["user_id"] = user_id
     for clipping in book_dict["clippings"]:
         clipping["type"] = clipping["type"].value
@@ -67,7 +67,6 @@ def mongo_book_serializer(book: Book, user_id: str) -> dict:
 
 def mongo_book_deserializer(book: dict) -> Book:
     book_dict = book.copy()
-    book_dict["id"] = book_dict.pop("_id")
     return from_dict(
         data_class=Book,
         data=book_dict,
@@ -89,18 +88,18 @@ class MongoBooksStorage(BooksStorageABC):
         self._deserializer = deserializer
 
     async def get(self, id: str) -> Book | None:
-        book = await self._collection.find_one({"_id": id, "user_id": self._user_id})
+        book = await self._collection.find_one({"id": id, "user_id": self._user_id})
         return self._deserializer(dict(book)) if book else None
 
     async def get_many(self, ids: list[str]) -> list[Book]:
         books = await self._collection.find(
-            {"_id": {"$in": ids}, "user_id": self._user_id}
+            {"id": {"$in": ids}, "user_id": self._user_id}
         ).to_list(None)
         return [self._deserializer(dict(book)) for book in books]
 
     async def add(self, book: Book) -> None:
         await self._collection.replace_one(
-            {"_id": book.id},
+            {"id": book.id},
             self._serializer(book, self._user_id),
             upsert=True,
         )
@@ -108,14 +107,14 @@ class MongoBooksStorage(BooksStorageABC):
     async def extend(self, books: list[Book]) -> None:
         operations: list[ReplaceOne[Mapping[str, Any]]] = [
             ReplaceOne(
-                {"_id": book.id}, self._serializer(book, self._user_id), upsert=True
+                {"id": book.id}, self._serializer(book, self._user_id), upsert=True
             )
             for book in books
         ]
         await self._collection.bulk_write(operations)
 
     async def remove(self, book: Book) -> None:
-        await self._collection.delete_one({"_id": book.id})
+        await self._collection.delete_one({"id": book.id})
 
     async def find(
         self, query: BooksStorageABC.FindQuery = BooksStorageABC.DEFAULT_FIND_QUERY
@@ -125,7 +124,7 @@ class MongoBooksStorage(BooksStorageABC):
 
         cursor = (
             self._collection.find({"user_id": self._user_id})
-            .sort([("title", 1), ("_id", 1)])
+            .sort([("title", 1), ("id", 1)])
             .skip(query.start)
         )
         if query.limit is not None:

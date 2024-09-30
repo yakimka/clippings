@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 class AsyncCommand:
     @classmethod
     def setup_parser(cls, parser: argparse.ArgumentParser) -> None:
-        raise NotImplementedError
+        pass
 
     async def run(self, args: argparse.Namespace) -> None:
         raise NotImplementedError
