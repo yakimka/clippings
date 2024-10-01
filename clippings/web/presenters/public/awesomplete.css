@@ -39,6 +39,6 @@
 }
 
 .awesomplete li[aria-selected="true"] {
-    background-color: var(--pico-color);
-    color: var(--pico-muted-color);
+    background-color: var(--pico-secondary-background);
+    color: var(--pico-secondary-inverse);
 }
