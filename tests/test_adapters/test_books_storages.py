@@ -14,11 +14,13 @@ if TYPE_CHECKING:
 
 @pytest.fixture(params=["mock", "mongo"])
 def make_sut(request, mongo_db):
-    async def _make_sut(books: list[Book] | None = None) -> BooksStorageABC:
+    async def _make_sut(
+        books: list[Book] | None = None, user_id: str = "test_user:1"
+    ) -> BooksStorageABC:
         if request.param == "mock":
             storage = MockBooksStorage()
         elif request.param == "mongo":
-            storage = MongoBooksStorage(mongo_db, "test_user:1")
+            storage = MongoBooksStorage(mongo_db, user_id)
         else:
             raise ValueError(f"Unknown storage type: {request.param}")
         if books:
@@ -147,3 +149,84 @@ async def test_can_get_count_of_books(make_sut, make_books):
     result = await sut.count(sut.FindQuery(start=0, limit=None))
 
     assert result == 42
+
+
+async def test_user_can_get_only_his_books(make_sut, mother):
+    await make_sut([mother.book(id="book:1")], user_id="user1")
+    sut = await make_sut(user_id="user2")
+
+    result_all = await sut.find()
+    result_by_id = await sut.get("book:1")
+
+    assert result_all == []
+    assert result_by_id is None
+
+
+async def test_user_can_delete_only_his_books(make_sut, mother):
+    book = mother.book(id="book:1")
+    sut1 = await make_sut([book], user_id="user1")
+    sut2 = await make_sut(user_id="user2")
+
+    await sut2.remove(book)
+    result = await sut1.get("book:1")
+
+    assert result == book
+
+
+async def test_user_can_update_only_his_books(make_sut, mother):
+    book = mother.book(id="book:1", title="Title")
+    sut1 = await make_sut([book], user_id="user1")
+    sut2 = await make_sut(user_id="user2")
+
+    new_book = mother.book(id="book:1", title="Changed Title")
+    await sut2.add(new_book)
+    result = await sut1.get("book:1")
+
+    assert result.title == "Title"
+
+
+async def test_user_can_multiupdate_only_his_books(make_sut, mother):
+    book = mother.book(id="book:1", title="Title")
+    sut1 = await make_sut([book], user_id="user1")
+    sut2 = await make_sut(user_id="user2")
+
+    new_book = mother.book(id="book:1", title="Changed Title")
+    await sut2.extend([new_book])
+    result = await sut1.get("book:1")
+
+    assert result.title == "Title"
+
+
+async def test_get_distinct_authors_from_saved_books(make_sut, mother):
+    books = [
+        mother.book(id="book:1", authors=["Stephen King"]),
+        mother.book(id="book:2", authors=["Stephen King", "Peter Straub"]),
+        mother.book(id="book:3", authors=["J. R. R. Tolkien", "J. R. R. Tolkien"]),
+        mother.book(id="book:4", authors=["Philip K. Dick"]),
+    ]
+    sut = await make_sut(books)
+
+    result = await sut.distinct_authors()
+
+    assert len(result) == len(set(result))
+    assert set(result) == {
+        "Stephen King",
+        "Peter Straub",
+        "J. R. R. Tolkien",
+        "Philip K. Dick",
+    }
+
+
+async def test_get_authors_only_from_selected_user(make_sut, mother):
+    sut1 = await make_sut(
+        [mother.book(id="book:1", authors=["Author 1"])], user_id="user1"
+    )
+    sut2 = await make_sut(
+        [mother.book(id="book:1", authors=["Author 2"])], user_id="user2"
+    )
+
+    result1 = await sut1.distinct_authors()
+    result2 = await sut2.distinct_authors()
+
+    assert result1 == ["Author 1"]
+    assert result2 == ["Author 2"]

@@ -55,6 +55,9 @@ class MockBooksStorage(BooksStorageABC):
     async def count(self, query: BooksStorageABC.FindQuery) -> int:
         return len(await self.find(query))
 
+    async def distinct_authors(self) -> list[str]:
+        return list({author for book in self.books.values() for author in book.authors})
+
 
 def mongo_book_serializer(book: Book, user_id: str) -> dict:
     book_dict = asdict(book)
@@ -99,7 +102,7 @@ class MongoBooksStorage(BooksStorageABC):
 
     async def add(self, book: Book) -> None:
         await self._collection.replace_one(
-            {"id": book.id},
+            {"id": book.id, "user_id": self._user_id},
             self._serializer(book, self._user_id),
             upsert=True,
         )
@@ -107,14 +110,16 @@ class MongoBooksStorage(BooksStorageABC):
     async def extend(self, books: list[Book]) -> None:
         operations: list[ReplaceOne[Mapping[str, Any]]] = [
             ReplaceOne(
-                {"id": book.id}, self._serializer(book, self._user_id), upsert=True
+                {"id": book.id, "user_id": self._user_id},
+                self._serializer(book, self._user_id),
+                upsert=True,
             )
             for book in books
         ]
         await self._collection.bulk_write(operations)
 
     async def remove(self, book: Book) -> None:
-        await self._collection.delete_one({"id": book.id})
+        await self._collection.delete_one({"id": book.id, "user_id": self._user_id})
 
     async def find(
         self, query: BooksStorageABC.FindQuery = BooksStorageABC.DEFAULT_FIND_QUERY
@@ -149,6 +154,15 @@ class MongoBooksStorage(BooksStorageABC):
         result = await self._collection.aggregate(pipeline).to_list(None)
 
         return result[0]["total"] if result else 0
+
+    async def distinct_authors(self) -> list[str]:
+        pipeline: list[dict[str, Any]] = [
+            {"$match": {"user_id": self._user_id}},
+            {"$unwind": "$authors"},
+            {"$group": {"_id": "$authors"}},
+        ]
+        result = await self._collection.aggregate(pipeline).to_list(None)
+        return [doc["_id"] for doc in result]
 
 
 class MockDeletedHashStorage(DeletedHashStorageABC):

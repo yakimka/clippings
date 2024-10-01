@@ -19,26 +19,37 @@
             <label>
                 {{ fields.authors.label }}
                 <input
+                        id="authors-input"
+                        list="authors-list"
                         name="authors"
-                        data-list="Steven King, J.R.R. Tolkien, J.K. Rowling, George R.R. Martin, Stephen Hawking, Neil deGrasse Tyson"
-                        data-multiple
                         {% if fields.authors.required %}required{% endif %}
                         placeholder="{{ fields.authors.label }}"
                         value="{{ data.authors }}"
                 />
+                <datalist id="authors-list">
+                    {% for author in data.authors_autocomplete %}
+                        <option>{{ author }}</option>
+                    {% endfor %}
+                </datalist>
                 <script>
-                    new Awesomplete('input[data-multiple]', {
+                    const input = document.getElementById("authors-input");
+                    new Awesomplete(input, {
                         filter: function(text, input) {
-                            return Awesomplete.FILTER_CONTAINS(text, input.match(/[^,]*$/)[0]);
+                            return Awesomplete.FILTER_CONTAINS(text, input.match(/[^&]*$/)[0]);
                         },
 
                         item: function(text, input) {
-                            return Awesomplete.ITEM(text, input.match(/[^,]*$/)[0]);
+                            return Awesomplete.ITEM(text, input.match(/[^&]*$/)[0]);
                         },
 
                         replace: function(text) {
-                            var before = this.input.value.match(/^.+,\s*|/)[0];
-                            this.input.value = before + text + ", ";
+                            const before = this.input.value.match(/^.+&\s*|/)[0];
+                            const parts = before.split("&");
+                            const cleaned = parts.map(part => part.trim()).filter(part => part !== "");
+                            cleaned.push(text.trim());
+                            this.input.value = cleaned.join(" & ");
+                            // Move caret to the end of the input
+                            this.input.selectionStart = this.input.selectionEnd = this.input.value.length;
                         }
                     });
                 </script>
