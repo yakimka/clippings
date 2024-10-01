@@ -48,6 +48,10 @@ class BooksStorageABC(abc.ABC):
     async def count(self, query: FindQuery) -> int:
         pass
 
+    @abc.abstractmethod
+    async def distinct_authors(self) -> list[str]:
+        pass
+
 
 class DeletedHashStorageABC(abc.ABC):
     @abc.abstractmethod
