@@ -4,38 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
-    <style>
-        {% block style %}{% endblock %}
-        .action-link {
-          color: var(--pico-secondary);
-          text-decoration: underline dotted;
-          cursor: pointer;
-          margin: 0 2px;
-        }
-        .action-link:hover {
-          color: var(--pico-secondary-dark);
-        }
-        .htmx-indicator{
-            display:none;
-        }
-        .htmx-request .htmx-indicator{
-            display:inline;
-        }
-        .htmx-request.htmx-indicator{
-            display:inline;
-        }
-        header {
-          background-color: var(--pico-background-color);
-          position: sticky;
-          top: 0;
-          z-index: 1000;
-        }
-        header hr {
-            margin: 0;
-        }
-    </style>
     <link rel="stylesheet" href="/pico.min.css">
+    <link rel="stylesheet" href="/style.css">
     <script src="/htmx.min.js"></script>
+    {% block in_head %}{% endblock %}
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body hx-indicator="#head-indicator">

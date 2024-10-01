@@ -20,10 +20,28 @@
                 {{ fields.authors.label }}
                 <input
                         name="authors"
+                        data-list="Steven King, J.R.R. Tolkien, J.K. Rowling, George R.R. Martin, Stephen Hawking, Neil deGrasse Tyson"
+                        data-multiple
                         {% if fields.authors.required %}required{% endif %}
                         placeholder="{{ fields.authors.label }}"
                         value="{{ data.authors }}"
                 />
+                <script>
+                    new Awesomplete('input[data-multiple]', {
+                        filter: function(text, input) {
+                            return Awesomplete.FILTER_CONTAINS(text, input.match(/[^,]*$/)[0]);
+                        },
+
+                        item: function(text, input) {
+                            return Awesomplete.ITEM(text, input.match(/[^,]*$/)[0]);
+                        },
+
+                        replace: function(text) {
+                            var before = this.input.value.match(/^.+,\s*|/)[0];
+                            this.input.value = before + text + ", ";
+                        }
+                    });
+                </script>
             </label>
             <label>
                 {{ fields.rating.label }}
