@@ -58,7 +58,11 @@ class EditBookInfoFormPresenter:
             rating=str(book.rating),
             fields_meta={
                 "title": {"label": "Book Title", "required": True},
-                "authors": {"label": "Authors", "required": True},
+                "authors": {
+                    "label": "Authors",
+                    "required": True,
+                    "tooltip": "You can add multiple authors separated by &",
+                },
                 "rating": {
                     "label": "Rating",
                     "min": "1",

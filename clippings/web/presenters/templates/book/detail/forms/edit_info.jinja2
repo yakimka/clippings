@@ -18,6 +18,7 @@
             </label>
             <label>
                 {{ fields.authors.label }}
+                {% if fields.authors.tooltip %}<span data-tooltip="{{ fields.authors.tooltip }}">( ? )</span>{% endif %}
                 <input
                         id="authors-input"
                         list="authors-list"
