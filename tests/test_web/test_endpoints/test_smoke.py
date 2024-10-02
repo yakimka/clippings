@@ -18,6 +18,12 @@ def clippings_for_upload():
         yield file
 
 
+async def test_home_page(client):
+    response = await client.get("/", follow_redirects=True)
+
+    assert response.status_code == 200
+
+
 @pytest.mark.parametrize(
     "url_template",
     [item.template for item in urls_manager.get_by_tag("book") if item.method == "get"],

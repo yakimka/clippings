@@ -11,7 +11,7 @@ class RedirectMiddleware:
         self.app = app
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        if scope["path"].endswith("/"):
-            scope["path"] = scope["path"].removesuffix("/")
+        if not scope["path"].endswith("/"):
+            scope["path"] = f"{scope['path']}/"
             scope["raw_path"] = scope["path"].encode("utf-8")
         await self.app(scope, receive, send)
