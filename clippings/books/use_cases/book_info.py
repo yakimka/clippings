@@ -8,6 +8,8 @@ class MockBookInfoClient(BookInfoClientABC):
             "N6EGEAAAQBAJ",
             "MoEO9onVftUC",
             "zFheDgAAQBAJ",
+            "DkexBQAAQBAJ",
+            "kYZHCgAAQBAJ",
         ]
 
         def make_google_books_img_urls(id: str, zoom: int) -> str:
@@ -27,11 +29,10 @@ class MockBookInfoClient(BookInfoClientABC):
     async def get(
         self, title: str, author: str | None = None
     ) -> BookInfoSearchResultDTO | None:
-        title_len = len(title)
-        if title_len % 2 == 0:
+        if "ч" in title:
             return None
 
-        small_img, large_img = self._images[title_len % len(self._images)]
+        small_img, large_img = self._images[len(title) % len(self._images)]
         return BookInfoSearchResultDTO(
             isbns=[],
             title=title,

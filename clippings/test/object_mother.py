@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from clippings.books.dtos import BookDTO, ClippingImportCandidateDTO
 from clippings.books.entities import (
     Book,
+    BookMeta,
     Clipping,
     ClippingType,
     DeletedHash,
@@ -30,7 +31,7 @@ class ObjectMother:
         id: str = "book:id",
         title: str = "The Book",
         authors: Iterable[str] = ("The Author",),
-        cover_url: str | None = "https://placehold.co/400x600",
+        meta: BookMeta | None = None,
         review: str = "",
         rating: int | None = None,
         clippings: list[Clipping] | None = None,
@@ -41,10 +42,23 @@ class ObjectMother:
             id=id,
             title=title,
             authors=list(authors),
-            cover_url=cover_url,
+            meta=meta or self.book_meta(),
             clippings=clippings,
             review=review,
             rating=rating,
+        )
+
+    def book_meta(
+        self,
+        *,
+        isbns: Iterable[str] = ("1234567890",),
+        cover_image_small: str = "https://placehold.co/100x150",
+        cover_image_big: str = "https://placehold.co/400x600",
+    ) -> BookMeta:
+        return BookMeta(
+            isbns=list(isbns),
+            cover_image_small=cover_image_small,
+            cover_image_big=cover_image_big,
         )
 
     def clipping(

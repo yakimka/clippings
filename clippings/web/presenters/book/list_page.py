@@ -75,7 +75,9 @@ class BooksListPagePresenter:
             page_title="Books",
             books=[
                 BookOnPageDTO(
-                    cover_url=image_or_default(book.cover_url, size="small"),
+                    cover_url=image_or_default(
+                        getattr(book.meta, "cover_image_small", None), size="small"
+                    ),
                     name=f"{book.title} by {book.authors[0]}",
                     clippings_count=len(book.clippings),
                     last_clipping_added_at=last_clipping_date(book.clippings),

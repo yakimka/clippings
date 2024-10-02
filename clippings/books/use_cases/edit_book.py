@@ -40,17 +40,6 @@ class TitleDTO(BookFieldDTO):
 
 
 @dataclass(kw_only=True)
-class CoverUrlDTO(BookFieldDTO):
-    cover_url: str | None
-
-    def apply(self, book: Book) -> bool:
-        if book.cover_url != self.cover_url:
-            book.cover_url = self.cover_url
-            return True
-        return False
-
-
-@dataclass(kw_only=True)
 class RatingDTO(BookFieldDTO):
     rating: int | None
 

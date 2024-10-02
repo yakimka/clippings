@@ -71,7 +71,7 @@ async def test_import_single_clipping(
         id="1",
         title="The Book",
         authors=["The Author"],
-        cover_url=None,
+        meta=None,
         clippings=[
             Clipping(
                 id=ANY,

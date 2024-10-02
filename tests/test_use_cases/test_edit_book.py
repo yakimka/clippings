@@ -4,7 +4,6 @@ import pytest
 
 from clippings.books.ports import BooksStorageABC
 from clippings.books.use_cases.edit_book import (
-    CoverUrlDTO,
     EditBookUseCase,
     RatingDTO,
     ReviewDTO,
@@ -39,25 +38,6 @@ async def test_update_book_with_title_and_authors(make_sut, mock_book_storage, m
     updated_book = await mock_book_storage.get("book-id")
     assert updated_book.title == "New Title"
     assert updated_book.authors_to_str() == "New Author"
-
-
-@pytest.mark.parametrize("new_cover_url", ["http://newcover.url", None])
-async def test_update_book_cover_url(
-    make_sut, mock_book_storage, mother, new_cover_url
-):
-    # Arrange
-    book = mother.book(id="book-id", cover_url="http://oldcover.url")
-    await mock_book_storage.add(book)
-    sut = make_sut()
-    fields = [CoverUrlDTO(cover_url=new_cover_url)]
-
-    # Act
-    result = await sut.execute("book-id", fields)
-
-    # Assert
-    assert result is None
-    updated_book = await mock_book_storage.get("book-id")
-    assert updated_book.cover_url == new_cover_url
 
 
 @pytest.mark.parametrize("new_rating", [9, None])
@@ -100,7 +80,6 @@ async def test_do_not_update_when_no_fields_change(make_sut, mother):
         title="Test Title",
         authors=["Author 1"],
         review="Test Review",
-        cover_url="http://cover.url",
         rating=5,
     )
     book_storage = create_autospec(BooksStorageABC, instance=True)
@@ -108,7 +87,6 @@ async def test_do_not_update_when_no_fields_change(make_sut, mother):
     sut = make_sut(book_storage)
     fields = [
         TitleDTO(title="Test Title", authors="Author 1"),
-        CoverUrlDTO(cover_url="http://cover.url"),
         RatingDTO(rating=5),
         ReviewDTO(review="Test Review"),
     ]

@@ -33,8 +33,9 @@
                     {% endfor %}
                 </datalist>
                 <script>
-                    const input = document.getElementById("authors-input");
+                    let input = document.getElementById("authors-input");
                     new Awesomplete(input, {
+                        minChars: 1,
                         filter: function(text, input) {
                             return Awesomplete.FILTER_CONTAINS(text, input.match(/[^&]*$/)[0]);
                         },
@@ -65,15 +66,6 @@
                         type="number"
                         min="{{ fields.rating.min }}"
                         max="{{ fields.rating.max }}"
-                />
-            </label>
-            <label>
-                {{ fields.cover.label }}
-                <input
-                        name="cover"
-                        {% if fields.cover.required %}required{% endif %}
-                        placeholder="{{ fields.cover.label }}"
-                        type="file"
                 />
             </label>
             {% endwith %}

@@ -66,7 +66,7 @@ class ImportClippingsUseCase:
                     id=book_id,
                     title=candidate.book.title,
                     authors=candidate.book.authors or [Book.UNKNOWN_AUTHOR],
-                    cover_url=None,
+                    meta=None,
                     clippings=[],
                 )
             clipping = Clipping(
