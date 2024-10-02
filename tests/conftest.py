@@ -2,6 +2,8 @@ import pytest
 
 from clippings.books.adapters.readers import MockClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage, MockDeletedHashStorage
+from clippings.books.services import SearchBookCoverService
+from clippings.books.use_cases.book_info import MockBookInfoClient
 from clippings.test.object_mother import ObjectMother
 from clippings.users.adapters.password_hashers import PBKDF2PasswordHasher
 from clippings.users.adapters.storages import MockUsersStorage
@@ -48,3 +50,13 @@ def dummy_password_hasher():
             return self.hash(password) == hashed_password
 
     return DummyPasswordHasher()
+
+
+@pytest.fixture()
+def mock_book_info_client():
+    return MockBookInfoClient()
+
+
+@pytest.fixture()
+def search_book_cover_service(mock_book_info_client):
+    return SearchBookCoverService(mock_book_info_client)

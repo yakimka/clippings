@@ -11,13 +11,18 @@ from clippings.books.adapters.storages import (
     MongoBooksStorage,
     MongoDeletedHashStorage,
 )
+from clippings.books.use_cases.book_info import MockBookInfoClient
 from clippings.settings import InfrastructureSettings
 from clippings.users.adapters.password_hashers import PBKDF2PasswordHasher
 from clippings.users.adapters.storages import MockUsersStorage, MongoUsersStorage
 
 if TYPE_CHECKING:
     from clippings.books.entities import Book, DeletedHash
-    from clippings.books.ports import BooksStorageABC, DeletedHashStorageABC
+    from clippings.books.ports import (
+        BookInfoClientABC,
+        BooksStorageABC,
+        DeletedHashStorageABC,
+    )
     from clippings.users.entities import User
     from clippings.users.ports import PasswordHasherABC, UsersStorageABC
 
@@ -150,3 +155,14 @@ def get_users_storage(
 @inject
 def get_password_hasher() -> PasswordHasherABC:
     return PBKDF2PasswordHasher()
+
+
+def get_mock_book_info_client() -> MockBookInfoClient:
+    return MockBookInfoClient()
+
+
+@inject
+def get_book_info_client(
+    mock_book_info_client: MockBookInfoClient = Provide(get_mock_book_info_client),
+) -> BookInfoClientABC:
+    return mock_book_info_client

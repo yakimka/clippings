@@ -14,6 +14,7 @@ if TYPE_CHECKING:
         DeletedHashStorageABC,
         InlineNoteIdGenerator,
     )
+    from clippings.books.services import SearchBookCoverService
 
 
 @dataclass(kw_only=True)
@@ -72,8 +73,13 @@ class ReviewDTO(BookFieldDTO):
 
 
 class EditBookUseCase:
-    def __init__(self, book_storage: BooksStorageABC):
+    def __init__(
+        self,
+        book_storage: BooksStorageABC,
+        search_book_cover_service: SearchBookCoverService,
+    ):
         self._book_storage = book_storage
+        self._search_book_cover_service = search_book_cover_service
 
     async def execute(
         self, book_id: str, fields: list[BookFieldDTO]
@@ -83,9 +89,14 @@ class EditBookUseCase:
             return DomainError(f"Can't find book with id: {book_id}")
 
         changed = False
+        need_update_meta = False
         for field in fields:
             if field.apply(book):
                 changed = True
+                if isinstance(field, TitleDTO):
+                    need_update_meta = True
+        if need_update_meta:
+            await self._search_book_cover_service.execute(book)
         if changed:
             await self._book_storage.add(book)
         return None

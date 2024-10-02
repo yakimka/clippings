@@ -14,7 +14,16 @@ if TYPE_CHECKING:
 
 
 @dataclass
+class BookMeta:
+    isbns: list[str]
+    cover_image_small: str | None
+    cover_image_big: str | None
+
+
+@dataclass
 class Book:
+    UNKNOWN_AUTHOR = "Unknown Author"
+
     id: str
     title: str
     authors: list[str]
@@ -22,6 +31,12 @@ class Book:
     clippings: list[Clipping]
     review: str = ""
     rating: int | None = None
+    meta: BookMeta | None = None
+
+    def get_first_author(self) -> str | None:
+        if not self.authors or self.authors[0] == self.UNKNOWN_AUTHOR:
+            return None
+        return self.authors[0]
 
     def authors_to_str(self) -> str:
         return " & ".join(self.authors)

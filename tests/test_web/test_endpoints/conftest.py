@@ -4,7 +4,9 @@ from picodi import registry
 from picodi.helpers import enter, lifespan
 
 from clippings.deps import (
+    get_book_info_client,
     get_books_storage,
+    get_mock_book_info_client,
     get_mock_books_storage,
     get_mock_users_storage,
     get_password_hasher,
@@ -47,7 +49,8 @@ async def _override_deps(mother):
     with registry.override(get_users_map, lambda *a, **k: users_map):
         with registry.override(get_users_storage, get_mock_users_storage):
             with registry.override(get_books_storage, get_mock_books_storage):
-                yield
+                with registry.override(get_book_info_client, get_mock_book_info_client):
+                    yield
 
 
 @pytest.fixture()
