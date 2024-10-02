@@ -3,16 +3,7 @@ from httpx import AsyncClient
 from picodi import registry
 from picodi.helpers import enter, lifespan
 
-from clippings.deps import (
-    get_book_info_client,
-    get_books_storage,
-    get_mock_book_info_client,
-    get_mock_books_storage,
-    get_mock_users_storage,
-    get_password_hasher,
-    get_users_map,
-    get_users_storage,
-)
+from clippings.deps import get_books_storage, get_password_hasher, get_users_map
 from clippings.web.deps import get_user_id
 from clippings.web.main import app
 
@@ -46,11 +37,8 @@ async def _override_deps(mother):
         )
     users_map = {"user:id": test_user}
 
-    with registry.override(get_users_map, lambda *a, **k: users_map):
-        with registry.override(get_users_storage, get_mock_users_storage):
-            with registry.override(get_books_storage, get_mock_books_storage):
-                with registry.override(get_book_info_client, get_mock_book_info_client):
-                    yield
+    with registry.override(get_users_map, lambda: users_map):
+        yield
 
 
 @pytest.fixture()

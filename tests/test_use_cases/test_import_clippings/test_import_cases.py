@@ -10,7 +10,7 @@ from clippings.books.adapters.id_generators import (
     clipping_id_generator,
     inline_note_id_generator,
 )
-from clippings.books.entities import Book, Clipping, ClippingType
+from clippings.books.entities import Book, BookMeta, Clipping, ClippingType
 from clippings.books.use_cases.import_clippings import (
     ImportClippingsUseCase,
     ImportedBookDTO,
@@ -71,7 +71,11 @@ async def test_import_single_clipping(
         id="1",
         title="The Book",
         authors=["The Author"],
-        meta=None,
+        meta=BookMeta(
+            isbns=ANY,
+            cover_image_small=ANY,
+            cover_image_big=ANY,
+        ),
         clippings=[
             Clipping(
                 id=ANY,

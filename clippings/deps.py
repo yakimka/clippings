@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from picodi import Provide, SingletonScope, dependency, inject
+from picodi.helpers import enter
 
 from clippings.books.adapters.storages import (
     MockBooksStorage,
@@ -12,7 +14,7 @@ from clippings.books.adapters.storages import (
     MongoDeletedHashStorage,
 )
 from clippings.books.use_cases.book_info import MockBookInfoClient
-from clippings.settings import InfrastructureSettings
+from clippings.settings import AdaptersSettings, InfrastructureSettings
 from clippings.users.adapters.password_hashers import PBKDF2PasswordHasher
 from clippings.users.adapters.storages import MockUsersStorage, MongoUsersStorage
 
@@ -27,9 +29,16 @@ if TYPE_CHECKING:
     from clippings.users.ports import PasswordHasherABC, UsersStorageABC
 
 
+def get_default_adapters() -> AdaptersSettings:
+    raise NotImplementedError("This dependency needs to be overridden")
+
+
 @dependency(scope_class=SingletonScope)
-def get_infrastructure_settings() -> InfrastructureSettings:
-    return InfrastructureSettings.create()
+@inject
+def get_infrastructure_settings(
+    default_adapters: AdaptersSettings = Provide(get_default_adapters),
+) -> InfrastructureSettings:
+    return InfrastructureSettings.create_from_config(default_adapters)
 
 
 @dependency(scope_class=SingletonScope)
@@ -51,11 +60,11 @@ def get_user_books_map(
 
 @inject
 def get_mongo_client(
-    infrastructure_settings: InfrastructureSettings = Provide(
-        get_infrastructure_settings
-    ),
+    infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> AsyncIOMotorClient:
-    return AsyncIOMotorClient(infrastructure_settings.mongo.uri)
+    if not infra_settings.mongo:
+        raise ValueError("Mongo settings are not provided")
+    return AsyncIOMotorClient(infra_settings.mongo.uri)
 
 
 @inject
@@ -87,9 +96,14 @@ def get_mongo_books_storage(
 
 @inject
 def get_books_storage(
-    mongo_books_storage: MongoBooksStorage = Provide(get_mongo_books_storage),
+    infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> BooksStorageABC:
-    return mongo_books_storage
+    variants: dict[str, Callable[..., Any]] = {
+        "mock": get_mock_books_storage,
+        "mongo": get_mongo_books_storage,
+    }
+    with enter(variants[infra_settings.adapters.books_storage]) as storage:
+        return storage
 
 
 @dependency(scope_class=SingletonScope)
@@ -124,11 +138,14 @@ def get_mongo_deleted_hash_storage(
 
 @inject
 def get_deleted_hash_storage(
-    mongo_deleted_hash_storage: MongoDeletedHashStorage = Provide(
-        get_mongo_deleted_hash_storage
-    ),
+    infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> DeletedHashStorageABC:
-    return mongo_deleted_hash_storage
+    variants: dict[str, Callable[..., Any]] = {
+        "mock": get_mock_deleted_hash_storage,
+        "mongo": get_mongo_deleted_hash_storage,
+    }
+    with enter(variants[infra_settings.adapters.deleted_hash_storage]) as storage:
+        return storage
 
 
 @inject
@@ -147,9 +164,14 @@ def get_mongo_users_storage(
 
 @inject
 def get_users_storage(
-    mongo_users_storage: MongoUsersStorage = Provide(get_mongo_users_storage),
+    infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> UsersStorageABC:
-    return mongo_users_storage
+    variants: dict[str, Callable[..., Any]] = {
+        "mock": get_mock_users_storage,
+        "mongo": get_mongo_users_storage,
+    }
+    with enter(variants[infra_settings.adapters.users_storage]) as storage:
+        return storage
 
 
 @inject
@@ -163,6 +185,10 @@ def get_mock_book_info_client() -> MockBookInfoClient:
 
 @inject
 def get_book_info_client(
-    mock_book_info_client: MockBookInfoClient = Provide(get_mock_book_info_client),
+    infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> BookInfoClientABC:
-    return mock_book_info_client
+    variants: dict[str, Callable[..., Any]] = {
+        "mock": get_mock_book_info_client,
+    }
+    with enter(variants[infra_settings.adapters.book_info_client]) as client:
+        return client

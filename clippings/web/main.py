@@ -70,6 +70,7 @@ if __name__ == "__main__":
         "clippings.web.main:app",
         host="0.0.0.0",  # noqa: S104
         port=8000,
+        lifespan="on",
         reload=True,
         reload_dirs=["/opt/project/clippings/"],
     )

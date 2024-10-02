@@ -5,7 +5,13 @@ from typing import TYPE_CHECKING
 from picodi import Provide, dependency, inject, registry
 from picodi.integrations.starlette import RequestScope
 
-from clippings.deps import get_password_hasher, get_user_id, get_users_storage
+from clippings.deps import (
+    get_default_adapters,
+    get_password_hasher,
+    get_user_id,
+    get_users_storage,
+)
+from clippings.settings import AdaptersSettings
 from clippings.users.use_cases.auth import AuthenticateUserUseCase
 
 if TYPE_CHECKING:
@@ -24,6 +30,11 @@ def get_user_id_from_request(web_context: dict = Provide(get_request_context)) -
     if user_id := web_context.get("user_id"):
         return user_id
     raise ValueError("User is not authenticated")
+
+
+@registry.override(get_default_adapters)
+def get_default_adapters_for_web() -> AdaptersSettings:
+    return AdaptersSettings.defaults_for_web()
 
 
 @inject
