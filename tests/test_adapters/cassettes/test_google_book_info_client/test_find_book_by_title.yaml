@@ -1,0 +1,62 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - www.googleapis.com
+      user-agent:
+      - python-httpx/0.27.2
+    method: GET
+    uri: https://www.googleapis.com/books/v1/volumes?fields=items%28volumeInfo%28title%2Cauthors%2CimageLinks%2CindustryIdentifiers%29%29&q=intitle%3AThe+Hitchhiker%27s+Guide+to+the+Galaxy%2Binauthor%3ADouglas+Adams
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAC/92YXW/aMBSG7/srLC7YTUdt8o2EprRElI0PtdBJ1VRVaWISr06cJU4/VvW/z7RA
+        QdtK0jU13U2AY+ecE+fh1Wvf7QBQIxxHWa0FvokfANw9XEX4itE8wr14ysTYIirinHCKRag2CTE4
+        JNwLQ3KJ0w8Z6ObEx4AzwMVI16XuzW1t9+lGN+chS58qzcMdlgfUzYDtu6KN5cjZyp0k9vOMp7c9
+        H8ecTAn+LcvdyvdZj7fJQ4u98f7wHCkrXTzmW+aZTbIMEyoK1JACTVRbmXm/W7QCfL7CMr2xlv7P
+        zxq5Ae6T+DJbW3YxkkUupZMwjy5il9BZ3pDzpLW3d8HYZdYIGAsobngsegzseSzmootPxG93opNU
+        /4GczungoJ6kJOYZ9trTVMzw2BVO6yQK2qj+k7GordWxH+C2l6e0nrE89XA7uMjO3YSsPWSNV94J
+        +nsny0YWi/j4OX9j/8zwJCWUBdtB7wa2kAYtU2salvoydDf/OZYVdEn0Jv2U2Ue2fWDbnzfT+/rM
+        lqmPqiT1hHKxwPw/kl1oqJap6lpFsjtPb0oCNxp91Jtfb5I+hpJlt0wn8mR3jWHQo3SGn+DdB45P
+        OGHxO+EaaU0LqjpSX6jJGyV/nt6SxPVQd7qObdtH+0UEuUquy3SyJVxvBcMFDKtqNaFqVGUqlhWQ
+        JIaP6BeaXTvSTEWZ+pWZCjv2gR0zAWcKJiGJA9BoNAoA6jASgwNGp+J97r4tuQXQQiqCahMpZjWu
+        YpFekUSupw6v+ZCMjpXTAq7i9cktU79SO7xJaVtgNuv92ogH/4qMykBepJclwd+bancwhCM+NiXb
+        4zKdvIGNeAI7K4CqnfuEdZmUwwcVmiq0DOOF52YFrPSiApQE6U3HVeJAnk8oU79StR2lJCCxSzdv
+        3I5dASQYeylJeBGAt0FrxV7NEG7UNPVqtmyL9LJMg94Pur2raOxJP4oo08kbbdmeOVeTjO9ocugc
+        P4/WyWjQUiyINKhDXdENVdYxLesjKrbi9kCSUpapX1gpxfVs537nF/c9Ed8pGwAA
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - private
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Wed, 02 Oct 2024 22:52:32 GMT
+      Server:
+      - ESF
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      - X-Origin
+      - Referer
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+version: 1

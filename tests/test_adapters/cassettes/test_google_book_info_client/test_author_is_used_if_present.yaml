@@ -1,0 +1,60 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - www.googleapis.com
+      user-agent:
+      - python-httpx/0.27.2
+    method: GET
+    uri: https://www.googleapis.com/books/v1/volumes?fields=items%28volumeInfo%28title%2Cauthors%2CimageLinks%2CindustryIdentifiers%29%29&q=intitle%3AThe+Hitchhiker%27s+Guide+to+the+Galaxy%2Binauthor%3AStephen+King
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAC/9WYUW/aMBSF3/kVUR546koMcRIqoYkC6ljLNAqo3aYKhcQEK7HNHIeNov73mdJQ
+        0NZpmZSYvAR87ZycmE8nN2wqmqZjgUisX2jf5EDTNs9HWV6xKCGoT+dMzqVVWRdYREiW9PECaWNG
+        yDqkzAsRj/Wz11VuIhaMv8q+lEcCLReIateYBvp+4uHgREz9JBZ83fcRFXiO0W8im4PvWz/r5bOd
+        /ujy0xQ0Dkzs9PY620VN2wHQAMAEDWDrByufzv71Csbfr/CG/J/vlbgBusE0jI+2WM7ExI2i8SIh
+        M+riaKu7EGJ5UavNGAvj84CxIELnHiO7Qs1jVEgX77Hf+sC/tDs/2u3hZftjdckxFTHyWnMuV3hs
+        hXgVk6AFqo+MkRasIj9ALS/hUTVmCfdQK5jFU3eJj25SF7k7AW872RtJN3H3+fKLZeO1T2M5TgQq
+        CatNpw6AAW0zH1ZTeUMRq+K297PXPgVWszgpiNWRcKlfDk6NhgNh3XGglQune/l7RZxOZnM69kjo
+        XocdtZxmcVIQp2M3wnJvaVZUj3bjMxKIS+S5m8xUha0JgdV0GlZOjUEqbyqC2HCuxt7XQbh6NBVD
+        nMVJQRDfMBpod24UliNw0y6znlNjkMpDRawO7VNpYrM4KYDVCfVlTgpJbJeRsnSxpm3ZDWjm1cWm
+        8pYiWMGkOf3ecdsza6g4WLM4KShYbxNKJXraIHuDoDZaIcw1WpX1slPbO5FozeKkAFo7KIpKhGi9
+        Xjed/BDdyqtCFI4WuHsSfwtkcVJQoF5xJOkb4KgsT/8tTZZh5gnrVr6hCNbVuz7rnkSeZnFSAKx9
+        URJAHdNpmoZjg3wATeVVvfffgXsIfOLy3kRxe5rFyX8AKo8PlafKL753dG3VGgAA
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - private
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Wed, 02 Oct 2024 22:52:31 GMT
+      Server:
+      - ESF
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      - X-Origin
+      - Referer
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+version: 1

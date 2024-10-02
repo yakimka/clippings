@@ -30,6 +30,5 @@ class BookInfoSearchResultDTO:
     isbns: list[str]
     title: str
     authors: list[str]
-    description: str | None
     cover_image_small: str | None
     cover_image_big: str | None

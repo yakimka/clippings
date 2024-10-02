@@ -40,6 +40,34 @@ async def test_update_book_with_title_and_authors(make_sut, mock_book_storage, m
     assert updated_book.authors_to_str() == "New Author"
 
 
+@pytest.mark.parametrize(
+    "new_title,new_author",
+    [
+        ("New Title", "Old Author"),
+        ("Old Title", "New Author"),
+        ("New Title", "New Author"),
+    ],
+)
+async def test_update_book_with_title_or_authors_set_cover(
+    new_title, new_author, make_sut, mock_book_storage, mother
+):
+    # Arrange
+    book = mother.book(
+        id="book-id", title="Old Title", authors=["Old Author"], meta=None
+    )
+    await mock_book_storage.add(book)
+    sut = make_sut()
+    fields = [TitleDTO(title=new_title, authors=new_author)]
+
+    # Act
+    result = await sut.execute("book-id", fields)
+
+    # Assert
+    assert result is None
+    updated_book = await mock_book_storage.get("book-id")
+    assert updated_book.meta is not None
+
+
 @pytest.mark.parametrize("new_rating", [9, None])
 async def test_update_book_rating(make_sut, mock_book_storage, mother, new_rating):
     # Arrange

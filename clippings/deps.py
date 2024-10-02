@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
@@ -13,12 +12,14 @@ from clippings.books.adapters.storages import (
     MongoBooksStorage,
     MongoDeletedHashStorage,
 )
-from clippings.books.use_cases.book_info import MockBookInfoClient
+from clippings.books.use_cases.book_info import GoogleBookInfoClient, MockBookInfoClient
 from clippings.settings import AdaptersSettings, InfrastructureSettings
 from clippings.users.adapters.password_hashers import PBKDF2PasswordHasher
 from clippings.users.adapters.storages import MockUsersStorage, MongoUsersStorage
 
 if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator, Callable
+
     from clippings.books.entities import Book, DeletedHash
     from clippings.books.ports import (
         BookInfoClientABC,
@@ -183,12 +184,32 @@ def get_mock_book_info_client() -> MockBookInfoClient:
     return MockBookInfoClient()
 
 
+@dependency(scope_class=SingletonScope, ignore_manual_init=True)
 @inject
-def get_book_info_client(
+async def get_google_book_info_client(
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
-) -> BookInfoClientABC:
+) -> AsyncGenerator[GoogleBookInfoClient, None]:
+    if not infra_settings.google_books_api:
+        raise ValueError("Google Books API settings are not provided")
+
+    client = GoogleBookInfoClient(
+        timeout=infra_settings.google_books_api.timeout,
+        api_key=infra_settings.google_books_api.api_key,
+    )
+    try:
+        yield client
+    finally:
+        await client.aclose()
+
+
+@dependency(scope_class=SingletonScope)
+@inject
+async def get_book_info_client(
+    infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
+) -> AsyncGenerator[BookInfoClientABC, None]:
     variants: dict[str, Callable[..., Any]] = {
         "mock": get_mock_book_info_client,
+        "google": get_google_book_info_client,
     }
-    with enter(variants[infra_settings.adapters.book_info_client]) as client:
-        return client
+    async with enter(variants[infra_settings.adapters.book_info_client]) as client:
+        yield client  # noqa: ASYNC119

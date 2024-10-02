@@ -1,0 +1,53 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - www.googleapis.com
+      user-agent:
+      - python-httpx/0.27.2
+    method: GET
+    uri: https://www.googleapis.com/books/v1/volumes?fields=items%28volumeInfo%28title%2Cauthors%2CimageLinks%2CindustryIdentifiers%29%29&q=intitle%3Asomething+with+%D1%87%2Binauthor%3AAbracadabra
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAC/9WUOwuDMBSFd39FyCylNfG5WRUqFAqhW+lQMNKAj6KxIOJ/b7QPA106lECWJPfc
+        ew+Hb8hgAAAZp2ULA3ASBQDDfAr5XhddSdMqr0XvrQqdM15QIcFwS8IojKcLkCQ6kDghAENzGb10
+        /Fo3i/dLlhZX8NM4S4usyrqWN32a0YqznNEvk0F6T6H625zpcNwlRIrwdPu4zCPRPgo2a2x5yHMw
+        gtLsuIQxZGU0/4HG0QmNi9FaHRpfKzS+balDg3RC4yDsqUPj6oRmY7lYHRpPJzTIdn/7a4xJGY0H
+        PAut5rYGAAA=
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - private
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Wed, 02 Oct 2024 22:52:31 GMT
+      Server:
+      - ESF
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      - X-Origin
+      - Referer
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+version: 1
