@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from starlette.types import ASGIApp, Receive, Scope, Send
 
 
-class RedirectMiddleware:
+class ClosingSlashMiddleware:
     def __init__(self, app: ASGIApp) -> None:
         self.app = app
 

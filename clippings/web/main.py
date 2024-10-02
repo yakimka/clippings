@@ -9,7 +9,7 @@ from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
 from clippings.web.auth import BasicAuthBackend
-from clippings.web.middleware import RedirectMiddleware
+from clippings.web.middleware import ClosingSlashMiddleware
 from clippings.web.presenters.urls import urls_manager
 from clippings.web.views import get_views_map
 from clippings.web.views.system import not_found_view, server_error_view
@@ -45,7 +45,7 @@ exception_handlers = {
 middleware = [
     Middleware(RequestScopeMiddleware),
     Middleware(AuthenticationMiddleware, backend=BasicAuthBackend()),
-    Middleware(RedirectMiddleware),
+    Middleware(ClosingSlashMiddleware),
 ]
 
 app = Starlette(
