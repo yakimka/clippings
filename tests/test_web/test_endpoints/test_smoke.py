@@ -26,9 +26,13 @@ async def test_home_page(client):
 
 @pytest.mark.parametrize(
     "url_template",
-    [item.template for item in urls_manager.get_by_tag("book") if item.method == "get"],
+    [
+        item.template
+        for item in urls_manager
+        if item.method == "get" and item.id not in ("home_page", "logout")
+    ],
 )
-async def test_books_get_endpoints(client, book_storage, mother, url_template):
+async def test_get_endpoints(client, book_storage, mother, url_template):
     inline_note = mother.inline_note(id="inlinenote1")
     clipping = mother.clipping(id="clipping1", inline_notes=[inline_note])
     book = mother.book(id="book1", clippings=[clipping])

@@ -30,6 +30,7 @@ class ActionDTO:
     id: str
     label: str
     url: UrlDTO | None
+    description: str = ""
     confirm_message: str = ""
 
 
