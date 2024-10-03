@@ -209,4 +209,6 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
     steps:
       - name: Update service
-        run: curl ${{ secrets.UPDATE_URL }}
+        run: |
+          sleep 30
+          curl ${{ secrets.UPDATE_URL }}

@@ -8,7 +8,7 @@ from starlette.responses import HTMLResponse, Response
 from clippings.web.auth import basic_auth
 from clippings.web.controllers.clippings_import import (
     ClippingsImportController,
-    RenderClippingsImportPage,
+    RenderClippingsImportPageController,
 )
 from clippings.web.views._utils import convert_response
 
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 @basic_auth
 async def clipping_import_page(request: Request) -> Response:  # noqa: U100
-    controller = RenderClippingsImportPage()
+    controller = RenderClippingsImportPageController()
     result = await controller.fire()
     return convert_response(result)
 

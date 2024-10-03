@@ -377,4 +377,4 @@ class ClearDeletedHashesController:
             deleted_hash_storage=self._deleted_hash_storage
         )
         await use_case.execute()
-        return HTMLResponse(payload="", status_code=200)
+        return HTMLResponse(payload="Ok", status_code=200)

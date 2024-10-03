@@ -1,7 +1,4 @@
-<div hx-target="this" style="display: flex; align-items: center; gap: var(--pico-spacing);">
-    <div>
-        <img src="{{ data.cover_url }}" width="400" alt="Book Image" class="book-cover">
-    </div>
+<div hx-target="this">
     <form
             {{ hx_action(data.actions_map.save) }}
             hx-swap="outerHTML">

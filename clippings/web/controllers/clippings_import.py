@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     )
 
 
-class RenderClippingsImportPage:
+class RenderClippingsImportPageController:
     async def fire(self) -> HTMLResponse:
         presenter = ClippingsImportPagePresenter(urls_manager=urls_manager)
         result = await presenter.present()

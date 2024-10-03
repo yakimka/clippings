@@ -41,16 +41,9 @@ def create_global_data(request_context: dict, urls_manager: UrlsManager) -> Glob
                     url=urls_manager.build_url("clipping_import_page"),
                 ),
                 ActionDTO(
-                    id="reset_deleted_memory",
-                    label="Reset deleted memory",
-                    url=urls_manager.build_url("deleted_hash_clear"),
-                    confirm_message=(
-                        "When you delete your clippings, we save a hash for each "
-                        "removed item. This helps us prevent reimporting clippings "
-                        "that you've already deleted. Resetting this memory will allow "
-                        "those clippings to be imported again, even if they were "
-                        "previously deleted. This action cannot be undone."
-                    ),
+                    id="goto_settings_page",
+                    label="Settings",
+                    url=urls_manager.build_url("settings_page"),
                 ),
                 ActionDTO(
                     id="logout", label="Logout", url=urls_manager.build_url("logout")
