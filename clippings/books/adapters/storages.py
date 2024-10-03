@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
 from dataclasses import asdict
 from datetime import datetime
 from enum import Enum
@@ -13,7 +12,7 @@ from clippings.books.entities import Book, DeletedHash
 from clippings.books.ports import BooksStorageABC, DeletedHashStorageABC
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import AsyncGenerator, Callable, Mapping
 
     from motor.motor_asyncio import AsyncIOMotorDatabase
 
@@ -45,12 +44,20 @@ class MockBooksStorage(BooksStorageABC):
     async def find(
         self, query: BooksStorageABC.FindQuery = BooksStorageABC.DEFAULT_FIND_QUERY
     ) -> list[Book]:
+        return [book async for book in self.find_iter(query)]
+
+    async def find_iter(
+        self, query: BooksStorageABC.FindQuery = BooksStorageABC.DEFAULT_FIND_QUERY
+    ) -> AsyncGenerator[Book, None]:
         books = sorted(self.books.values(), key=lambda b: (b.title, b.id))
         start = query.start
         if query.limit is None:
-            return books[start:]
+            for book in books[start:]:
+                yield book
+            return
         end = start + query.limit
-        return books[start:end]
+        for book in books[start:end]:
+            yield book
 
     async def count(self, query: BooksStorageABC.FindQuery) -> int:
         return len(await self.find(query))
@@ -124,8 +131,13 @@ class MongoBooksStorage(BooksStorageABC):
     async def find(
         self, query: BooksStorageABC.FindQuery = BooksStorageABC.DEFAULT_FIND_QUERY
     ) -> list[Book]:
+        return [book async for book in self.find_iter(query)]
+
+    async def find_iter(
+        self, query: BooksStorageABC.FindQuery = BooksStorageABC.DEFAULT_FIND_QUERY
+    ) -> AsyncGenerator[Book, None]:
         if query.limit == 0:
-            return []
+            return
 
         cursor = (
             self._collection.find({"user_id": self._user_id})
@@ -134,8 +146,9 @@ class MongoBooksStorage(BooksStorageABC):
         )
         if query.limit is not None:
             cursor = cursor.limit(query.limit)
-        books = await cursor.to_list(None)
-        return [self._deserializer(dict(book)) for book in books]
+
+        async for book in cursor:
+            yield self._deserializer(dict(book))
 
     async def count(self, query: BooksStorageABC.FindQuery) -> int:
         if query.limit == 0:

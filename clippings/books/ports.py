@@ -45,6 +45,12 @@ class BooksStorageABC(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def find_iter(
+        self, query: FindQuery = DEFAULT_FIND_QUERY
+    ) -> AsyncGenerator[Book, None]:
+        pass
+
+    @abc.abstractmethod
     async def count(self, query: FindQuery) -> int:
         pass
 

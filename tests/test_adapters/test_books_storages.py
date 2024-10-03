@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING
 import pytest
 
 from clippings.books.adapters.storages import MockBooksStorage, MongoBooksStorage
+from clippings.books.entities import Book
 
 if TYPE_CHECKING:
-    from clippings.books.entities import Book
     from clippings.books.ports import BooksStorageABC
 
 
@@ -149,6 +149,16 @@ async def test_can_get_count_of_books(make_sut, make_books):
     result = await sut.count(sut.FindQuery(start=0, limit=None))
 
     assert result == 42
+
+
+async def test_can_iterate_over_books(make_sut, mother):
+    books = [mother.book(id=f"book:{i}", title=f"Book {i}") for i in range(10)]
+    sut = await make_sut(books)
+
+    result = [item async for item in sut.find_iter(sut.FindQuery(start=0, limit=None))]
+
+    assert len(result) == 10
+    assert all(isinstance(book, Book) for book in result)
 
 
 async def test_user_can_get_only_his_books(make_sut, mother):
