@@ -41,6 +41,11 @@ def create_global_data(request_context: dict, urls_manager: UrlsManager) -> Glob
                     url=urls_manager.build_url("clipping_import_page"),
                 ),
                 ActionDTO(
+                    id="goto_settings_page",
+                    label="Settings",
+                    url=urls_manager.build_url("settings_page"),
+                ),
+                ActionDTO(
                     id="reset_deleted_memory",
                     label="Reset deleted memory",
                     url=urls_manager.build_url("deleted_hash_clear"),

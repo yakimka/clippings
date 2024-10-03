@@ -14,4 +14,9 @@ def make_user_urls(base_url: str = "/users") -> list[UrlTemplateDTO]:
             template=make_template("/logout"),
             method="get",
         ),
+        UrlTemplateDTO(
+            id="settings_page",
+            template=make_template("/me/settings"),
+            method="get",
+        ),
     ]

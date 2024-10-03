@@ -19,7 +19,6 @@ if TYPE_CHECKING:
 
 @dataclass(kw_only=True)
 class EditBookInfoDTO:
-    cover_url: str
     title: str
     authors: str
     authors_autocomplete: list[str]
@@ -48,10 +47,7 @@ class EditBookInfoFormPresenter:
         if book is None:
             return not_found_page_presenter()
         distinct_authors = await self._storage.distinct_authors()
-        builder = BookDetailBuilder(book, self._urls_manager)
-
         data = EditBookInfoDTO(
-            cover_url=builder.cover_url_big(),
             title=book.title,
             authors=book.authors_to_str(),
             authors_autocomplete=sorted(distinct_authors),
