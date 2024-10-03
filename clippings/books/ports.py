@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
     from datetime import datetime
 
-    from clippings.books.dtos import ClippingImportCandidateDTO
+    from clippings.books.dtos import BookInfoSearchResultDTO, ClippingImportCandidateDTO
     from clippings.books.entities import Book, ClippingType, DeletedHash, Position
 
 
@@ -70,6 +70,14 @@ class DeletedHashStorageABC(abc.ABC):
 class ClippingsReaderABC(abc.ABC):
     @abc.abstractmethod
     def read(self) -> AsyncGenerator[ClippingImportCandidateDTO, None]:
+        pass
+
+
+class BookInfoClientABC(abc.ABC):
+    @abc.abstractmethod
+    async def get(
+        self, title: str, author: str | None = None
+    ) -> BookInfoSearchResultDTO | None:
         pass
 
 

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from picodi import Provide, inject
 
 from clippings.books.adapters.id_generators import inline_note_id_generator
+from clippings.books.services import SearchBookCoverService
 from clippings.books.use_cases.edit_book import (
     AddInlineNoteUseCase,
     ClearDeletedHashesUseCase,
@@ -20,7 +21,11 @@ from clippings.books.use_cases.edit_book import (
     TitleDTO,
     UnlinkInlineNoteUseCase,
 )
-from clippings.deps import get_books_storage, get_deleted_hash_storage
+from clippings.deps import (
+    get_book_info_client,
+    get_books_storage,
+    get_deleted_hash_storage,
+)
 from clippings.seedwork.exceptions import DomainError
 from clippings.web.controllers.responses import HTMLResponse, RedirectResponse, Response
 from clippings.web.presenters.book.detail.forms import (
@@ -33,7 +38,11 @@ from clippings.web.presenters.book.detail.forms import (
 from clippings.web.presenters.urls import urls_manager
 
 if TYPE_CHECKING:
-    from clippings.books.ports import BooksStorageABC, DeletedHashStorageABC
+    from clippings.books.ports import (
+        BookInfoClientABC,
+        BooksStorageABC,
+        DeletedHashStorageABC,
+    )
 
 
 class RenderBookReviewEditFormController:
@@ -118,12 +127,19 @@ class RenderInlineNoteEditFormController:
 class UpdateBookReviewController:
     @inject
     def __init__(
-        self, books_storage: BooksStorageABC = Provide(get_books_storage)
+        self,
+        books_storage: BooksStorageABC = Provide(get_books_storage),
+        book_info_client: BookInfoClientABC = Provide(get_book_info_client),
     ) -> None:
         self._books_storage = books_storage
+        self._book_info_client = book_info_client
 
     async def fire(self, book_id: str, review: str) -> Response:
-        use_case = EditBookUseCase(book_storage=self._books_storage)
+        search_book_cover_service = SearchBookCoverService(self._book_info_client)
+        use_case = EditBookUseCase(
+            book_storage=self._books_storage,
+            search_book_cover_service=search_book_cover_service,
+        )
         result = await use_case.execute(
             book_id=book_id, fields=[ReviewDTO(review=review)]
         )
@@ -137,14 +153,21 @@ class UpdateBookReviewController:
 class UpdateBookInfoController:
     @inject
     def __init__(
-        self, books_storage: BooksStorageABC = Provide(get_books_storage)
+        self,
+        books_storage: BooksStorageABC = Provide(get_books_storage),
+        book_info_client: BookInfoClientABC = Provide(get_book_info_client),
     ) -> None:
         self._books_storage = books_storage
+        self._book_info_client = book_info_client
 
     async def fire(
         self, book_id: str, title: str, authors: str, rating: int | None
     ) -> Response:
-        use_case = EditBookUseCase(book_storage=self._books_storage)
+        search_book_cover_service = SearchBookCoverService(self._book_info_client)
+        use_case = EditBookUseCase(
+            book_storage=self._books_storage,
+            search_book_cover_service=search_book_cover_service,
+        )
         result = await use_case.execute(
             book_id=book_id,
             fields=[

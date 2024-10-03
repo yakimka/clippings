@@ -16,12 +16,16 @@ from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
 
 @pytest.fixture()
 def import_clippings_use_case(
-    mock_book_storage, mock_clipping_reader, mock_deleted_hash_storage
+    mock_book_storage,
+    mock_clipping_reader,
+    mock_deleted_hash_storage,
+    search_book_cover_service,
 ) -> ImportClippingsUseCase:
     return ImportClippingsUseCase(
         storage=mock_book_storage,
         reader=mock_clipping_reader,
         deleted_hash_storage=mock_deleted_hash_storage,
+        search_book_cover_service=search_book_cover_service,
         book_id_generator=book_id_generator,
         clipping_id_generator=clipping_id_generator,
         inline_note_id_generator=inline_note_id_generator,

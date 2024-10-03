@@ -30,6 +30,10 @@ test:  ## Run tests
 	$(RUN) poetry run pytest --cov=tests --cov=clippings $(args)
 	$(RUN) poetry run pytest --dead-fixtures
 
+.PHONY: test-record-vcr
+test-record-vcr:  ## Run tests with VCR recording
+	$(RUN) poetry run pytest -k vcr --record-mode=rewrite --block-network $(args)
+
 .PHONY: package
 package:  ## Run packages (dependencies) checks
 	$(RUN) poetry check

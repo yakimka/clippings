@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 from picodi.helpers import lifespan
 
+from clippings.cli import deps  # noqa: F401
 from clippings.cli.core import AsyncCommand
 
 if TYPE_CHECKING:

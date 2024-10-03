@@ -147,10 +147,14 @@ class BookDetailBuilder:
         )
 
     def cover_url_small(self) -> str:
-        return image_or_default(self.book.cover_url, size="small")
+        return image_or_default(
+            getattr(self.book.meta, "cover_image_small", None), size="small"
+        )
 
     def cover_url_big(self) -> str:
-        return image_or_default(self.book.cover_url, size="big")
+        return image_or_default(
+            getattr(self.book.meta, "cover_image_big", None), size="big"
+        )
 
     def clipping_data_dto(self, clipping_id: str) -> ClippingDataDTO:
         clipping = self.clippings_by_id[clipping_id]

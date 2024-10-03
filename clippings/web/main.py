@@ -1,3 +1,5 @@
+import contextlib
+from collections.abc import AsyncGenerator
 from pathlib import Path
 
 import picodi
@@ -17,8 +19,13 @@ from clippings.web.views.system import not_found_view, server_error_view
 CURRENT_DIR = Path(__file__).parent
 
 
-async def startup() -> None:
+@contextlib.asynccontextmanager
+async def lifespan(app: Starlette) -> AsyncGenerator[None, None]:  # noqa: U100
     await picodi.init_dependencies()
+    try:
+        yield
+    finally:
+        await picodi.shutdown_dependencies()  # noqa: ASYNC102
 
 
 def make_routes() -> list[Route]:
@@ -58,7 +65,7 @@ app = Starlette(
         ),
     ],
     middleware=middleware,
-    on_startup=[startup],
+    lifespan=lifespan,
     exception_handlers=exception_handlers,
 )
 
@@ -70,6 +77,7 @@ if __name__ == "__main__":
         "clippings.web.main:app",
         host="0.0.0.0",  # noqa: S104
         port=8000,
+        lifespan="on",
         reload=True,
         reload_dirs=["/opt/project/clippings/"],
     )

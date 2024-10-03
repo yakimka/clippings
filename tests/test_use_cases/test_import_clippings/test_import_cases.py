@@ -10,7 +10,7 @@ from clippings.books.adapters.id_generators import (
     clipping_id_generator,
     inline_note_id_generator,
 )
-from clippings.books.entities import Book, Clipping, ClippingType
+from clippings.books.entities import Book, BookMeta, Clipping, ClippingType
 from clippings.books.use_cases.import_clippings import (
     ImportClippingsUseCase,
     ImportedBookDTO,
@@ -32,11 +32,13 @@ def sut(
     mock_clipping_reader,
     autoincrement_id_generator,
     mock_deleted_hash_storage,
+    search_book_cover_service,
 ) -> ImportClippingsUseCase:
     return ImportClippingsUseCase(
         storage=mock_book_storage,
         reader=mock_clipping_reader,
         deleted_hash_storage=mock_deleted_hash_storage,
+        search_book_cover_service=search_book_cover_service,
         book_id_generator=autoincrement_id_generator,
         clipping_id_generator=clipping_id_generator,
         inline_note_id_generator=inline_note_id_generator,
@@ -69,7 +71,11 @@ async def test_import_single_clipping(
         id="1",
         title="The Book",
         authors=["The Author"],
-        cover_url=None,
+        meta=BookMeta(
+            isbns=ANY,
+            cover_image_small=ANY,
+            cover_image_big=ANY,
+        ),
         clippings=[
             Clipping(
                 id=ANY,

@@ -35,7 +35,7 @@ async def test_present_should_replace_none_with_text_representation(
     make_sut, mock_book_storage, mother
 ):
     sut = make_sut()
-    book = mother.book(id="book-id", rating=None, cover_url=None)
+    book = mother.book(id="book-id", rating=None, meta=None)
     await mock_book_storage.add(book)
 
     result = await sut.present(book_id="book-id")
