@@ -1,13 +1,27 @@
 import pytest
+from picodi import registry
 
 from clippings.books.adapters.readers import MockClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage, MockDeletedHashStorage
 from clippings.books.services import SearchBookCoverService
 from clippings.books.use_cases.book_info import MockBookInfoClient
+from clippings.deps import get_mongo_database_name
+from clippings.settings import settings
 from clippings.test.object_mother import ObjectMother
 from clippings.users.adapters.password_hashers import PBKDF2PasswordHasher
 from clippings.users.adapters.storages import MockUsersStorage
 from clippings.users.ports import PasswordHasherABC
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _set_test_settings():
+    settings.configure(FORCE_ENV_FOR_DYNACONF="testing")
+
+
+@pytest.fixture(autouse=True)
+def _override_deps_for_tests():
+    with registry.override(get_mongo_database_name, lambda: "test_db"):
+        yield
 
 
 @pytest.fixture()

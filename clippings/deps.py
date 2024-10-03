@@ -68,11 +68,16 @@ def get_mongo_client(
     return AsyncIOMotorClient(infra_settings.mongo.uri)
 
 
+def get_mongo_database_name() -> str:
+    return "clippings_db"
+
+
 @inject
 def get_mongo_database(
     mongo_client: AsyncIOMotorClient = Provide(get_mongo_client),
+    database_name: str = Provide(get_mongo_database_name),
 ) -> AsyncIOMotorDatabase:
-    return mongo_client.clippings_db
+    return getattr(mongo_client, database_name)
 
 
 @dependency(scope_class=SingletonScope)

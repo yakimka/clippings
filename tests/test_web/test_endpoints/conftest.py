@@ -22,7 +22,7 @@ async def client(asgi_app, client_auth) -> AsyncClient:
 
 
 @pytest.fixture(autouse=True)
-async def _shutdown_dependencies():
+async def _dependencies_lifespan():
     async with lifespan.async_():
         yield
 
