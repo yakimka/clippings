@@ -1,17 +1,13 @@
 from __future__ import annotations
 
-import os
-
 import pytest
-from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
+from picodi.helpers import enter
+
+from clippings.deps import get_mongo_database
 
 
 @pytest.fixture()
-async def mongo_db() -> AsyncIOMotorDatabase:
-    uri = os.getenv("TEST_MONGO_URI")
-    if uri is None:
-        raise ValueError("TEST_MONGO_URI is not set")
-
-    client = AsyncIOMotorClient(uri)
-    await client.drop_database("test_db")
-    return client.test_db
+async def mongo_db(mongo_client, mongo_test_db_name) -> AsyncIOMotorDatabase:
+    async with enter(get_mongo_database) as db:
+        yield db
