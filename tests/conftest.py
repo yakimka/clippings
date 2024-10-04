@@ -3,7 +3,7 @@ from uuid import uuid4
 import pytest
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from picodi import Provide, SingletonScope, dependency, inject, registry
-from picodi.helpers import enter, lifespan
+from picodi.helpers import lifespan
 
 from clippings.books.adapters.readers import MockClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage, MockDeletedHashStorage
@@ -30,12 +30,6 @@ def mongo_test_db_prefix():
 @pytest.fixture()
 def mongo_test_db_name(mongo_test_db_prefix):
     return f"{mongo_test_db_prefix}{uuid4().hex}"
-
-
-@pytest.fixture()
-async def mongo_client():
-    async with enter(get_mongo_client) as client:
-        return client
 
 
 # TODO: Check that `get_mongo_database` was used in test
