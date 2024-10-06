@@ -10,8 +10,13 @@ def make_book_urls(base_url: str = "/books") -> list[UrlTemplateDTO]:
 
     return [
         UrlTemplateDTO(
-            id="clipping_import_page",
+            id="clippings_import_page",
             template=make_template("/import"),
+            method="get",
+        ),
+        UrlTemplateDTO(
+            id="clippings_export",
+            template=make_template("/export"),
             method="get",
         ),
         UrlTemplateDTO(

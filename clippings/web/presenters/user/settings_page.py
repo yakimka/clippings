@@ -34,6 +34,17 @@ class SettingsPagePresenter:
                         "This action cannot be undone."
                     ),
                 ),
+                ActionDTO(
+                    id="goto_clippings_export_file",
+                    label="Download my data",
+                    url=urls_manager.build_url("clippings_export"),
+                    description=(
+                        "Download all your data "
+                        "(books, clippings, deleted history, etc.). "
+                        "You can use this data as a backup or to import it into "
+                        "another account."
+                    ),
+                ),
             ],
         )
         return PresenterResult(

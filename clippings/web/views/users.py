@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from starlette.responses import Response
 
+from clippings.web.auth import basic_auth
 from clippings.web.controllers.users import RenderSettingsPageController
 from clippings.web.views._utils import convert_response
 
@@ -22,6 +23,7 @@ async def logout(request: Request) -> Response:  # noqa: U100
     )
 
 
+@basic_auth
 async def settings_page(request: Request) -> Response:  # noqa: U100
     controller = RenderSettingsPageController()
     result = await controller.fire()

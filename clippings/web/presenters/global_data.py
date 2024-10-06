@@ -38,7 +38,7 @@ def create_global_data(request_context: dict, urls_manager: UrlsManager) -> Glob
                 ActionDTO(
                     id="goto_import_page",
                     label="Import clippings",
-                    url=urls_manager.build_url("clipping_import_page"),
+                    url=urls_manager.build_url("clippings_import_page"),
                 ),
                 ActionDTO(
                     id="goto_settings_page",

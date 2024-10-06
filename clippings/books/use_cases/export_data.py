@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator, Callable
+    from collections.abc import AsyncGenerator, AsyncIterable, Callable
 
     from clippings.books.entities import Book, DeletedHash
     from clippings.books.ports import BooksStorageABC, DeletedHashStorageABC
@@ -50,6 +52,14 @@ def deleted_hash_json_serializer(deleted_hash: DeletedHash) -> str:
     return json.dumps(serialized_hash)
 
 
+@dataclass
+class ExportDataDTO:
+    version: str
+    iterator: AsyncIterable[str]
+    started_at: datetime
+    filename: str
+
+
 class ExportDataUseCase:
     def __init__(
         self,
@@ -64,12 +74,25 @@ class ExportDataUseCase:
         self._deleted_hash_storage = deleted_hash_storage
         self._book_serializer = book_serializer
         self._deleted_hash_serializer = deleted_hash_serializer
+        self._version = "1"
 
-    async def execute(self) -> AsyncGenerator[str, None]:
+    async def execute(self) -> ExportDataDTO:
+        date_now = datetime.now()
+        return ExportDataDTO(
+            version=self._version,
+            iterator=self._generate_data(),
+            started_at=date_now,
+            filename=f"my-clippings-{date_now.strftime('%Y-%m-%d_%H-%M-%S')}.ndjson",
+        )
+
+    async def _generate_data(self) -> AsyncGenerator[str, None]:
         query = self._book_storage.FindQuery(start=0, limit=None)
-        yield '{"version": 1}'
+        yield self._format_item(json.dumps({"version": self._version}))
         async for book in self._book_storage.find_iter(query):
-            yield self._book_serializer(book)
+            yield self._format_item(self._book_serializer(book))
 
         for deleted_hash in await self._deleted_hash_storage.get_all():
-            yield self._deleted_hash_serializer(deleted_hash)
+            yield self._format_item(self._deleted_hash_serializer(deleted_hash))
+
+    def _format_item(self, item: str) -> str:
+        return f"{item}\n"

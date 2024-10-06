@@ -21,11 +21,11 @@ async def test_first_entry_is_export_metadata(make_sut, mock_book_storage, mothe
     book = mother.book()
     await mock_book_storage.add(book)
 
-    result = sut.execute()
-    data = [item async for item in result]
+    result = await sut.execute()
+    data = [item async for item in result.iterator]
 
     assert data
-    assert json.loads(data[0]) == {"version": 1}
+    assert json.loads(data[0]) == {"version": "1"}
 
 
 async def test_export_one_book(make_sut, mock_book_storage, mother):
@@ -61,9 +61,12 @@ async def test_export_one_book(make_sut, mock_book_storage, mother):
     )
     await mock_book_storage.add(book)
 
-    result = sut.execute()
-    data = [item async for item in result]
+    result = await sut.execute()
+    data = [item async for item in result.iterator]
 
+    assert result.version
+    assert result.started_at
+    assert result.filename
     assert data
     exported_book = json.loads(data[-1])
     assert exported_book == {
@@ -99,10 +102,23 @@ async def test_export_multiple_books(make_sut, mock_book_storage, mother):
     books = [mother.book(id=f"book_id_{i}") for i in range(3)]
     await mock_book_storage.extend(books)
 
-    result = sut.execute()
-    data = [item async for item in result]
+    result = await sut.execute()
+    data = [item async for item in result.iterator]
 
     assert len(data) == 4  # 1 metadata + 3 books
+
+
+async def test_exported_data_must_be_delimited_by_newline(
+    make_sut, mock_book_storage, mother
+):
+    sut = make_sut()
+    books = [mother.book(id=f"book_id_{i}") for i in range(3)]
+    await mock_book_storage.extend(books)
+
+    result = await sut.execute()
+    data = [item async for item in result.iterator]
+
+    assert all(item.endswith("\n") for item in data)
 
 
 async def test_export_deleted_hashes(make_sut, mother, mock_deleted_hash_storage):
@@ -110,8 +126,8 @@ async def test_export_deleted_hashes(make_sut, mother, mock_deleted_hash_storage
     deleted_hash = mother.deleted_hash(id="deleted_hash")
     await mock_deleted_hash_storage.add(deleted_hash)
 
-    result = sut.execute()
-    data = [item async for item in result]
+    result = await sut.execute()
+    data = [item async for item in result.iterator]
 
     assert data
     assert json.loads(data[-1]) == {"type": "deleted_hash", "id": "deleted_hash"}
@@ -126,7 +142,7 @@ async def test_export_all_entities_at_once(
     await mock_book_storage.add(book)
     await mock_deleted_hash_storage.add(deleted_hash)
 
-    result = sut.execute()
-    data = [item async for item in result]
+    result = await sut.execute()
+    data = [item async for item in result.iterator]
 
     assert len(data) == 3  # 1 metadata + 1 book + 1 deleted hash

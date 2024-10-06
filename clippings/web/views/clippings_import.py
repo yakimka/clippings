@@ -6,6 +6,7 @@ from starlette.datastructures import UploadFile
 from starlette.responses import HTMLResponse, Response
 
 from clippings.web.auth import basic_auth
+from clippings.web.controllers.clippings_export import ClippingsExportController
 from clippings.web.controllers.clippings_import import (
     ClippingsImportController,
     RenderClippingsImportPageController,
@@ -17,8 +18,15 @@ if TYPE_CHECKING:
 
 
 @basic_auth
-async def clipping_import_page(request: Request) -> Response:  # noqa: U100
+async def clippings_import_page(request: Request) -> Response:  # noqa: U100
     controller = RenderClippingsImportPageController()
+    result = await controller.fire()
+    return convert_response(result)
+
+
+@basic_auth
+async def clippings_export(request: Request) -> Response:  # noqa: U100
+    controller = ClippingsExportController()
     result = await controller.fire()
     return convert_response(result)
 
