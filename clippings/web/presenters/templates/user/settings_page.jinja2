@@ -6,16 +6,28 @@
     <div class="grid">
         <div>
             {% for action in data.actions %}
-            {% if action.description %}
-            <p>{{ action.description }}</p>
-            {% endif %}
-            <button
-                    {{ hx_action(action) }}
-                    hx-swap="textContent"
-                    hx-disabled-elt="this"
-                    class="outline contrast"
-            >{{ action.label }}
-            </button>
+            <div style="margin-bottom: 1em;">
+                {% if action.description %}
+                <p>{{ action.description }}</p>
+                {% endif %}
+                {% if action.id.startswith("goto_") %}
+                <a
+                        role="button"
+                        class="outline contrast"
+                        href="{{ action.url.value }}"
+                        hx-confirm="{{ action.confirm_message }}"
+                >{{ action.label }}
+                </a>
+                {% else %}
+                <button
+                        {{ hx_action(action) }}
+                        hx-swap="textContent"
+                        hx-disabled-elt="this"
+                        class="outline contrast"
+                >{{ action.label }}
+                </button>
+                {% endif %}
+            </div>
             {% endfor %}
         </div>
         <div></div>

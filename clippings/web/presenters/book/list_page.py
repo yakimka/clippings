@@ -108,7 +108,7 @@ class BooksListPagePresenter:
             empty_action=ActionDTO(
                 id="goto_import_page",
                 label="Go to the import page",
-                url=self._urls_manager.build_url("clipping_import_page"),
+                url=self._urls_manager.build_url("clippings_import_page"),
             ),
             fields_meta={
                 "cover_url": {"label": "Cover"},

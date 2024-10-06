@@ -22,8 +22,11 @@ class MongoSettings:
     uri: str
 
     @classmethod
-    def create_from_config(cls) -> MongoSettings:
-        return cls(uri=settings.mongo.uri)
+    def create_from_config(cls) -> MongoSettings | None:
+        try:
+            return cls(uri=settings.mongo.uri)
+        except AttributeError:
+            return None
 
 
 @dataclass
@@ -77,8 +80,10 @@ class GoogleBooksApi:
     api_key: str | None = None
 
     @classmethod
-    def create_from_config(cls) -> GoogleBooksApi:
-        google_conf = settings.get("google_books_api") or {}
+    def create_from_config(cls) -> GoogleBooksApi | None:
+        google_conf = settings.get("google_books_api")
+        if not google_conf:
+            return None
         params = {}
         if timeout := google_conf.get("timeout"):
             params["timeout"] = timeout
@@ -95,11 +100,8 @@ class InfrastructureSettings:
 
     @classmethod
     def create_from_config(cls, defaults: AdaptersSettings) -> InfrastructureSettings:
-        mongo = google_books_api = None
         adapters = AdaptersSettings.create_from_config()
         adapters.set_defaults(defaults)
-        if adapters.has_value("mongo"):
-            mongo = MongoSettings.create_from_config()
-        if adapters.has_value("google"):
-            google_books_api = GoogleBooksApi.create_from_config()
+        mongo = MongoSettings.create_from_config()
+        google_books_api = GoogleBooksApi.create_from_config()
         return cls(adapters=adapters, mongo=mongo, google_books_api=google_books_api)

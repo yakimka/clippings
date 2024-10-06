@@ -5,8 +5,6 @@ x-common: &common
     target: development
     context: .
     dockerfile: Dockerfile-dev
-  environment:
-    - TEST_MONGO_URI=mongodb://me:root_password@mongo4:27017
   image: "clippings:dev"
   volumes:
     - .:/opt/code
