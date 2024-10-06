@@ -20,6 +20,7 @@ pytest_plugins = [
     "picodi.integrations._pytest_asyncio",
 ]
 
+
 @pytest.fixture(scope="session", autouse=True)
 def _set_test_settings():
     settings.configure(FORCE_ENV_FOR_DYNACONF="testing")
@@ -40,17 +41,12 @@ def picodi_overrides(mongo_test_db_name):
     return [(get_mongo_database_name, lambda: mongo_test_db_name)]
 
 
-@pytest.fixture()
-async def mongo_client():
-    async with enter(get_mongo_client) as mongo_client:
-        yield mongo_client
-
-
 @pytest.fixture(autouse=True)
-async def _drop_mongo_test_database(mongo_test_db_name, mongo_client):
+async def _drop_mongo_test_database(mongo_test_db_name):
     yield
     if get_mongo_database in registry.touched:
-        await mongo_client.drop_database(mongo_test_db_name)
+        async with enter(get_mongo_client) as mongo_client:
+            await mongo_client.drop_database(mongo_test_db_name)
 
 
 @pytest.fixture()
