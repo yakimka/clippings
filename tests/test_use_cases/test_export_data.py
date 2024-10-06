@@ -7,9 +7,11 @@ from clippings.books.use_cases.export_data import ExportDataUseCase
 
 
 @pytest.fixture()
-def make_sut(mock_book_storage):
+def make_sut(mock_book_storage, mock_deleted_hash_storage):
     def _make_sut():
-        return ExportDataUseCase(mock_book_storage)
+        return ExportDataUseCase(
+            mock_book_storage, deleted_hash_storage=mock_deleted_hash_storage
+        )
 
     return _make_sut
 
@@ -101,3 +103,30 @@ async def test_export_multiple_books(make_sut, mock_book_storage, mother):
     data = [item async for item in result]
 
     assert len(data) == 4  # 1 metadata + 3 books
+
+
+async def test_export_deleted_hashes(make_sut, mother, mock_deleted_hash_storage):
+    sut = make_sut()
+    deleted_hash = mother.deleted_hash(id="deleted_hash")
+    await mock_deleted_hash_storage.add(deleted_hash)
+
+    result = sut.execute()
+    data = [item async for item in result]
+
+    assert data
+    assert json.loads(data[-1]) == {"type": "deleted_hash", "id": "deleted_hash"}
+
+
+async def test_export_all_entities_at_once(
+    make_sut, mother, mock_book_storage, mock_deleted_hash_storage
+):
+    sut = make_sut()
+    book = mother.book(id="book_id")
+    deleted_hash = mother.deleted_hash(id="deleted_hash")
+    await mock_book_storage.add(book)
+    await mock_deleted_hash_storage.add(deleted_hash)
+
+    result = sut.execute()
+    data = [item async for item in result]
+
+    assert len(data) == 3  # 1 metadata + 1 book + 1 deleted hash
