@@ -1,9 +1,8 @@
 from uuid import uuid4
 
 import pytest
-from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
-from picodi import Provide, SingletonScope, dependency, inject, registry
-from picodi.helpers import lifespan
+from picodi import registry
+from picodi.helpers import enter
 
 from clippings.books.adapters.readers import MockClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage, MockDeletedHashStorage
@@ -16,6 +15,10 @@ from clippings.users.adapters.password_hashers import PBKDF2PasswordHasher
 from clippings.users.adapters.storages import MockUsersStorage
 from clippings.users.ports import PasswordHasherABC
 
+pytest_plugins = [
+    "picodi.integrations._pytest",
+    "picodi.integrations._pytest_asyncio",
+]
 
 @pytest.fixture(scope="session", autouse=True)
 def _set_test_settings():
@@ -32,26 +35,22 @@ def mongo_test_db_name(mongo_test_db_prefix):
     return f"{mongo_test_db_prefix}{uuid4().hex}"
 
 
-# TODO: Check that `get_mongo_database` was used in test
-#   and cleanup the database after the test. Wait for picodi to support this.
-@dependency(scope_class=SingletonScope)
-@inject
-async def get_mongo_database_for_tests(
-    mongo_client: AsyncIOMotorClient = Provide(get_mongo_client),
-    database_name: str = Provide(get_mongo_database_name),
-) -> AsyncIOMotorDatabase:
-    yield getattr(mongo_client, database_name)
-    await mongo_client.drop_database(database_name)
+@pytest.fixture()
+def picodi_overrides(mongo_test_db_name):
+    return [(get_mongo_database_name, lambda: mongo_test_db_name)]
+
+
+@pytest.fixture()
+async def mongo_client():
+    async with enter(get_mongo_client) as mongo_client:
+        yield mongo_client
 
 
 @pytest.fixture(autouse=True)
-async def _override_deps_for_tests(mongo_test_db_name):
-    with registry.override(get_mongo_database_name, lambda: mongo_test_db_name):
-        with registry.override(get_mongo_database, get_mongo_database_for_tests):
-            # TODO: Delete this lifespan after picodi will support getting
-            #   dependencies that was used in the test
-            async with lifespan.async_():
-                yield
+async def _drop_mongo_test_database(mongo_test_db_name, mongo_client):
+    yield
+    if get_mongo_database in registry.touched:
+        await mongo_client.drop_database(mongo_test_db_name)
 
 
 @pytest.fixture()
