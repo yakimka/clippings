@@ -1,6 +1,15 @@
 import pytest
 
 from clippings.books.adapters.id_generators import inline_note_id_generator
+from clippings.books.constants import (
+    BOOK_AUTHOR_MAX_LENGTH,
+    BOOK_MAX_AUTHORS,
+    BOOK_MAX_CLIPPINGS,
+    BOOK_REVIEW_MAX_LENGTH,
+    BOOK_TITLE_MAX_LENGTH,
+    CLIPPING_CONTENT_MAX_LENGTH,
+    CLIPPING_MAX_INLINE_NOTES,
+)
 from clippings.books.entities import ClippingType
 from clippings.seedwork.exceptions import DomainError
 
@@ -228,3 +237,54 @@ class TestRemoveClipping:
         book.remove_clipping(mother.clipping(id="2"))
 
         assert book.clippings == [clipping]
+
+
+class TestValidation:
+    @pytest.mark.parametrize(
+        "field,max_value",
+        [
+            ("title", BOOK_TITLE_MAX_LENGTH),
+            ("review", BOOK_REVIEW_MAX_LENGTH),
+        ],
+    )
+    def test_truncate_text_fields_if_value_is_too_long(self, field, max_value, mother):
+        book = mother.book(**{field: "a" * (max_value * 2)})
+
+        assert len(getattr(book, field)) == max_value
+
+    def test_truncate_authors_text_values_if_value_is_too_long(self, mother):
+        book = mother.book(
+            authors=["a" * (BOOK_AUTHOR_MAX_LENGTH * 2) for _ in range(2)]
+        )
+
+        assert all(len(author) == BOOK_AUTHOR_MAX_LENGTH for author in book.authors)
+
+    def test_drop_extra_authors_if_count_is_too_big(self, mother):
+        book = mother.book(authors=["Author 1"] * (BOOK_MAX_AUTHORS * 2))
+
+        assert len(book.authors) == BOOK_MAX_AUTHORS
+
+    def test_drop_extra_clippings_if_count_is_too_big(self, mother):
+        book = mother.book(
+            clippings=[mother.clipping() for _ in range(BOOK_MAX_CLIPPINGS * 2)]
+        )
+
+        assert len(book.clippings) == BOOK_MAX_CLIPPINGS
+
+    def test_truncate_clipping_content_if_value_is_too_long(self, mother):
+        clipping = mother.clipping(content="a" * (CLIPPING_CONTENT_MAX_LENGTH * 2))
+        inline_note = mother.inline_note(
+            content="a" * (CLIPPING_CONTENT_MAX_LENGTH * 2)
+        )
+
+        assert len(clipping.content) == CLIPPING_CONTENT_MAX_LENGTH
+        assert len(inline_note.content) == CLIPPING_CONTENT_MAX_LENGTH
+
+    def test_drop_extra_inline_notes_if_count_is_too_big(self, mother):
+        clipping = mother.clipping(
+            inline_notes=[
+                mother.inline_note() for _ in range(CLIPPING_MAX_INLINE_NOTES * 2)
+            ]
+        )
+
+        assert len(clipping.inline_notes) == CLIPPING_MAX_INLINE_NOTES

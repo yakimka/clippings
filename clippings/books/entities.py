@@ -4,8 +4,18 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING, TypeAlias
 
+from clippings.books.constants import (
+    BOOK_AUTHOR_MAX_LENGTH,
+    BOOK_MAX_AUTHORS,
+    BOOK_MAX_CLIPPINGS,
+    BOOK_REVIEW_MAX_LENGTH,
+    BOOK_TITLE_MAX_LENGTH,
+    CLIPPING_CONTENT_MAX_LENGTH,
+    CLIPPING_MAX_INLINE_NOTES,
+)
 from clippings.books.exceptions import CantFindEntityError
 from clippings.seedwork.exceptions import DomainError
+from clippings.seedwork.validators import truncate_string
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -31,6 +41,15 @@ class Book:
     review: str = ""
     rating: int | None = None
     meta: BookMeta | None = None
+
+    def __post_init__(self) -> None:
+        self.title = truncate_string(self.title, BOOK_TITLE_MAX_LENGTH)
+        self.authors = [
+            truncate_string(item, BOOK_AUTHOR_MAX_LENGTH)
+            for item in self.authors[:BOOK_MAX_AUTHORS]
+        ]
+        self.clippings = self.clippings[:BOOK_MAX_CLIPPINGS]
+        self.review = truncate_string(self.review, BOOK_REVIEW_MAX_LENGTH)
 
     def get_first_author(self) -> str | None:
         if not self.authors or self.authors[0] == self.UNKNOWN_AUTHOR:
@@ -135,6 +154,9 @@ class InlineNote:
     automatically_linked: bool
     added_at: datetime
 
+    def __post_init__(self) -> None:
+        self.content = truncate_string(self.content, CLIPPING_CONTENT_MAX_LENGTH)
+
     @classmethod
     def create(
         cls, *, content: str, added_at: datetime, id_generator: InlineNoteIdGenerator
@@ -172,6 +194,10 @@ class Clipping:
     content: str
     inline_notes: list[InlineNote]
     added_at: datetime
+
+    def __post_init__(self) -> None:
+        self.content = truncate_string(self.content, CLIPPING_CONTENT_MAX_LENGTH)
+        self.inline_notes = self.inline_notes[:CLIPPING_MAX_INLINE_NOTES]
 
     @property
     def position_id(self) -> Position:
