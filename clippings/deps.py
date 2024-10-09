@@ -34,7 +34,7 @@ def get_default_adapters() -> AdaptersSettings:
     raise NotImplementedError("This dependency needs to be overridden")
 
 
-@dependency(scope_class=SingletonScope)
+@dependency(scope_class=SingletonScope, use_init_hook=True)
 @inject
 def get_infrastructure_settings(
     default_adapters: AdaptersSettings = Provide(get_default_adapters),
@@ -42,7 +42,7 @@ def get_infrastructure_settings(
     return InfrastructureSettings.create_from_config(default_adapters)
 
 
-@dependency(scope_class=SingletonScope)
+@dependency(scope_class=SingletonScope, use_init_hook=True)
 async def get_books_map() -> dict[str, dict[str, Book]]:
     return {}
 
@@ -80,7 +80,7 @@ def get_mongo_database(
     return getattr(mongo_client, database_name)
 
 
-@dependency(scope_class=SingletonScope)
+@dependency(scope_class=SingletonScope, use_init_hook=True)
 async def get_users_map() -> dict[str, User]:
     return {}
 
@@ -112,7 +112,7 @@ def get_books_storage(
         return storage
 
 
-@dependency(scope_class=SingletonScope)
+@dependency(scope_class=SingletonScope, use_init_hook=True)
 async def get_deleted_hashes_map() -> dict[str, dict[str, DeletedHash]]:
     return {}
 
@@ -189,7 +189,7 @@ def get_mock_book_info_client() -> MockBookInfoClient:
     return MockBookInfoClient()
 
 
-@dependency(scope_class=SingletonScope, ignore_manual_init=True)
+@dependency(scope_class=SingletonScope)
 @inject
 async def get_google_book_info_client(
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
@@ -207,7 +207,7 @@ async def get_google_book_info_client(
         await client.aclose()
 
 
-@dependency(scope_class=SingletonScope)
+@dependency(scope_class=SingletonScope, use_init_hook=True)
 @inject
 async def get_book_info_client(
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
