@@ -13,8 +13,11 @@ from clippings.books.constants import (
     CLIPPING_CONTENT_MAX_LENGTH,
     CLIPPING_MAX_INLINE_NOTES,
 )
-from clippings.books.exceptions import CantFindEntityError
-from clippings.seedwork.exceptions import DomainError
+from clippings.seedwork.exceptions import (
+    CantFindEntityError,
+    DomainError,
+    ValidationError,
+)
 from clippings.seedwork.validators import truncate_string
 
 if TYPE_CHECKING:
@@ -43,6 +46,9 @@ class Book:
     meta: BookMeta | None = None
 
     def __post_init__(self) -> None:
+        if len(self.id) > 13:
+            raise ValidationError(f"Invalid book id: {self.id}")
+
         self.title = truncate_string(self.title, BOOK_TITLE_MAX_LENGTH)
         self.authors = [
             truncate_string(item, BOOK_AUTHOR_MAX_LENGTH)
@@ -155,6 +161,12 @@ class InlineNote:
     added_at: datetime
 
     def __post_init__(self) -> None:
+        if len(self.id) > 32:
+            raise ValidationError(f"Invalid inline note id: {self.id}")
+
+        if self.original_id and len(self.original_id) > 13:
+            raise ValidationError(f"Invalid original id: {self.original_id}")
+
         self.content = truncate_string(self.content, CLIPPING_CONTENT_MAX_LENGTH)
 
     @classmethod
@@ -196,6 +208,9 @@ class Clipping:
     added_at: datetime
 
     def __post_init__(self) -> None:
+        if len(self.id) > 13:
+            raise ValidationError(f"Invalid clipping id: {self.id}")
+
         self.content = truncate_string(self.content, CLIPPING_CONTENT_MAX_LENGTH)
         self.inline_notes = self.inline_notes[:CLIPPING_MAX_INLINE_NOTES]
 
@@ -235,6 +250,10 @@ class Clipping:
 @dataclass
 class DeletedHash:
     id: str
+
+    def __post_init__(self) -> None:
+        if len(self.id) > 50:
+            raise ValidationError(f"Invalid deleted hash: {self.id}")
 
     @classmethod
     def from_ids(cls, book_id: str, clipping_id: str | None = None) -> DeletedHash:

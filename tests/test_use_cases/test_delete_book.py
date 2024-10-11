@@ -1,7 +1,7 @@
 import pytest
 
-from clippings.books.exceptions import CantFindEntityError
 from clippings.books.use_cases.edit_book import DeleteBookUseCase
+from clippings.seedwork.exceptions import CantFindEntityError
 
 
 @pytest.fixture()
