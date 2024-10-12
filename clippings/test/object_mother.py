@@ -14,6 +14,7 @@ from clippings.books.entities import (
     Position,
 )
 from clippings.users.entities import User
+from clippings.utils.hash import hasher
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -87,7 +88,7 @@ class ObjectMother:
         *,
         id: str = "inline_note:id",
         content: str = "some note",
-        original_id: str = "inline_note:original_id",
+        original_id: str | None = "in:orig_id",
         automatically_linked: bool = False,
         added_at: datetime = datetime(2024, 8, 9),  # noqa: B008
     ) -> InlineNote:
@@ -120,6 +121,9 @@ class ObjectMother:
 
     def deleted_hash(self, *, id: str = "hash") -> DeletedHash:
         return DeletedHash(id=id)
+
+    def hashed_id(self, text: str, /) -> str:
+        return hasher(text)
 
     def user(
         self,

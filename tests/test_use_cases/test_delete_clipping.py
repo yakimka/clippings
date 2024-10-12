@@ -1,8 +1,7 @@
 import pytest
 
-from clippings.books.exceptions import CantFindEntityError
 from clippings.books.use_cases.edit_book import DeleteClippingUseCase
-from clippings.seedwork.exceptions import DomainError
+from clippings.seedwork.exceptions import CantFindEntityError, DomainError
 
 
 @pytest.fixture()

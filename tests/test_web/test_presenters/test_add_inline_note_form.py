@@ -54,9 +54,7 @@ async def test_present_should_return_not_found_when_clipping_is_not_found(
     make_sut, mock_book_storage, mother
 ):
     sut = make_sut()
-    book = mother.book(
-        id="book-id", clippings=[mother.clipping(id="other-clipping-id")]
-    )
+    book = mother.book(id="book-id", clippings=[mother.clipping(id="AAABBB")])
     await mock_book_storage.add(book)
 
     result = await sut.present(

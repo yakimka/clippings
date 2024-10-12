@@ -78,7 +78,7 @@ async def test_import_single_clipping(
         ),
         clippings=[
             Clipping(
-                id=ANY,
+                id="3AVVHZIWHWFGZ",
                 page=(1, 1),
                 location=(10, 22),
                 type=ClippingType.HIGHLIGHT,
