@@ -80,7 +80,7 @@ jobs:
           docker tag ${DEV_IMAGE} ${PROJECT_NAME}:dev
 
       - name: Spin DB containers
-        run: docker compose up -d mongo4
+        run: docker compose up -d mongo
 
       - name: Prepare configs
         run: cp settings.example.yaml settings.yaml
