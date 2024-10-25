@@ -800,13 +800,13 @@ files = [
 
 [[package]]
 name = "picodi"
-version = "0.28.0"
+version = "0.30.0"
 description = "Simple Dependency Injection for Python"
 optional = false
 python-versions = "<4.0,>=3.10"
 files = [
-    {file = "picodi-0.28.0-py3-none-any.whl", hash = "sha256:6e05abbd95180f56b669d3593d054a8f62eb3e8fc528d32f813bfc5dc5f13f82"},
-    {file = "picodi-0.28.0.tar.gz", hash = "sha256:1ff5e7f458016dd44bce9e00b0b3f1eb44b49fd838c79648856c2258674481a5"},
+    {file = "picodi-0.30.0-py3-none-any.whl", hash = "sha256:737000050d215014a5eb44992a50e75a0c0e260be309d56771db59a4a7c64260"},
+    {file = "picodi-0.30.0.tar.gz", hash = "sha256:bb0c634f12e514ddee465ac7a8cfc6e9cf2d779523d92dda1702d0cc2355c59f"},
 ]
 
 [[package]]
@@ -1557,4 +1557,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "e3d74a04afe045ecfbdf0ceab31eda24b6ee421cb37d6fc25f43859de2156c65"
+content-hash = "2b1f3fd9055c920dc11316615c40d02388657081e36ed7de2fa990eba70bf470"
