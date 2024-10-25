@@ -69,6 +69,10 @@ class DeletedHashStorageABC(abc.ABC):
         pass
 
     @abc.abstractmethod
+    async def extend(self, deleted_hashes: list[DeletedHash]) -> None:
+        pass
+
+    @abc.abstractmethod
     async def clear(self) -> None:
         pass
 

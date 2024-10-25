@@ -39,6 +39,7 @@ dacite = "^1.8.1"
 dynaconf = "^3.2.6"
 markdown-it-py = "^3.0.0"
 mmh3 = "^5.0.1"
+jsonschema = "^4.23.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.13.0"

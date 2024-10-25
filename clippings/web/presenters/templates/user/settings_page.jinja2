@@ -18,6 +18,24 @@
                         hx-confirm="{{ action.confirm_message }}"
                 >{{ action.label }}
                 </a>
+                {% elif action.id == "restore_data" %}
+                <form
+                        hx-encoding="multipart/form-data"
+                        hx-disabled-elt="find #submit"
+                        class="grid"
+                        {{ hx_action(action) }}>
+                    <input
+                            id="submit"
+                            type="submit"
+                            class="outline contrast"
+                            value="{{ action.label }}"
+                    />
+                    <input
+                            name="file"
+                            type="file"
+                            placeholder="{{ action.label }}"
+                    />
+                </form>
                 {% else %}
                 <button
                         {{ hx_action(action) }}
