@@ -1,6 +1,6 @@
 default:
   mongo:
-    uri: mongodb://mongo4:27017
+    uri: mongodb://mongo:27017
 
 testing:
   adapters:
@@ -9,4 +9,4 @@ testing:
     deleted_hash_storage: mock
     book_info_client: mock
   mongo:
-    uri: mongodb://me:root_password@mongo4:27017
+    uri: mongodb://me:root_password@mongo:27017
