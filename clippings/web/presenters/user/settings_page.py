@@ -45,6 +45,16 @@ class SettingsPagePresenter:
                         "another account."
                     ),
                 ),
+                ActionDTO(
+                    id="restore_data",
+                    label="Restore my data",
+                    url=urls_manager.build_url("clippings_restore"),
+                    description=(
+                        "Restore your data from a backup. "
+                        "If you restore books that already exist in your library, "
+                        "the existing books will be replaced with the new data."
+                    ),
+                ),
             ],
         )
         return PresenterResult(

@@ -13,11 +13,11 @@ from clippings.seedwork.exceptions import DomainError
 
 
 @pytest.fixture()
-def make_sut(mock_book_storage, search_book_cover_service):
+def make_sut(mock_book_storage, enrich_books_meta_service):
     def _make_sut(books_storage=mock_book_storage):
         return EditBookUseCase(
             book_storage=books_storage,
-            search_book_cover_service=search_book_cover_service,
+            enrich_books_meta_service=enrich_books_meta_service,
         )
 
     return _make_sut

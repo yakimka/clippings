@@ -188,6 +188,9 @@ class MockDeletedHashStorage(DeletedHashStorageABC):
     async def add(self, deleted_hash: DeletedHash) -> None:
         self.hashes[deleted_hash.id] = deleted_hash
 
+    async def extend(self, deleted_hashes: list[DeletedHash]) -> None:
+        self.hashes.update({hash.id: hash for hash in deleted_hashes})
+
     async def clear(self) -> None:
         self.hashes.clear()
 
@@ -204,6 +207,17 @@ class MongoDeletedHashStorage(DeletedHashStorageABC):
     async def add(self, hash: DeletedHash) -> None:
         doc = {"_id": hash.id, "user_id": self._user_id}
         await self._collection.replace_one({"_id": hash.id}, doc, upsert=True)
+
+    async def extend(self, hashes: list[DeletedHash]) -> None:
+        operations: list[ReplaceOne[Mapping[str, Any]]] = [
+            ReplaceOne(
+                {"_id": hash.id, "user_id": self._user_id},
+                {"_id": hash.id, "user_id": self._user_id},
+                upsert=True,
+            )
+            for hash in hashes
+        ]
+        await self._collection.bulk_write(operations)
 
     async def clear(self) -> None:
         await self._collection.delete_many({"user_id": self._user_id})

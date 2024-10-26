@@ -18,6 +18,14 @@ def clippings_for_upload():
         yield file
 
 
+@pytest.fixture()
+def data_for_restore():
+    this_dir = Path(__file__).parent
+    fixture = this_dir / "my-clippings-backup.ndjson"
+    with open(fixture, "rb") as file:
+        yield file
+
+
 async def test_home_page(client):
     response = await client.get("/", follow_redirects=True)
 
@@ -75,6 +83,15 @@ async def test_import_clippings(client, book_storage, clippings_for_upload):
     assert response.status_code == 200
     books = await book_storage.find()
     assert len(books) == 1
+
+
+async def test_restore_data(client, book_storage, data_for_restore):
+    url = urls_manager.build_url("clippings_restore").value
+    response = await client.post(url, files={"file": data_for_restore})
+
+    assert response.status_code == 200
+    books = await book_storage.find()
+    assert len(books) > 1
 
 
 async def test_update_book_info(client, book_storage, mother):
