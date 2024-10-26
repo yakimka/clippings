@@ -10,7 +10,7 @@ from clippings.books.adapters.id_generators import (
     inline_note_id_generator,
 )
 from clippings.books.adapters.readers import KindleClippingsReader
-from clippings.books.services import SearchBookCoverService
+from clippings.books.services import EnrichBooksMetaService
 from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
 from clippings.deps import (
     get_book_info_client,
@@ -53,12 +53,12 @@ class ClippingsImportController:
 
     async def fire(self, file: BinaryIO) -> HTMLResponse:
         clippings_reader = KindleClippingsReader(file)
-        search_book_cover_service = SearchBookCoverService(self._book_info_client)
+        enrich_books_meta_service = EnrichBooksMetaService(self._book_info_client)
         import_use_case = ImportClippingsUseCase(
             storage=self._books_storage,
             reader=clippings_reader,
             deleted_hash_storage=self._deleted_hash_storage,
-            search_book_cover_service=search_book_cover_service,
+            enrich_books_meta_service=enrich_books_meta_service,
             book_id_generator=book_id_generator,
             clipping_id_generator=clipping_id_generator,
             inline_note_id_generator=inline_note_id_generator,

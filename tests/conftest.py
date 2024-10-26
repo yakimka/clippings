@@ -6,7 +6,7 @@ from picodi.helpers import enter
 
 from clippings.books.adapters.readers import MockClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage, MockDeletedHashStorage
-from clippings.books.services import SearchBookCoverService
+from clippings.books.services import EnrichBooksMetaService
 from clippings.books.use_cases.book_info import MockBookInfoClient
 from clippings.deps import get_mongo_client, get_mongo_database, get_mongo_database_name
 from clippings.settings import settings
@@ -97,5 +97,5 @@ def mock_book_info_client():
 
 
 @pytest.fixture()
-def search_book_cover_service(mock_book_info_client):
-    return SearchBookCoverService(mock_book_info_client)
+def enrich_books_meta_service(mock_book_info_client):
+    return EnrichBooksMetaService(mock_book_info_client)

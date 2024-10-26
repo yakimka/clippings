@@ -32,13 +32,13 @@ def sut(
     mock_clipping_reader,
     autoincrement_id_generator,
     mock_deleted_hash_storage,
-    search_book_cover_service,
+    enrich_books_meta_service,
 ) -> ImportClippingsUseCase:
     return ImportClippingsUseCase(
         storage=mock_book_storage,
         reader=mock_clipping_reader,
         deleted_hash_storage=mock_deleted_hash_storage,
-        search_book_cover_service=search_book_cover_service,
+        enrich_books_meta_service=enrich_books_meta_service,
         book_id_generator=autoincrement_id_generator,
         clipping_id_generator=clipping_id_generator,
         inline_note_id_generator=inline_note_id_generator,

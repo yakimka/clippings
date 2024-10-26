@@ -1,19 +1,9 @@
 from __future__ import annotations
 
-import asyncio
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from clippings.books.entities import Book, Clipping, DeletedHash
-
-try:
-    from itertools import batched
-except ImportError:
-    from collections.abc import Iterable  # noqa: TC003
-
-    def batched(iterable: list, n: int) -> Iterable:  # type: ignore[no-redef]
-        return (iterable[i : i + n] for i in range(0, len(iterable), n))
-
 
 if TYPE_CHECKING:
 
@@ -25,7 +15,7 @@ if TYPE_CHECKING:
         DeletedHashStorageABC,
         InlineNoteIdGenerator,
     )
-    from clippings.books.services import SearchBookCoverService
+    from clippings.books.services import EnrichBooksMetaService
 
 
 @dataclass
@@ -42,7 +32,7 @@ class ImportClippingsUseCase:
         storage: BooksStorageABC,
         reader: ClippingsReaderABC,
         deleted_hash_storage: DeletedHashStorageABC,
-        search_book_cover_service: SearchBookCoverService,
+        enrich_books_meta_service: EnrichBooksMetaService,
         book_id_generator: BookIdGenerator,
         clipping_id_generator: ClippingIdGenerator,
         inline_note_id_generator: InlineNoteIdGenerator,
@@ -50,7 +40,7 @@ class ImportClippingsUseCase:
         self._storage = storage
         self._reader = reader
         self._deleted_hash_storage = deleted_hash_storage
-        self._search_book_cover_service = search_book_cover_service
+        self._enrich_books_meta_service = enrich_books_meta_service
         self._book_id_generator = book_id_generator
         self._clipping_id_generator = clipping_id_generator
         self._inline_note_id_generator = inline_note_id_generator
@@ -120,16 +110,10 @@ class ImportClippingsUseCase:
                     )
                 )
 
-        await self._add_meta_to_books(books_to_add_meta)
+        await self._enrich_books_meta_service.execute(books_to_add_meta)
         for book in to_update:
             book.link_notes(inline_note_id_generator=self._inline_note_id_generator)
 
         if to_update:
             await self._storage.extend(to_update)
         return statistics
-
-    async def _add_meta_to_books(self, books: list[Book]) -> None:
-        for batch in batched(books, 4):
-            await asyncio.gather(
-                *[self._search_book_cover_service.execute(book) for book in batch]
-            )

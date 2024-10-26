@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from picodi import Provide, inject
 
 from clippings.books.adapters.id_generators import inline_note_id_generator
-from clippings.books.services import SearchBookCoverService
+from clippings.books.services import EnrichBooksMetaService
 from clippings.books.use_cases.edit_book import (
     AddInlineNoteUseCase,
     ClearDeletedHashesUseCase,
@@ -135,10 +135,10 @@ class UpdateBookReviewController:
         self._book_info_client = book_info_client
 
     async def fire(self, book_id: str, review: str) -> Response:
-        search_book_cover_service = SearchBookCoverService(self._book_info_client)
+        enrich_books_meta_service = EnrichBooksMetaService(self._book_info_client)
         use_case = EditBookUseCase(
             book_storage=self._books_storage,
-            search_book_cover_service=search_book_cover_service,
+            enrich_books_meta_service=enrich_books_meta_service,
         )
         result = await use_case.execute(
             book_id=book_id, fields=[ReviewDTO(review=review)]
@@ -163,10 +163,10 @@ class UpdateBookInfoController:
     async def fire(
         self, book_id: str, title: str, authors: str, rating: int | None
     ) -> Response:
-        search_book_cover_service = SearchBookCoverService(self._book_info_client)
+        enrich_books_meta_service = EnrichBooksMetaService(self._book_info_client)
         use_case = EditBookUseCase(
             book_storage=self._books_storage,
-            search_book_cover_service=search_book_cover_service,
+            enrich_books_meta_service=enrich_books_meta_service,
         )
         result = await use_case.execute(
             book_id=book_id,

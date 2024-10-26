@@ -13,7 +13,7 @@ if TYPE_CHECKING:
         DeletedHashStorageABC,
         InlineNoteIdGenerator,
     )
-    from clippings.books.services import SearchBookCoverService
+    from clippings.books.services import EnrichBooksMetaService
 
 
 @dataclass(kw_only=True)
@@ -64,10 +64,10 @@ class EditBookUseCase:
     def __init__(
         self,
         book_storage: BooksStorageABC,
-        search_book_cover_service: SearchBookCoverService,
+        enrich_books_meta_service: EnrichBooksMetaService,
     ):
         self._book_storage = book_storage
-        self._search_book_cover_service = search_book_cover_service
+        self._enrich_books_meta_service = enrich_books_meta_service
 
     async def execute(
         self, book_id: str, fields: list[BookFieldDTO]
@@ -84,7 +84,7 @@ class EditBookUseCase:
                 if isinstance(field, TitleDTO):
                     need_update_meta = True
         if need_update_meta:
-            await self._search_book_cover_service.execute(book)
+            await self._enrich_books_meta_service.execute([book])
         if changed:
             await self._book_storage.add(book)
         return None

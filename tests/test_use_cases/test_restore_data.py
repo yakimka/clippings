@@ -13,10 +13,12 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture()
-def make_sut(mock_book_storage, mock_deleted_hash_storage):
+def make_sut(mock_book_storage, mock_deleted_hash_storage, enrich_books_meta_service):
     def _make_sut():
         return RestoreDataUseCase(
-            mock_book_storage, deleted_hash_storage=mock_deleted_hash_storage
+            mock_book_storage,
+            deleted_hash_storage=mock_deleted_hash_storage,
+            enrich_books_meta_service=enrich_books_meta_service,
         )
 
     return _make_sut

@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
 
     from clippings.books.ports import BooksStorageABC, DeletedHashStorageABC
+    from clippings.books.services import EnrichBooksMetaService
 
 DATA_SCHEMA = {
     "type": "object",
@@ -159,6 +160,7 @@ class RestoreDataUseCase:
         self,
         book_storage: BooksStorageABC,
         deleted_hash_storage: DeletedHashStorageABC,
+        enrich_books_meta_service: EnrichBooksMetaService,
         book_deserializer: Callable[[dict], Book] = book_json_deserializer,
         deleted_hash_deserializer: Callable[
             [dict], DeletedHash
@@ -166,6 +168,7 @@ class RestoreDataUseCase:
     ) -> None:
         self._book_storage = book_storage
         self._deleted_hash_storage = deleted_hash_storage
+        self._enrich_books_meta_service = enrich_books_meta_service
         self._book_deserializer = book_deserializer
         self._deleted_hash_deserializer = deleted_hash_deserializer
 
@@ -197,6 +200,7 @@ class RestoreDataUseCase:
                 else:
                     raise RuntimeError("Unreachable code")
         if books:
+            await self._enrich_books_meta_service.execute(books)
             await self._book_storage.extend(books)
         if deleted_hashes:
             await self._deleted_hash_storage.extend(deleted_hashes)
