@@ -31,6 +31,7 @@ DATA_SCHEMA = {
     "type": "object",
     "oneOf": [
         {
+            "type": "object",
             "properties": {
                 "type": {"type": "string", "enum": ["book"]},
                 "id": {"type": "string", "pattern": "^[A-Z0-9]+$", "maxLength": 13},
@@ -104,19 +105,20 @@ DATA_SCHEMA = {
                             "inline_notes",
                         ],
                     },
-                    "required": [
-                        "type",
-                        "id",
-                        "title",
-                        "authors",
-                        "review",
-                        "rating",
-                        "clippings",
-                    ],
                 },
             },
+            "required": [
+                "type",
+                "id",
+                "title",
+                "authors",
+                "review",
+                "rating",
+                "clippings",
+            ],
         },
         {
+            "type": "object",
             "properties": {
                 "type": {"type": "string", "enum": ["deleted_hash"]},
                 "id": {"type": "string"},
