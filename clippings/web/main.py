@@ -57,7 +57,7 @@ middleware = [
     Middleware(RequestScopeMiddleware),
     Middleware(AuthenticationMiddleware, backend=BasicAuthBackend()),
     Middleware(ClosingSlashMiddleware),
-    Middleware(PrometheusMiddleware),
+    Middleware(PrometheusMiddleware, app_name="clippings_web"),
 ]
 
 app = Starlette(
