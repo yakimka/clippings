@@ -97,6 +97,7 @@ class InfrastructureSettings:
     adapters: AdaptersSettings
     mongo: MongoSettings | None
     google_books_api: GoogleBooksApi | None
+    sentry_dsn: str | None = None
 
     @classmethod
     def create_from_config(cls, defaults: AdaptersSettings) -> InfrastructureSettings:
@@ -104,4 +105,9 @@ class InfrastructureSettings:
         adapters.set_defaults(defaults)
         mongo = MongoSettings.create_from_config()
         google_books_api = GoogleBooksApi.create_from_config()
-        return cls(adapters=adapters, mongo=mongo, google_books_api=google_books_api)
+        return cls(
+            adapters=adapters,
+            mongo=mongo,
+            google_books_api=google_books_api,
+            sentry_dsn=settings.get("sentry_dsn"),
+        )
