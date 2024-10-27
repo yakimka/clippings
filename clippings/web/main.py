@@ -3,13 +3,17 @@ from collections.abc import AsyncGenerator
 from pathlib import Path
 
 import picodi
+import sentry_sdk
 from picodi.integrations.starlette import RequestScopeMiddleware
+from sentry_sdk.integrations.starlette import StarletteIntegration
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
+from starlette_exporter import PrometheusMiddleware, handle_metrics
 
+from clippings.deps import get_infrastructure_settings
 from clippings.web.auth import BasicAuthBackend
 from clippings.web.middleware import ClosingSlashMiddleware
 from clippings.web.presenters.urls import urls_manager
@@ -53,11 +57,13 @@ middleware = [
     Middleware(RequestScopeMiddleware),
     Middleware(AuthenticationMiddleware, backend=BasicAuthBackend()),
     Middleware(ClosingSlashMiddleware),
+    Middleware(PrometheusMiddleware),
 ]
 
 app = Starlette(
     routes=[
         *make_routes(),
+        Route("/metrics/", handle_metrics),
         Mount(
             "/",
             app=StaticFiles(directory=CURRENT_DIR / "presenters" / "public"),
@@ -69,6 +75,15 @@ app = Starlette(
     exception_handlers=exception_handlers,
 )
 
+settings = get_infrastructure_settings()
+
+if settings.sentry_dsn:
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        traces_sample_rate=0.3,
+        profiles_sample_rate=0.3,
+        integrations=[StarletteIntegration()],
+    )
 
 if __name__ == "__main__":
     import uvicorn
