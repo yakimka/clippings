@@ -50,7 +50,7 @@ pytest = "^8.3.3"
 pytest-asyncio = "^0.24.0"
 pytest-cov = "^5.0.0"
 pytest-deadfixtures = "^2.2.1"
-pytest-randomly = "^3.12"
+pytest-randomly = "^3.16"
 motor-types = "^1.0.0b4"
 pytest-recording = "^0.13.2"
 
