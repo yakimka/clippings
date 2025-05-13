@@ -4,6 +4,11 @@ import asyncio
 from typing import TYPE_CHECKING
 
 from clippings.books.entities import Book, BookMeta
+from clippings.seedwork.exceptions import QuotaExceededError
+
+if TYPE_CHECKING:
+    from clippings.users.entities import User
+
 
 try:
     from itertools import batched
@@ -42,3 +47,30 @@ class EnrichBooksMetaService:
             )
             book.meta = book_meta
         return book
+
+
+def check_book_limit(
+    user: User, current_user_book_count: int, books_being_added_count: int
+) -> None:
+    if (current_user_book_count + books_being_added_count) > user.max_books:
+        raise QuotaExceededError(
+            f"Adding {books_being_added_count} book(s) would exceed the "
+            f"limit of {user.max_books} books for user '{user.nickname}'."
+        )
+
+
+def check_clippings_per_book_limit(
+    user: User,
+    book_current_clipping_count: int,
+    clippings_being_added_count: int,
+    book_title: str | None = None,
+) -> None:
+    if (
+        book_current_clipping_count + clippings_being_added_count
+    ) > user.max_clippings_per_book:
+        book_context = f" for book '{book_title}'" if book_title else ""
+        raise QuotaExceededError(
+            f"Adding {clippings_being_added_count} clipping(s){book_context} "
+            f"would exceed the limit of {user.max_clippings_per_book} clippings "
+            f"per book for user '{user.nickname}'."
+        )

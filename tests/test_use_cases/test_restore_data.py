@@ -13,13 +13,22 @@ if TYPE_CHECKING:
     from io import BytesIO
 
 
+pytestmark = pytest.mark.usefixtures("user")
+
+
 @pytest.fixture()
-def make_sut(mock_book_storage, mock_deleted_hash_storage, enrich_books_meta_service):
+def make_sut(
+    mock_book_storage,
+    mock_deleted_hash_storage,
+    enrich_books_meta_service,
+    mock_users_storage,
+):
     def _make_sut():
         return RestoreDataUseCase(
             mock_book_storage,
             deleted_hash_storage=mock_deleted_hash_storage,
             enrich_books_meta_service=enrich_books_meta_service,
+            users_storage=mock_users_storage,
         )
 
     return _make_sut
@@ -35,7 +44,7 @@ def backup() -> BytesIO:
 async def test_can_restore_data(make_sut, backup):
     sut = make_sut()
 
-    result = await sut.execute(backup)
+    result = await sut.execute(backup, user_id="user:42")
 
     assert not isinstance(result, DomainError)
 
@@ -59,7 +68,7 @@ async def test_cant_restore_data_with_invalid_data(data, error_substring, make_s
     sut = make_sut()
     text_data = f'{{"version": "1"}}\n{data}'
 
-    result = await sut.execute(io.BytesIO(text_data.encode("utf-8")))
+    result = await sut.execute(io.BytesIO(text_data.encode("utf-8")), user_id="user:42")
 
     assert isinstance(result, DomainError)
     assert error_substring in str(result)

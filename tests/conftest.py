@@ -99,3 +99,10 @@ def mock_book_info_client():
 @pytest.fixture()
 def enrich_books_meta_service(mock_book_info_client):
     return EnrichBooksMetaService(mock_book_info_client)
+
+
+@pytest.fixture()
+async def user(mother, mock_users_storage):
+    new_user = mother.user()
+    await mock_users_storage.add(new_user)
+    return new_user

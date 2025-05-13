@@ -13,6 +13,8 @@ from clippings.books.use_cases.edit_book import (
 )
 from clippings.books.use_cases.import_clippings import ImportClippingsUseCase
 
+pytestmark = pytest.mark.usefixtures("user")
+
 
 @pytest.fixture()
 def import_clippings_use_case(
@@ -20,6 +22,7 @@ def import_clippings_use_case(
     mock_clipping_reader,
     mock_deleted_hash_storage,
     enrich_books_meta_service,
+    mock_users_storage,
 ) -> ImportClippingsUseCase:
     return ImportClippingsUseCase(
         storage=mock_book_storage,
@@ -29,6 +32,7 @@ def import_clippings_use_case(
         book_id_generator=book_id_generator,
         clipping_id_generator=clipping_id_generator,
         inline_note_id_generator=inline_note_id_generator,
+        users_storage=mock_users_storage,
     )
 
 
@@ -68,13 +72,13 @@ async def test_reimporting_deleted_book_does_nothing(
             content="The content",
         )
     ]
-    await import_clippings_use_case.execute()
+    await import_clippings_use_case.execute(user_id="user:42")
     imported_books = await mock_book_storage.find()
     assert len(imported_books) == 1
 
     # Act
     await delete_book_use_case.execute(imported_books[0].id)
-    await import_clippings_use_case.execute()
+    await import_clippings_use_case.execute(user_id="user:42")
 
     # Assert
     all_books = await mock_book_storage.find()
@@ -96,7 +100,7 @@ async def test_reimporting_deleted_clipping_does_nothing(
             content="The content",
         )
     ]
-    await import_clippings_use_case.execute()
+    await import_clippings_use_case.execute(user_id="user:42")
     imported_books = await mock_book_storage.find()
     assert len(imported_books) == 1
     assert len(imported_books[0].clippings) == 1
@@ -105,7 +109,7 @@ async def test_reimporting_deleted_clipping_does_nothing(
     await delete_clipping_use_case.execute(
         book_id=imported_books[0].id, clipping_id=imported_books[0].clippings[0].id
     )
-    await import_clippings_use_case.execute()
+    await import_clippings_use_case.execute(user_id="user:42")
 
     # Assert
     all_books = await mock_book_storage.find()
@@ -137,7 +141,7 @@ async def test_reimporting_deleted_inline_note_does_nothing(
             location=(42, 42),
         ),
     ]
-    await import_clippings_use_case.execute()
+    await import_clippings_use_case.execute(user_id="user:42")
     imported_books = await mock_book_storage.find()
     assert len(imported_books) == 1
     assert len(imported_books[0].clippings) == 1
@@ -149,7 +153,7 @@ async def test_reimporting_deleted_inline_note_does_nothing(
         clipping_id=imported_books[0].clippings[0].id,
         inline_note_id=imported_books[0].clippings[0].inline_notes[0].id,
     )
-    await import_clippings_use_case.execute()
+    await import_clippings_use_case.execute(user_id="user:42")
 
     # Assert
     all_books = await mock_book_storage.find()
@@ -182,7 +186,7 @@ async def test_reimporting_deleted_inline_note_which_deleted_with_clipping_does_
             location=(42, 42),
         ),
     ]
-    await import_clippings_use_case.execute()
+    await import_clippings_use_case.execute(user_id="user:42")
     imported_books = await mock_book_storage.find()
     assert len(imported_books) == 1
     assert len(imported_books[0].clippings) == 1
@@ -193,7 +197,7 @@ async def test_reimporting_deleted_inline_note_which_deleted_with_clipping_does_
         book_id=imported_books[0].id,
         clipping_id=imported_books[0].clippings[0].id,
     )
-    await import_clippings_use_case.execute()
+    await import_clippings_use_case.execute(user_id="user:42")
 
     # Assert
     all_books = await mock_book_storage.find()

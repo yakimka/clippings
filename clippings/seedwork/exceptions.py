@@ -8,3 +8,7 @@ class CantFindEntityError(DomainError):
 
 class ValidationError(DomainError):
     pass
+
+
+class QuotaExceededError(DomainError):
+    """Raised when a user exceeds their allocated quota."""
