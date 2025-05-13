@@ -7,7 +7,7 @@ all: help
 
 .PHONY: pre-commit
 pre-commit:  ## Run pre-commit with args
-	$(RUN) poetry run pre-commit $(args)
+	$(RUN) pre-commit $(args)
 
 .PHONY: poetry
 poetry:  ## Run poetry with args
@@ -23,21 +23,21 @@ lint:  ## Run flake8, mypy, other linters and verify formatting
 
 .PHONY: mypy
 mypy:  ## Run mypy
-	$(RUN) poetry run mypy $(args)
+	$(RUN) mypy $(args)
 
 .PHONY: test
 test:  ## Run tests
-	$(RUN) poetry run pytest --cov=tests --cov=clippings $(args)
-	$(RUN) poetry run pytest --dead-fixtures
+	$(RUN) pytest --cov=tests --cov=clippings $(args)
+	$(RUN) pytest --dead-fixtures
 
 .PHONY: test-record-vcr
 test-record-vcr:  ## Run tests with VCR recording
-	$(RUN) poetry run pytest -k vcr --record-mode=rewrite --block-network $(args)
+	$(RUN) pytest -k vcr --record-mode=rewrite --block-network $(args)
 
 .PHONY: package
 package:  ## Run packages (dependencies) checks
 	$(RUN) poetry check
-	$(RUN) poetry run pip check
+	$(RUN) pip check
 
 .PHONY: build-package
 build-package:  ## Build package
@@ -75,7 +75,7 @@ bash:  ## Run bash
 
 .PHONY: run-command
 run-command:  ## Run bash
-	$(RUN) poetry run python -m clippings.cli $(args)
+	$(RUN) python -m clippings.cli $(args)
 
 .PHONY: help
 help:
