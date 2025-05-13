@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
-from picodi import Provide, SingletonScope, dependency, inject
-from picodi.helpers import enter
+from picodi import Provide, SingletonScope, inject, registry
+from picodi.helpers import resolve
 
 from clippings.books.adapters.storages import (
     MockBooksStorage,
@@ -34,7 +34,7 @@ def get_default_adapters() -> AdaptersSettings:
     raise NotImplementedError("This dependency needs to be overridden")
 
 
-@dependency(scope_class=SingletonScope, use_init_hook=True)
+@registry.set_scope(scope_class=SingletonScope, auto_init=True)
 @inject
 def get_infrastructure_settings(
     default_adapters: AdaptersSettings = Provide(get_default_adapters),
@@ -42,7 +42,7 @@ def get_infrastructure_settings(
     return InfrastructureSettings.create_from_config(default_adapters)
 
 
-@dependency(scope_class=SingletonScope, use_init_hook=True)
+@registry.set_scope(scope_class=SingletonScope, auto_init=True)
 async def get_books_map() -> dict[str, dict[str, Book]]:
     return {}
 
@@ -80,7 +80,7 @@ def get_mongo_database(
     return getattr(mongo_client, database_name)
 
 
-@dependency(scope_class=SingletonScope, use_init_hook=True)
+@registry.set_scope(scope_class=SingletonScope, auto_init=True)
 async def get_users_map() -> dict[str, User]:
     return {}
 
@@ -108,11 +108,11 @@ def get_books_storage(
         "mock": get_mock_books_storage,
         "mongo": get_mongo_books_storage,
     }
-    with enter(variants[infra_settings.adapters.books_storage]) as storage:
+    with resolve(variants[infra_settings.adapters.books_storage]) as storage:
         return storage
 
 
-@dependency(scope_class=SingletonScope, use_init_hook=True)
+@registry.set_scope(scope_class=SingletonScope, auto_init=True)
 async def get_deleted_hashes_map() -> dict[str, dict[str, DeletedHash]]:
     return {}
 
@@ -150,7 +150,7 @@ def get_deleted_hash_storage(
         "mock": get_mock_deleted_hash_storage,
         "mongo": get_mongo_deleted_hash_storage,
     }
-    with enter(variants[infra_settings.adapters.deleted_hash_storage]) as storage:
+    with resolve(variants[infra_settings.adapters.deleted_hash_storage]) as storage:
         return storage
 
 
@@ -176,7 +176,7 @@ def get_users_storage(
         "mock": get_mock_users_storage,
         "mongo": get_mongo_users_storage,
     }
-    with enter(variants[infra_settings.adapters.users_storage]) as storage:
+    with resolve(variants[infra_settings.adapters.users_storage]) as storage:
         return storage
 
 
@@ -189,7 +189,7 @@ def get_mock_book_info_client() -> MockBookInfoClient:
     return MockBookInfoClient()
 
 
-@dependency(scope_class=SingletonScope)
+@registry.set_scope(scope_class=SingletonScope)
 @inject
 async def get_google_book_info_client(
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
@@ -207,7 +207,7 @@ async def get_google_book_info_client(
         await client.aclose()
 
 
-@dependency(scope_class=SingletonScope, use_init_hook=True)
+@registry.set_scope(scope_class=SingletonScope, auto_init=True)
 @inject
 async def get_book_info_client(
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
@@ -216,5 +216,5 @@ async def get_book_info_client(
         "mock": get_mock_book_info_client,
         "google": get_google_book_info_client,
     }
-    async with enter(variants[infra_settings.adapters.book_info_client]) as client:
+    async with resolve(variants[infra_settings.adapters.book_info_client]) as client:
         yield client  # noqa: ASYNC119

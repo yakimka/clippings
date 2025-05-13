@@ -2,7 +2,7 @@ from uuid import uuid4
 
 import pytest
 from picodi import registry
-from picodi.helpers import enter
+from picodi.helpers import resolve
 
 from clippings.books.adapters.readers import MockClippingsReader
 from clippings.books.adapters.storages import MockBooksStorage, MockDeletedHashStorage
@@ -45,7 +45,7 @@ def picodi_overrides(mongo_test_db_name):
 async def _drop_mongo_test_database(mongo_test_db_name):
     yield
     if get_mongo_database in registry.touched:
-        async with enter(get_mongo_client) as mongo_client:
+        async with resolve(get_mongo_client) as mongo_client:
             await mongo_client.drop_database(mongo_test_db_name)
 
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from picodi import Provide, dependency, inject, registry
+from picodi import Provide, inject, registry
 from picodi.integrations.starlette import RequestScope
 
 from clippings.deps import (
@@ -19,12 +19,11 @@ if TYPE_CHECKING:
     from clippings.users.ports import PasswordHasherABC, UsersStorageABC
 
 
-@dependency(scope_class=RequestScope)
+@registry.set_scope(scope_class=RequestScope)
 def get_request_context() -> dict:
     return {}
 
 
-@registry.override(get_user_id)
 @inject
 def get_user_id_from_request(web_context: dict = Provide(get_request_context)) -> str:
     if user_id := web_context.get("user_id"):
@@ -32,7 +31,6 @@ def get_user_id_from_request(web_context: dict = Provide(get_request_context)) -
     raise ValueError("User is not authenticated")
 
 
-@registry.override(get_default_adapters)
 def get_default_adapters_for_web() -> AdaptersSettings:
     return AdaptersSettings.defaults_for_web()
 
@@ -45,3 +43,7 @@ def get_auth_use_case(
     return AuthenticateUserUseCase(
         users_storage=users_storage, password_hasher=password_hasher
     )
+
+
+registry.override(get_user_id, get_user_id_from_request)
+registry.override(get_default_adapters, get_default_adapters_for_web)

@@ -1,7 +1,7 @@
 import pytest
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 from picodi import registry
-from picodi.helpers import enter, lifespan
+from picodi.helpers import resolve
 
 from clippings.deps import get_books_storage, get_password_hasher, get_users_map
 from clippings.web.deps import get_user_id
@@ -16,20 +16,23 @@ def asgi_app():
 @pytest.fixture()
 async def client(asgi_app, client_auth) -> AsyncClient:
     async with AsyncClient(
-        app=asgi_app, base_url="http://testserver", auth=client_auth, timeout=2
+        transport=ASGITransport(app=asgi_app),
+        base_url="http://testserver",
+        auth=client_auth,
+        timeout=2,
     ) as client:
         yield client
 
 
 @pytest.fixture(autouse=True)
 async def _dependencies_lifespan():
-    async with lifespan.async_():
+    async with registry.alifespan():
         yield
 
 
 @pytest.fixture(autouse=True)
 async def _override_deps(mother):
-    with enter(get_password_hasher) as password_hasher:
+    with resolve(get_password_hasher) as password_hasher:
         test_user = mother.user(
             id="user:id",
             nickname="testuser",
@@ -44,5 +47,5 @@ async def _override_deps(mother):
 @pytest.fixture()
 async def book_storage():
     with registry.override(get_user_id, lambda: "user:id"):
-        async with enter(get_books_storage) as storage:
+        async with resolve(get_books_storage) as storage:
             return storage
