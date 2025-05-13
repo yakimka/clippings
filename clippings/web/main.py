@@ -2,8 +2,8 @@ import contextlib
 from collections.abc import AsyncGenerator
 from pathlib import Path
 
-import picodi
 import sentry_sdk
+from picodi import registry
 from picodi.integrations.starlette import RequestScopeMiddleware
 from sentry_sdk.integrations.starlette import StarletteIntegration
 from starlette.applications import Starlette
@@ -25,11 +25,8 @@ CURRENT_DIR = Path(__file__).parent
 
 @contextlib.asynccontextmanager
 async def lifespan(app: Starlette) -> AsyncGenerator[None, None]:  # noqa: U100
-    await picodi.init_dependencies()
-    try:
+    async with registry.alifespan():
         yield
-    finally:
-        await picodi.shutdown_dependencies()  # noqa: ASYNC102
 
 
 def make_routes() -> list[Route]:

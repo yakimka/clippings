@@ -6,7 +6,7 @@ import inspect
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from picodi.helpers import lifespan
+from picodi import registry
 
 from clippings.cli import deps  # noqa: F401
 from clippings.cli.core import AsyncCommand
@@ -45,7 +45,7 @@ def make_parser(
     return parser
 
 
-@lifespan
+@registry.alifespan()
 async def main() -> None:
     commands = list(collect_commands())
     parser = make_parser(commands)
