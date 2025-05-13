@@ -18,7 +18,7 @@ ENV XDG_CACHE_HOME="$CODE_PATH/.cache" \
     XDG_CONFIG_HOME="/tmp/.config"
 
 
-ENV PATH="$VENV_PATH/bin:$CODE_PATH/.venv/bin:$PATH"
+ENV PATH="$CODE_PATH/.venv/bin:$VENV_PATH/bin:$PATH"
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 ARG USER_NAME=app
@@ -61,6 +61,8 @@ FROM python-base as development
 ENV PYTHONDONTWRITEBYTECODE=1
 WORKDIR $CODE_PATH
 
+# https://pythonspeed.com/articles/activate-virtualenv-dockerfile/
+ENV VIRTUAL_ENV=$CODE_PATH/.venv
 COPY --from=builder-base $VENV_PATH $VENV_PATH
 
 USER $USER_NAME
