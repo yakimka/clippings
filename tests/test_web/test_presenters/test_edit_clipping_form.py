@@ -9,8 +9,8 @@ from clippings.web.presenters.urls import urls_manager
 
 
 @pytest.fixture()
-def make_sut(mock_book_storage):
-    def _make_sut(book_storage=mock_book_storage):
+def make_sut(memory_book_storage):
+    def _make_sut(book_storage=memory_book_storage):
         return EditClippingFormPresenter(
             storage=book_storage, urls_manager=urls_manager
         )
@@ -19,14 +19,14 @@ def make_sut(mock_book_storage):
 
 
 async def test_present_should_return_edit_clipping_dto_when_clipping_is_found(
-    make_sut, mock_book_storage, mother
+    make_sut, memory_book_storage, mother
 ):
     sut = make_sut()
     book = mother.book(
         id="book-id",
         clippings=[mother.clipping(id="clipping-id", content="Sample content")],
     )
-    await mock_book_storage.add(book)
+    await memory_book_storage.add(book)
 
     result = await sut.present(book_id="book-id", clipping_id="clipping-id")
 
@@ -37,11 +37,11 @@ async def test_present_should_return_edit_clipping_dto_when_clipping_is_found(
 
 
 async def test_present_should_return_not_found_when_clipping_is_not_found(
-    make_sut, mock_book_storage, mother
+    make_sut, memory_book_storage, mother
 ):
     sut = make_sut()
     book = mother.book(id="book-id", clippings=[mother.clipping(id="clipping-id")])
-    await mock_book_storage.add(book)
+    await memory_book_storage.add(book)
 
     result = await sut.present(
         book_id="book-id", clipping_id="non-existent-clipping-id"

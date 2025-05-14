@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 from clippings.books.adapters.storages import (
-    MockDeletedHashStorage,
+    MemoryDeletedHashStorage,
     MongoDeletedHashStorage,
 )
 
@@ -13,11 +13,11 @@ if TYPE_CHECKING:
     from clippings.books.ports import DeletedHashStorageABC
 
 
-@pytest.fixture(params=["mock", "mongo"])
+@pytest.fixture(params=["memory", "mongo"])
 def make_sut(request, mongo_db):
     async def _make_sut() -> DeletedHashStorageABC:
-        if request.param == "mock":
-            storage = MockDeletedHashStorage()
+        if request.param == "memory":
+            storage = MemoryDeletedHashStorage()
         elif request.param == "mongo":
             storage = MongoDeletedHashStorage(mongo_db, user_id="user_id")
         else:

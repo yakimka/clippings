@@ -31,9 +31,9 @@ class MongoSettings:
 
 @dataclass
 class AdaptersSettings:
-    books_storage: Literal["mongo", "mock", "notset"]
-    users_storage: Literal["mongo", "mock", "notset"]
-    deleted_hash_storage: Literal["mongo", "mock", "notset"]
+    books_storage: Literal["mongo", "memory", "notset"]
+    users_storage: Literal["mongo", "memory", "notset"]
+    deleted_hash_storage: Literal["mongo", "memory", "notset"]
     book_info_client: Literal["mock", "google", "notset"]
 
     @classmethod

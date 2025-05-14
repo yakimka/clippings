@@ -30,13 +30,27 @@ class CreateUserController:
         self._users_storage = users_storage
         self._password_hasher = password_hasher
 
-    async def execute(self, nickname: str, password: str) -> Result:
+    async def execute(
+        self,
+        nickname: str,
+        password: str,
+        max_books: int | None = None,
+        max_clippings_per_book: int | None = None,
+    ) -> Result:
         use_case = CreateUserUseCase(
             users_storage=self._users_storage,
             user_id_generator=user_id_generator,
             password_hasher=self._password_hasher,
         )
-        user_to_create = UserToCreateDTO(nickname=nickname, password=password)
+        kwargs: dict[str, str | int] = {
+            "nickname": nickname,
+            "password": password,
+        }
+        if max_books is not None:
+            kwargs["max_books"] = max_books
+        if max_clippings_per_book is not None:
+            kwargs["max_clippings_per_book"] = max_clippings_per_book
+        user_to_create = UserToCreateDTO(**kwargs)  # type: ignore[arg-type]
         result = await use_case.execute(user_to_create)
         if isinstance(result, DomainError):
             return Result(message=str(result), exit_code=1)

@@ -4,23 +4,23 @@ from clippings.cli.controllers import CreateUserController
 
 
 @pytest.fixture()
-def make_sut(mock_users_storage, dummy_password_hasher):
+def make_sut(memory_users_storage, dummy_password_hasher):
     def _make_sut():
         return CreateUserController(
-            users_storage=mock_users_storage, password_hasher=dummy_password_hasher
+            users_storage=memory_users_storage, password_hasher=dummy_password_hasher
         )
 
     return _make_sut
 
 
-async def test_create_user_success(make_sut, mock_users_storage):
+async def test_create_user_success(make_sut, memory_users_storage):
     sut = make_sut()
 
     result = await sut.execute(nickname="test_user", password="test_password")
 
     assert isinstance(result.message, str)
     assert result.exit_code == 0
-    created_user = await mock_users_storage.get_by_nickname("test_user")
+    created_user = await memory_users_storage.get_by_nickname("test_user")
     assert created_user.nickname == "test_user"
     assert created_user.hashed_password == "test_password_hashed"
 

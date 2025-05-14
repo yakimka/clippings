@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from motor.motor_asyncio import AsyncIOMotorDatabase
 
 
-class MockBooksStorage(BooksStorageABC):
+class MemoryBooksStorage(BooksStorageABC):
     def __init__(self, books_map: dict[str, Book] | None = None) -> None:
         self.books: dict[str, Book] = {} if books_map is None else books_map
 
@@ -178,7 +178,7 @@ class MongoBooksStorage(BooksStorageABC):
         return [doc["_id"] for doc in result]
 
 
-class MockDeletedHashStorage(DeletedHashStorageABC):
+class MemoryDeletedHashStorage(DeletedHashStorageABC):
     def __init__(self, hashes_map: dict[str, DeletedHash] | None = None) -> None:
         self.hashes: dict[str, DeletedHash] = {} if hashes_map is None else hashes_map
 

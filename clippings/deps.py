@@ -7,15 +7,15 @@ from picodi import Provide, SingletonScope, inject, registry
 from picodi.helpers import resolve
 
 from clippings.books.adapters.storages import (
-    MockBooksStorage,
-    MockDeletedHashStorage,
+    MemoryBooksStorage,
+    MemoryDeletedHashStorage,
     MongoBooksStorage,
     MongoDeletedHashStorage,
 )
 from clippings.books.use_cases.book_info import GoogleBookInfoClient, MockBookInfoClient
 from clippings.settings import AdaptersSettings, InfrastructureSettings
 from clippings.users.adapters.password_hashers import PBKDF2PasswordHasher
-from clippings.users.adapters.storages import MockUsersStorage, MongoUsersStorage
+from clippings.users.adapters.storages import MemoryUsersStorage, MongoUsersStorage
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator, Callable
@@ -86,10 +86,10 @@ async def get_users_map() -> dict[str, User]:
 
 
 @inject
-def get_mock_books_storage(
+def get_memory_books_storage(
     books_map: dict[str, Book] = Provide(get_user_books_map),
-) -> MockBooksStorage:
-    return MockBooksStorage(books_map)
+) -> MemoryBooksStorage:
+    return MemoryBooksStorage(books_map)
 
 
 @inject
@@ -105,7 +105,7 @@ def get_books_storage(
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> BooksStorageABC:
     variants: dict[str, Callable[..., Any]] = {
-        "mock": get_mock_books_storage,
+        "memory": get_memory_books_storage,
         "mongo": get_mongo_books_storage,
     }
     with resolve(variants[infra_settings.adapters.books_storage]) as storage:
@@ -128,10 +128,10 @@ def get_user_deleted_hashes_map(
 
 
 @inject
-def get_mock_deleted_hash_storage(
+def get_memory_deleted_hash_storage(
     deleted_hashes_map: dict[str, DeletedHash] = Provide(get_user_deleted_hashes_map),
-) -> MockDeletedHashStorage:
-    return MockDeletedHashStorage(deleted_hashes_map)
+) -> MemoryDeletedHashStorage:
+    return MemoryDeletedHashStorage(deleted_hashes_map)
 
 
 @inject
@@ -147,7 +147,7 @@ def get_deleted_hash_storage(
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> DeletedHashStorageABC:
     variants: dict[str, Callable[..., Any]] = {
-        "mock": get_mock_deleted_hash_storage,
+        "memory": get_memory_deleted_hash_storage,
         "mongo": get_mongo_deleted_hash_storage,
     }
     with resolve(variants[infra_settings.adapters.deleted_hash_storage]) as storage:
@@ -155,10 +155,10 @@ def get_deleted_hash_storage(
 
 
 @inject
-def get_mock_users_storage(
+def get_memory_users_storage(
     users_map: dict = Provide(get_users_map),
-) -> MockUsersStorage:
-    return MockUsersStorage(users_map)
+) -> MemoryUsersStorage:
+    return MemoryUsersStorage(users_map)
 
 
 @inject
@@ -173,7 +173,7 @@ def get_users_storage(
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> UsersStorageABC:
     variants: dict[str, Callable[..., Any]] = {
-        "mock": get_mock_users_storage,
+        "memory": get_memory_users_storage,
         "mongo": get_mongo_users_storage,
     }
     with resolve(variants[infra_settings.adapters.users_storage]) as storage:

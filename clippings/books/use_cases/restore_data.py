@@ -19,13 +19,22 @@ from clippings.books.constants import (
     CLIPPING_MAX_INLINE_NOTES,
 )
 from clippings.books.entities import Book, DeletedHash
-from clippings.seedwork.exceptions import DomainError
+from clippings.books.ports import BooksStorageABC, DeletedHashStorageABC
+from clippings.books.services import (
+    EnrichBooksMetaService,
+    check_book_limit,
+    check_clippings_per_book_limit,
+)
+from clippings.seedwork.exceptions import (
+    CantFindEntityError,
+    DomainError,
+    QuotaExceededError,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
 
-    from clippings.books.ports import BooksStorageABC, DeletedHashStorageABC
-    from clippings.books.services import EnrichBooksMetaService
+    from clippings.users.ports import UsersStorageABC
 
 DATA_SCHEMA = {
     "type": "object",
@@ -162,6 +171,7 @@ class RestoreDataUseCase:
         self,
         book_storage: BooksStorageABC,
         deleted_hash_storage: DeletedHashStorageABC,
+        users_storage: UsersStorageABC,
         enrich_books_meta_service: EnrichBooksMetaService,
         book_deserializer: Callable[[dict], Book] = book_json_deserializer,
         deleted_hash_deserializer: Callable[
@@ -170,17 +180,24 @@ class RestoreDataUseCase:
     ) -> None:
         self._book_storage = book_storage
         self._deleted_hash_storage = deleted_hash_storage
+        self._users_storage = users_storage
         self._enrich_books_meta_service = enrich_books_meta_service
         self._book_deserializer = book_deserializer
         self._deleted_hash_deserializer = deleted_hash_deserializer
 
     async def execute(  # noqa: C901
-        self, data: Iterable[bytes]
-    ) -> None | InvalidDataError:
+        self, data: Iterable[bytes], user_id: str
+    ) -> None | InvalidDataError | CantFindEntityError | QuotaExceededError:
+        user = await self._users_storage.get(user_id)
+        if not user:
+            raise CantFindEntityError(f"User with id '{user_id}' not found.")
+
         data_iter = iter(data)
         next(data_iter)  # version
-        books = []
-        deleted_hashes = []
+
+        book_json_data_list: list[dict] = []
+        deleted_hashes_to_restore: list[DeletedHash] = []
+
         for i, item in enumerate(data_iter):
             try:
                 item_str = item.decode("utf-8")
@@ -196,14 +213,36 @@ class RestoreDataUseCase:
                     return error
 
                 if json_data["type"] == "book":
-                    books.append(self._book_deserializer(json_data))
+                    book_json_data_list.append(json_data)
                 elif json_data["type"] == "deleted_hash":
-                    deleted_hashes.append(self._deleted_hash_deserializer(json_data))
+                    deleted_hashes_to_restore.append(
+                        self._deleted_hash_deserializer(json_data)
+                    )
                 else:
                     raise RuntimeError("Unreachable code")
-        if books:
-            await self._enrich_books_meta_service.execute(books)
-            await self._book_storage.extend(books)
-        if deleted_hashes:
-            await self._deleted_hash_storage.extend(deleted_hashes)
+
+        if book_json_data_list:
+            current_user_book_count = await self._book_storage.count(
+                BooksStorageABC.FindQuery()
+            )
+            check_book_limit(user, current_user_book_count, len(book_json_data_list))
+
+        books_to_restore: list[Book] = []
+        if book_json_data_list:
+            for book_json_data in book_json_data_list:
+                book_object = self._book_deserializer(book_json_data)
+                check_clippings_per_book_limit(
+                    user,
+                    book_current_clipping_count=0,  # For new/restored books
+                    clippings_being_added_count=len(book_object.clippings),
+                    book_title=book_object.title,
+                )
+                books_to_restore.append(book_object)
+
+        if books_to_restore:
+            await self._enrich_books_meta_service.execute(books_to_restore)
+            await self._book_storage.extend(books_to_restore)
+
+        if deleted_hashes_to_restore:
+            await self._deleted_hash_storage.extend(deleted_hashes_to_restore)
         return None

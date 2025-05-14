@@ -4,18 +4,18 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from clippings.users.adapters.storages import MockUsersStorage, MongoUsersStorage
+from clippings.users.adapters.storages import MemoryUsersStorage, MongoUsersStorage
 
 if TYPE_CHECKING:
     from clippings.users.entities import User
     from clippings.users.ports import UsersStorageABC
 
 
-@pytest.fixture(params=["mock", "mongo"])
+@pytest.fixture(params=["memory", "mongo"])
 def make_sut(request, mongo_db):
     async def _make_sut(users: list[User] | None = None) -> UsersStorageABC:
-        if request.param == "mock":
-            storage = MockUsersStorage()
+        if request.param == "memory":
+            storage = MemoryUsersStorage()
         elif request.param == "mongo":
             storage = MongoUsersStorage(mongo_db)
         else:

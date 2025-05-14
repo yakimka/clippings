@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from motor.motor_asyncio import AsyncIOMotorDatabase
 
 
-class MockUsersStorage(UsersStorageABC):
+class MemoryUsersStorage(UsersStorageABC):
     def __init__(self, users_map: dict[str, User] | None = None) -> None:
         self.users: dict[str, User] = {} if users_map is None else users_map
 

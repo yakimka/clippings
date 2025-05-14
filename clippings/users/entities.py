@@ -12,6 +12,8 @@ class User:
     id: str
     nickname: str
     hashed_password: str | None
+    max_books: int
+    max_clippings_per_book: int
 
     def set_password(self, password: str, hasher: PasswordHasherABC) -> None:
         self.hashed_password = hasher.hash(password)

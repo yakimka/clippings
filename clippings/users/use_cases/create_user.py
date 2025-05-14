@@ -18,6 +18,8 @@ if TYPE_CHECKING:
 class UserToCreateDTO:
     nickname: str
     password: str
+    max_books: int = 100
+    max_clippings_per_book: int = 500
 
 
 class CreateUserUseCase:
@@ -44,6 +46,8 @@ class CreateUserUseCase:
                 id=user_id,
                 nickname=user.nickname,
                 hashed_password=self._password_hasher.hash(user.password),
+                max_books=user.max_books,
+                max_clippings_per_book=user.max_clippings_per_book,
             )
         )
         return user_id

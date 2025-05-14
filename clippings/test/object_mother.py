@@ -131,5 +131,13 @@ class ObjectMother:
         id: str = "user:42",
         nickname: str = "my_nickname",
         hashed_password: str | None = None,
+        max_books: int = 100,
+        max_clippings_per_book: int = 500,
     ) -> User:
-        return User(id=id, nickname=nickname, hashed_password=hashed_password)
+        return User(
+            id=id,
+            nickname=nickname,
+            hashed_password=hashed_password,
+            max_books=max_books,
+            max_clippings_per_book=max_clippings_per_book,
+        )
