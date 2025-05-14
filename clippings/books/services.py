@@ -54,8 +54,10 @@ def check_book_limit(
 ) -> None:
     if (current_user_book_count + books_being_added_count) > user.max_books:
         raise QuotaExceededError(
-            f"Adding {books_being_added_count} book(s) would exceed the "
-            f"limit of {user.max_books} books for user '{user.nickname}'."
+            quota_type="books",
+            current_quota=user.max_books,
+            trying_to_add=books_being_added_count,
+            user_id=user.id,
         )
 
 
@@ -68,9 +70,10 @@ def check_clippings_per_book_limit(
     if (
         book_current_clipping_count + clippings_being_added_count
     ) > user.max_clippings_per_book:
-        book_context = f" for book '{book_title}'" if book_title else ""
         raise QuotaExceededError(
-            f"Adding {clippings_being_added_count} clipping(s){book_context} "
-            f"would exceed the limit of {user.max_clippings_per_book} clippings "
-            f"per book for user '{user.nickname}'."
+            quota_type="clippings",
+            current_quota=user.max_clippings_per_book,
+            trying_to_add=clippings_being_added_count,
+            user_id=user.id,
+            book_title=book_title or "",
         )
