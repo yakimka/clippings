@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -12,8 +12,8 @@ class User:
     id: str
     nickname: str
     hashed_password: str | None
-    max_books: int = field(default=100)
-    max_clippings_per_book: int = field(default=500)
+    max_books: int
+    max_clippings_per_book: int
 
     def set_password(self, password: str, hasher: PasswordHasherABC) -> None:
         self.hashed_password = hasher.hash(password)
