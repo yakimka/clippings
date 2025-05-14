@@ -18,17 +18,17 @@ pytestmark = pytest.mark.usefixtures("user")
 
 @pytest.fixture()
 def make_sut(
-    mock_book_storage,
-    mock_deleted_hash_storage,
+    memory_book_storage,
+    memory_deleted_hash_storage,
     enrich_books_meta_service,
-    mock_users_storage,
+    memory_users_storage,
 ):
     def _make_sut():
         return RestoreDataUseCase(
-            mock_book_storage,
-            deleted_hash_storage=mock_deleted_hash_storage,
+            memory_book_storage,
+            deleted_hash_storage=memory_deleted_hash_storage,
             enrich_books_meta_service=enrich_books_meta_service,
-            users_storage=mock_users_storage,
+            users_storage=memory_users_storage,
         )
 
     return _make_sut

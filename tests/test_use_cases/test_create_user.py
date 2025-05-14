@@ -11,27 +11,29 @@ def password_hasher(dummy_password_hasher):
 
 
 @pytest.fixture()
-def make_sut(mock_users_storage, password_hasher):
+def make_sut(memory_users_storage, password_hasher):
     def _make_sut():
-        return CreateUserUseCase(mock_users_storage, user_id_generator, password_hasher)
+        return CreateUserUseCase(
+            memory_users_storage, user_id_generator, password_hasher
+        )
 
     return _make_sut
 
 
-async def test_successfully_add_user(make_sut, mock_users_storage, password_hasher):
+async def test_successfully_add_user(make_sut, memory_users_storage, password_hasher):
     sut = make_sut()
     user_to_create = UserToCreateDTO(nickname="mario", password="luigisucks")
 
     user_id = await sut.execute(user_to_create)
 
-    created_user = await mock_users_storage.get(user_id)
+    created_user = await memory_users_storage.get(user_id)
     assert created_user.id == user_id
     assert password_hasher.verify("luigisucks", created_user.hashed_password)
 
 
-async def test_cant_add_user_with_same_nickname(make_sut, mock_users_storage, mother):
+async def test_cant_add_user_with_same_nickname(make_sut, memory_users_storage, mother):
     sut = make_sut()
-    await mock_users_storage.add(mother.user(nickname="mario"))
+    await memory_users_storage.add(mother.user(nickname="mario"))
     user_to_create = UserToCreateDTO(nickname="mario", password="luigisucks")
 
     result = await sut.execute(user_to_create)

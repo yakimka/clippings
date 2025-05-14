@@ -7,19 +7,19 @@ from clippings.books.use_cases.export_data import ExportDataUseCase
 
 
 @pytest.fixture()
-def make_sut(mock_book_storage, mock_deleted_hash_storage):
+def make_sut(memory_book_storage, memory_deleted_hash_storage):
     def _make_sut():
         return ExportDataUseCase(
-            mock_book_storage, deleted_hash_storage=mock_deleted_hash_storage
+            memory_book_storage, deleted_hash_storage=memory_deleted_hash_storage
         )
 
     return _make_sut
 
 
-async def test_first_entry_is_export_metadata(make_sut, mock_book_storage, mother):
+async def test_first_entry_is_export_metadata(make_sut, memory_book_storage, mother):
     sut = make_sut()
     book = mother.book()
-    await mock_book_storage.add(book)
+    await memory_book_storage.add(book)
 
     result = await sut.execute()
     data = [item async for item in result.iterator]
@@ -28,7 +28,7 @@ async def test_first_entry_is_export_metadata(make_sut, mock_book_storage, mothe
     assert json.loads(data[0]) == {"version": "1"}
 
 
-async def test_export_one_book(make_sut, mock_book_storage, mother):
+async def test_export_one_book(make_sut, memory_book_storage, mother):
     sut = make_sut()
     book = mother.book(
         id="book_id",
@@ -59,7 +59,7 @@ async def test_export_one_book(make_sut, mock_book_storage, mother):
             )
         ],
     )
-    await mock_book_storage.add(book)
+    await memory_book_storage.add(book)
 
     result = await sut.execute()
     data = [item async for item in result.iterator]
@@ -97,10 +97,10 @@ async def test_export_one_book(make_sut, mock_book_storage, mother):
     }
 
 
-async def test_export_multiple_books(make_sut, mock_book_storage, mother):
+async def test_export_multiple_books(make_sut, memory_book_storage, mother):
     sut = make_sut()
     books = [mother.book(id=f"book_id_{i}") for i in range(3)]
-    await mock_book_storage.extend(books)
+    await memory_book_storage.extend(books)
 
     result = await sut.execute()
     data = [item async for item in result.iterator]
@@ -109,11 +109,11 @@ async def test_export_multiple_books(make_sut, mock_book_storage, mother):
 
 
 async def test_exported_data_must_be_delimited_by_newline(
-    make_sut, mock_book_storage, mother
+    make_sut, memory_book_storage, mother
 ):
     sut = make_sut()
     books = [mother.book(id=f"book_id_{i}") for i in range(3)]
-    await mock_book_storage.extend(books)
+    await memory_book_storage.extend(books)
 
     result = await sut.execute()
     data = [item async for item in result.iterator]
@@ -121,10 +121,10 @@ async def test_exported_data_must_be_delimited_by_newline(
     assert all(item.endswith("\n") for item in data)
 
 
-async def test_export_deleted_hashes(make_sut, mother, mock_deleted_hash_storage):
+async def test_export_deleted_hashes(make_sut, mother, memory_deleted_hash_storage):
     sut = make_sut()
     deleted_hash = mother.deleted_hash(id="deleted_hash")
-    await mock_deleted_hash_storage.add(deleted_hash)
+    await memory_deleted_hash_storage.add(deleted_hash)
 
     result = await sut.execute()
     data = [item async for item in result.iterator]
@@ -134,13 +134,13 @@ async def test_export_deleted_hashes(make_sut, mother, mock_deleted_hash_storage
 
 
 async def test_export_all_entities_at_once(
-    make_sut, mother, mock_book_storage, mock_deleted_hash_storage
+    make_sut, mother, memory_book_storage, memory_deleted_hash_storage
 ):
     sut = make_sut()
     book = mother.book(id="book_id")
     deleted_hash = mother.deleted_hash(id="deleted_hash")
-    await mock_book_storage.add(book)
-    await mock_deleted_hash_storage.add(deleted_hash)
+    await memory_book_storage.add(book)
+    await memory_deleted_hash_storage.add(deleted_hash)
 
     result = await sut.execute()
     data = [item async for item in result.iterator]

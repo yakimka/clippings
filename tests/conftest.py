@@ -5,14 +5,17 @@ from picodi import registry
 from picodi.helpers import resolve
 
 from clippings.books.adapters.readers import MockClippingsReader
-from clippings.books.adapters.storages import MockBooksStorage, MockDeletedHashStorage
+from clippings.books.adapters.storages import (
+    MemoryBooksStorage,
+    MemoryDeletedHashStorage,
+)
 from clippings.books.services import EnrichBooksMetaService
 from clippings.books.use_cases.book_info import MockBookInfoClient
 from clippings.deps import get_mongo_client, get_mongo_database, get_mongo_database_name
 from clippings.settings import settings
 from clippings.test.object_mother import ObjectMother
 from clippings.users.adapters.password_hashers import PBKDF2PasswordHasher
-from clippings.users.adapters.storages import MockUsersStorage
+from clippings.users.adapters.storages import MemoryUsersStorage
 from clippings.users.ports import PasswordHasherABC
 
 pytest_plugins = [
@@ -55,18 +58,13 @@ def mother():
 
 
 @pytest.fixture()
-def mock_storage_books_map():
-    return {}
+def memory_book_storage() -> MemoryBooksStorage:
+    return MemoryBooksStorage()
 
 
 @pytest.fixture()
-def mock_book_storage(mock_storage_books_map) -> MockBooksStorage:
-    return MockBooksStorage(books_map=mock_storage_books_map)
-
-
-@pytest.fixture()
-def mock_deleted_hash_storage() -> MockDeletedHashStorage:
-    return MockDeletedHashStorage()
+def memory_deleted_hash_storage() -> MemoryDeletedHashStorage:
+    return MemoryDeletedHashStorage()
 
 
 @pytest.fixture()
@@ -75,8 +73,8 @@ def mock_clipping_reader() -> MockClippingsReader:
 
 
 @pytest.fixture()
-def mock_users_storage():
-    return MockUsersStorage()
+def memory_users_storage():
+    return MemoryUsersStorage()
 
 
 @pytest.fixture()
@@ -102,7 +100,7 @@ def enrich_books_meta_service(mock_book_info_client):
 
 
 @pytest.fixture()
-async def user(mother, mock_users_storage):
+async def user(mother, memory_users_storage):
     new_user = mother.user()
-    await mock_users_storage.add(new_user)
+    await memory_users_storage.add(new_user)
     return new_user

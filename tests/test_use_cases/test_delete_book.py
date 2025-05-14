@@ -5,19 +5,19 @@ from clippings.seedwork.exceptions import CantFindEntityError
 
 
 @pytest.fixture()
-def make_sut(mock_book_storage, mock_deleted_hash_storage):
-    def _make_sut(books_storage=mock_book_storage):
+def make_sut(memory_book_storage, memory_deleted_hash_storage):
+    def _make_sut(books_storage=memory_book_storage):
         return DeleteBookUseCase(
-            book_storage=books_storage, deleted_hash_storage=mock_deleted_hash_storage
+            book_storage=books_storage, deleted_hash_storage=memory_deleted_hash_storage
         )
 
     return _make_sut
 
 
-async def test_remove_book(make_sut, mock_book_storage, mother):
+async def test_remove_book(make_sut, memory_book_storage, mother):
     # Arrange
     book = mother.book(id="book-id")
-    await mock_book_storage.add(book)
+    await memory_book_storage.add(book)
     sut = make_sut()
 
     # Act
@@ -25,7 +25,7 @@ async def test_remove_book(make_sut, mock_book_storage, mother):
 
     # Assert
     assert result is None
-    removed_book = await mock_book_storage.get("book-id")
+    removed_book = await memory_book_storage.get("book-id")
     assert removed_book is None
 
 
