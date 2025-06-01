@@ -5,20 +5,20 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from clippings.books.adapters.storages import MockBooksStorage, MongoBooksStorage
+from clippings.books.adapters.storages import MemoryBooksStorage, MongoBooksStorage
 from clippings.books.entities import Book
 
 if TYPE_CHECKING:
     from clippings.books.ports import BooksStorageABC
 
 
-@pytest.fixture(params=["mock", "mongo"])
+@pytest.fixture(params=["memory", "mongo"])
 def make_sut(request, mongo_db):
     async def _make_sut(
         books: list[Book] | None = None, user_id: str = "test_user:1"
     ) -> BooksStorageABC:
-        if request.param == "mock":
-            storage = MockBooksStorage()
+        if request.param == "memory":
+            storage = MemoryBooksStorage()
         elif request.param == "mongo":
             storage = MongoBooksStorage(mongo_db, user_id)
         else:

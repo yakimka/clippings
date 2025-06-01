@@ -13,8 +13,8 @@ from clippings.seedwork.exceptions import DomainError
 
 
 @pytest.fixture()
-def make_sut(mock_book_storage, enrich_books_meta_service):
-    def _make_sut(books_storage=mock_book_storage):
+def make_sut(memory_book_storage, enrich_books_meta_service):
+    def _make_sut(books_storage=memory_book_storage):
         return EditBookUseCase(
             book_storage=books_storage,
             enrich_books_meta_service=enrich_books_meta_service,
@@ -23,10 +23,12 @@ def make_sut(mock_book_storage, enrich_books_meta_service):
     return _make_sut
 
 
-async def test_update_book_with_title_and_authors(make_sut, mock_book_storage, mother):
+async def test_update_book_with_title_and_authors(
+    make_sut, memory_book_storage, mother
+):
     # Arrange
     book = mother.book(id="book-id", title="Old Title", authors=["Old Author"])
-    await mock_book_storage.add(book)
+    await memory_book_storage.add(book)
     sut = make_sut()
     fields = [TitleDTO(title="New Title", authors="New Author")]
 
@@ -35,7 +37,7 @@ async def test_update_book_with_title_and_authors(make_sut, mock_book_storage, m
 
     # Assert
     assert result is None
-    updated_book = await mock_book_storage.get("book-id")
+    updated_book = await memory_book_storage.get("book-id")
     assert updated_book.title == "New Title"
     assert updated_book.authors_to_str() == "New Author"
 
@@ -49,13 +51,13 @@ async def test_update_book_with_title_and_authors(make_sut, mock_book_storage, m
     ],
 )
 async def test_update_book_with_title_or_authors_set_cover(
-    new_title, new_author, make_sut, mock_book_storage, mother
+    new_title, new_author, make_sut, memory_book_storage, mother
 ):
     # Arrange
     book = mother.book(
         id="book-id", title="Old Title", authors=["Old Author"], meta=None
     )
-    await mock_book_storage.add(book)
+    await memory_book_storage.add(book)
     sut = make_sut()
     fields = [TitleDTO(title=new_title, authors=new_author)]
 
@@ -64,15 +66,15 @@ async def test_update_book_with_title_or_authors_set_cover(
 
     # Assert
     assert result is None
-    updated_book = await mock_book_storage.get("book-id")
+    updated_book = await memory_book_storage.get("book-id")
     assert updated_book.meta is not None
 
 
 @pytest.mark.parametrize("new_rating", [9, None])
-async def test_update_book_rating(make_sut, mock_book_storage, mother, new_rating):
+async def test_update_book_rating(make_sut, memory_book_storage, mother, new_rating):
     # Arrange
     book = mother.book(id="book-id", rating=3)
-    await mock_book_storage.add(book)
+    await memory_book_storage.add(book)
     sut = make_sut()
     fields = [RatingDTO(rating=new_rating)]
 
@@ -81,14 +83,14 @@ async def test_update_book_rating(make_sut, mock_book_storage, mother, new_ratin
 
     # Assert
     assert result is None
-    updated_book = await mock_book_storage.get("book-id")
+    updated_book = await memory_book_storage.get("book-id")
     assert updated_book.rating == new_rating
 
 
-async def test_update_book_review(make_sut, mock_book_storage, mother):
+async def test_update_book_review(make_sut, memory_book_storage, mother):
     # Arrange
     book = mother.book(id="book-id", review="Old Review")
-    await mock_book_storage.add(book)
+    await memory_book_storage.add(book)
     sut = make_sut()
     fields = [ReviewDTO(review="New Review")]
 
@@ -97,7 +99,7 @@ async def test_update_book_review(make_sut, mock_book_storage, mother):
 
     # Assert
     assert result is None
-    updated_book = await mock_book_storage.get("book-id")
+    updated_book = await memory_book_storage.get("book-id")
     assert updated_book.review == "New Review"
 
 
@@ -128,10 +130,10 @@ async def test_do_not_update_when_no_fields_change(make_sut, mother):
     book_storage.add.assert_not_awaited()
 
 
-async def test_return_error_when_book_not_found(make_sut, mock_book_storage, mother):
+async def test_return_error_when_book_not_found(make_sut, memory_book_storage, mother):
     # Arrange
     book = mother.book(id="book-id")
-    await mock_book_storage.add(book)
+    await memory_book_storage.add(book)
     sut = make_sut()
     fields = []
 

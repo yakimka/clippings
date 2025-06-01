@@ -20,6 +20,9 @@ if TYPE_CHECKING:
     from clippings.books.ports import BookIdGenerator
 
 
+pytestmark = pytest.mark.usefixtures("user")
+
+
 @pytest.fixture()
 def autoincrement_id_generator() -> BookIdGenerator:
     ids = (str(i) for i in range(1, 1000))
@@ -28,25 +31,27 @@ def autoincrement_id_generator() -> BookIdGenerator:
 
 @pytest.fixture()
 def sut(
-    mock_book_storage,
+    memory_book_storage,
     mock_clipping_reader,
     autoincrement_id_generator,
-    mock_deleted_hash_storage,
+    memory_deleted_hash_storage,
     enrich_books_meta_service,
+    memory_users_storage,
 ) -> ImportClippingsUseCase:
     return ImportClippingsUseCase(
-        storage=mock_book_storage,
+        storage=memory_book_storage,
         reader=mock_clipping_reader,
-        deleted_hash_storage=mock_deleted_hash_storage,
+        deleted_hash_storage=memory_deleted_hash_storage,
         enrich_books_meta_service=enrich_books_meta_service,
         book_id_generator=autoincrement_id_generator,
         clipping_id_generator=clipping_id_generator,
         inline_note_id_generator=inline_note_id_generator,
+        users_storage=memory_users_storage,
     )
 
 
 async def test_import_single_clipping(
-    sut, mother, mock_clipping_reader, mock_book_storage
+    sut, mother, mock_clipping_reader, memory_book_storage
 ):
     # Arrange
     mock_clipping_reader.clippings = [
@@ -62,10 +67,10 @@ async def test_import_single_clipping(
     ]
 
     # Act
-    await sut.execute()
+    await sut.execute(user_id="user:42")
 
     # Assert
-    book = await mock_book_storage.get("1")
+    book = await memory_book_storage.get("1")
 
     assert book == Book(
         id="1",
@@ -93,20 +98,20 @@ async def test_import_single_clipping(
 
 
 async def test_use_unknown_author_if_authors_is_empty(
-    sut, mother, mock_clipping_reader, mock_book_storage
+    sut, mother, mock_clipping_reader, memory_book_storage
 ):
     mock_clipping_reader.clippings = [
         mother.clipping_import_candidate_dto(book_authors="")
     ]
 
-    await sut.execute()
+    await sut.execute(user_id="user:42")
 
-    book = await mock_book_storage.get("1")
+    book = await memory_book_storage.get("1")
     assert book.authors == ["Unknown Author"]
 
 
 async def test_import_multiple_clippings_to_new_books(
-    sut, mother, mock_clipping_reader, mock_book_storage
+    sut, mother, mock_clipping_reader, memory_book_storage
 ):
     # Arrange
     mock_clipping_reader.clippings = [
@@ -131,11 +136,11 @@ async def test_import_multiple_clippings_to_new_books(
     ]
 
     # Act
-    result = await sut.execute()
+    result = await sut.execute(user_id="user:42")
 
     # Assert
-    book_one = await mock_book_storage.get("1")
-    book_two = await mock_book_storage.get("2")
+    book_one = await memory_book_storage.get("1")
+    book_two = await memory_book_storage.get("2")
 
     assert book_one.title == "Book One"
     assert len(book_one.clippings) == 1
@@ -162,10 +167,10 @@ async def test_import_multiple_clippings_to_new_books(
 
 
 async def test_update_existing_book_with_new_clipping(
-    sut, mother, mock_clipping_reader, mock_book_storage
+    sut, mother, mock_clipping_reader, memory_book_storage
 ):
     # Arrange
-    await mock_book_storage.add(
+    await memory_book_storage.add(
         mother.book(
             id="1",
             title="The Book",
@@ -189,10 +194,10 @@ async def test_update_existing_book_with_new_clipping(
     ]
 
     # Act
-    result = await sut.execute()
+    result = await sut.execute(user_id="user:42")
 
     # Assert
-    updated_book = await mock_book_storage.get("1")
+    updated_book = await memory_book_storage.get("1")
     assert len(updated_book.clippings) == 2
     assert updated_book.clippings[1].content == "New Clipping"
 
@@ -207,10 +212,10 @@ async def test_update_existing_book_with_new_clipping(
 
 
 async def test_no_new_clippings_should_not_update_books(
-    sut, mother, mock_clipping_reader, mock_book_storage
+    sut, mother, mock_clipping_reader, memory_book_storage
 ):
     # Arrange
-    await mock_book_storage.add(
+    await memory_book_storage.add(
         mother.book(
             id="1",
             title="The Book",
@@ -221,9 +226,9 @@ async def test_no_new_clippings_should_not_update_books(
     mock_clipping_reader.clippings = []
 
     # Act
-    result = await sut.execute()
+    result = await sut.execute(user_id="user:42")
 
     # Assert
-    updated_book = await mock_book_storage.get("1")
+    updated_book = await memory_book_storage.get("1")
     assert len(updated_book.clippings) == 1  # No new clippings added
     assert result == []  # No new books or clippings to update
