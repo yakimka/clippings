@@ -72,7 +72,7 @@ app = Starlette(
     exception_handlers=exception_handlers,
 )
 
-with registry.resolve([get_infrastructure_settings]) as (settings,):
+with registry.resolve(get_infrastructure_settings) as settings:
     if settings.sentry_dsn:
         sentry_sdk.init(
             dsn=settings.sentry_dsn,
