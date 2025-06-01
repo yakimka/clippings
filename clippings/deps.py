@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
-from picodi import Provide, SingletonScope, inject, registry
+from picodi import Provide, SingletonScope, registry
 from picodi.helpers import resolve
 
 from clippings.books.adapters.storages import (
@@ -35,7 +35,6 @@ def get_default_adapters() -> AdaptersSettings:
 
 
 @registry.set_scope(scope_class=SingletonScope, auto_init=True)
-@inject
 def get_infrastructure_settings(
     default_adapters: AdaptersSettings = Provide(get_default_adapters),
 ) -> InfrastructureSettings:
@@ -51,7 +50,6 @@ def get_user_id() -> str:
     raise NotImplementedError("This dependency needs to be overridden")
 
 
-@inject
 def get_user_books_map(
     books_map: dict[str, dict[str, Book]] = Provide(get_books_map),
     user_id: str = Provide(get_user_id),
@@ -59,7 +57,6 @@ def get_user_books_map(
     return books_map.setdefault(user_id, {})
 
 
-@inject
 def get_mongo_client(
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> AsyncIOMotorClient:
@@ -72,7 +69,6 @@ def get_mongo_database_name() -> str:
     return "clippings_db"
 
 
-@inject
 def get_mongo_database(
     mongo_client: AsyncIOMotorClient = Provide(get_mongo_client),
     database_name: str = Provide(get_mongo_database_name),
@@ -85,14 +81,12 @@ async def get_users_map() -> dict[str, User]:
     return {}
 
 
-@inject
 def get_memory_books_storage(
     books_map: dict[str, Book] = Provide(get_user_books_map),
 ) -> MemoryBooksStorage:
     return MemoryBooksStorage(books_map)
 
 
-@inject
 def get_mongo_books_storage(
     db: AsyncIOMotorDatabase = Provide(get_mongo_database),
     user_id: str = Provide(get_user_id),
@@ -100,7 +94,6 @@ def get_mongo_books_storage(
     return MongoBooksStorage(db, user_id=user_id)
 
 
-@inject
 def get_books_storage(
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> BooksStorageABC:
@@ -117,7 +110,6 @@ async def get_deleted_hashes_map() -> dict[str, dict[str, DeletedHash]]:
     return {}
 
 
-@inject
 def get_user_deleted_hashes_map(
     deleted_hashes_map: dict[str, dict[str, DeletedHash]] = Provide(
         get_deleted_hashes_map
@@ -127,14 +119,12 @@ def get_user_deleted_hashes_map(
     return deleted_hashes_map.setdefault(user_id, {})
 
 
-@inject
 def get_memory_deleted_hash_storage(
     deleted_hashes_map: dict[str, DeletedHash] = Provide(get_user_deleted_hashes_map),
 ) -> MemoryDeletedHashStorage:
     return MemoryDeletedHashStorage(deleted_hashes_map)
 
 
-@inject
 def get_mongo_deleted_hash_storage(
     db: AsyncIOMotorDatabase = Provide(get_mongo_database),
     user_id: str = Provide(get_user_id),
@@ -142,7 +132,6 @@ def get_mongo_deleted_hash_storage(
     return MongoDeletedHashStorage(db, user_id)
 
 
-@inject
 def get_deleted_hash_storage(
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> DeletedHashStorageABC:
@@ -154,21 +143,18 @@ def get_deleted_hash_storage(
         return storage
 
 
-@inject
 def get_memory_users_storage(
     users_map: dict = Provide(get_users_map),
 ) -> MemoryUsersStorage:
     return MemoryUsersStorage(users_map)
 
 
-@inject
 def get_mongo_users_storage(
     db: AsyncIOMotorDatabase = Provide(get_mongo_database),
 ) -> MongoUsersStorage:
     return MongoUsersStorage(db)
 
 
-@inject
 def get_users_storage(
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> UsersStorageABC:
@@ -180,7 +166,6 @@ def get_users_storage(
         return storage
 
 
-@inject
 def get_password_hasher() -> PasswordHasherABC:
     return PBKDF2PasswordHasher()
 
@@ -190,7 +175,6 @@ def get_mock_book_info_client() -> MockBookInfoClient:
 
 
 @registry.set_scope(scope_class=SingletonScope)
-@inject
 async def get_google_book_info_client(
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> AsyncGenerator[GoogleBookInfoClient, None]:
@@ -208,7 +192,6 @@ async def get_google_book_info_client(
 
 
 @registry.set_scope(scope_class=SingletonScope, auto_init=True)
-@inject
 async def get_book_info_client(
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> AsyncGenerator[BookInfoClientABC, None]:

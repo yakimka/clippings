@@ -72,15 +72,14 @@ app = Starlette(
     exception_handlers=exception_handlers,
 )
 
-settings = get_infrastructure_settings()
-
-if settings.sentry_dsn:
-    sentry_sdk.init(
-        dsn=settings.sentry_dsn,
-        traces_sample_rate=0.3,
-        profiles_sample_rate=0.3,
-        integrations=[StarletteIntegration()],
-    )
+with registry.resolve([get_infrastructure_settings]) as (settings,):
+    if settings.sentry_dsn:
+        sentry_sdk.init(
+            dsn=settings.sentry_dsn,
+            traces_sample_rate=0.3,
+            profiles_sample_rate=0.3,
+            integrations=[StarletteIntegration()],
+        )
 
 if __name__ == "__main__":
     import uvicorn
