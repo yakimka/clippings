@@ -28,5 +28,10 @@ class CreateUserCommand(AsyncCommand):
             warn("Using --password is not recommended, use interactive mode instead")
         password = args.password or getpass.getpass(f"Password for {args.nickname}: ")
         controller = CreateUserController()
-        result = await controller.execute(args.nickname, password)
+        result = await controller.execute(
+            args.nickname,
+            password,
+            max_books=args.max_books,
+            max_clippings_per_book=args.max_clippings_per_book,
+        )
         render_result(result)
