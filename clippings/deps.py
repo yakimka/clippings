@@ -3,8 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
-from picodi import Provide, SingletonScope, registry
-from picodi.helpers import resolve
+from picodi import Provide, Registry, SingletonScope, registry
 
 from clippings.books.adapters.storages import (
     MemoryBooksStorage,
@@ -95,13 +94,14 @@ def get_mongo_books_storage(
 
 
 def get_books_storage(
+    registry: Registry,
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> BooksStorageABC:
     variants: dict[str, Callable[..., Any]] = {
         "memory": get_memory_books_storage,
         "mongo": get_mongo_books_storage,
     }
-    with resolve(variants[infra_settings.adapters.books_storage]) as storage:
+    with registry.resolve(variants[infra_settings.adapters.books_storage]) as storage:
         return storage
 
 
@@ -133,13 +133,16 @@ def get_mongo_deleted_hash_storage(
 
 
 def get_deleted_hash_storage(
+    registry: Registry,
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> DeletedHashStorageABC:
     variants: dict[str, Callable[..., Any]] = {
         "memory": get_memory_deleted_hash_storage,
         "mongo": get_mongo_deleted_hash_storage,
     }
-    with resolve(variants[infra_settings.adapters.deleted_hash_storage]) as storage:
+    with registry.resolve(
+        variants[infra_settings.adapters.deleted_hash_storage]
+    ) as storage:
         return storage
 
 
@@ -156,13 +159,14 @@ def get_mongo_users_storage(
 
 
 def get_users_storage(
+    registry: Registry,
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> UsersStorageABC:
     variants: dict[str, Callable[..., Any]] = {
         "memory": get_memory_users_storage,
         "mongo": get_mongo_users_storage,
     }
-    with resolve(variants[infra_settings.adapters.users_storage]) as storage:
+    with registry.resolve(variants[infra_settings.adapters.users_storage]) as storage:
         return storage
 
 
@@ -193,11 +197,14 @@ async def get_google_book_info_client(
 
 @registry.set_scope(scope_class=SingletonScope, auto_init=True)
 async def get_book_info_client(
+    registry: Registry,
     infra_settings: InfrastructureSettings = Provide(get_infrastructure_settings),
 ) -> AsyncGenerator[BookInfoClientABC, None]:
     variants: dict[str, Callable[..., Any]] = {
         "mock": get_mock_book_info_client,
         "google": get_google_book_info_client,
     }
-    async with resolve(variants[infra_settings.adapters.book_info_client]) as client:
+    async with registry.aresolve(
+        variants[infra_settings.adapters.book_info_client]
+    ) as client:
         yield client  # noqa: ASYNC119
