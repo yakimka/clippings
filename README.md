@@ -24,7 +24,7 @@ This project aims to:
 - **Promote Data Portability:** Export your data in an open format, ensuring you always have control
   over your information.
 
-![Books List Screenshot](/screenshots/books_list.png)
+![Books List Screenshot](https://github.com/yakimka/clippings/blob/main/screenshots/books_list.png)
 
 ## Key Features
 
@@ -51,7 +51,7 @@ This project aims to:
 - **Responsive Design:** Access your clippings on various devices thanks to a clean, responsive
   interface built with Pico.css.
 
-![Books Page Screenshot](/screenshots/book.png)
+![Books Page Screenshot](https://github.com/yakimka/clippings/blob/main/screenshots/book.png)
 
 ## Who is this for?
 
