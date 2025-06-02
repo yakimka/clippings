@@ -46,7 +46,10 @@ class ClippingsRestoreController:
             enrich_books_meta_service=enrich_books_meta_service,
             users_storage=self._users_storage,
         )
-        result = await use_case.execute(backup, user_id=user_id)
+        try:
+            result = await use_case.execute(backup, user_id=user_id)
+        except Exception:  # noqa: PIE786
+            return HTMLResponse(payload="Something went wrong while restoring data")
         if isinstance(result, DomainError):
             return HTMLResponse(payload=str(result))
         return HTMLResponse(payload="Data restored")
