@@ -69,6 +69,23 @@ passive reading into an active and reusable knowledge base.
 
 ## Development
 
+### Architecture
+
+This project is an experimental endeavor into Clean Architecture principles. The primary motivation
+was to explore this architectural style and its practical application.
+
+This approach is also intended to lay a flexible foundation for future enhancements. Specifically,
+there are plans to introduce a Text User Interface (TUI) alongside the existing web interface. This
+TUI would manage clippings stored in local files, offering an alternative to the current
+database-backed storage, and the Clean Architecture design facilitates such an extension by
+decoupling business logic from specific delivery mechanisms and data storage solutions.
+
+Another experimental aspect of this project is the handling of errors within the domain layer.
+Instead of relying heavily on `try/except` blocks for flow control, the domain logic primarily
+returns errors as values.
+This was an intentional choice to explore alternative error management strategies and
+their impact on code clarity and robustness.
+
 ### Quick Start
 
 1. Clone the repository:
@@ -106,7 +123,7 @@ passive reading into an active and reusable knowledge base.
    ```bash
    make poetry args="<poetry-args>"
    ```
-   - For example: `make poetry args="add requests"`
+    - For example: `make poetry args="add requests"`
 
 5. For local CI debugging:
    ```bash
@@ -116,6 +133,7 @@ passive reading into an active and reusable knowledge base.
 #### Pre-commit Hooks
 
 We use [pre-commit](https://pre-commit.com/) for linting and formatting:
+
 - It runs inside a Docker container by default.
 - Optionally, set up hooks locally:
   ```bash
