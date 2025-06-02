@@ -144,8 +144,12 @@ class KindleClippingMetadataParser:
         clipping_type = self._parse_clipping_type(metadata)
         if isinstance(clipping_type, DomainError):
             return clipping_type
-        page, loc = self._parse_page_and_loc(metadata)
-        added_at = self._parse_date(metadata)
+        try:
+            page, loc = self._parse_page_and_loc(metadata)
+            added_at = self._parse_date(metadata)
+        except Exception:  # noqa: PIE786
+            return DomainError("Can't parse metadata from file")
+
         return {
             "type": clipping_type,
             "page": page,
